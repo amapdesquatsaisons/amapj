@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.amapj.model.models.acces.RoleList;
+import fr.amapj.service.services.parametres.ParamEcranDTO;
 import fr.amapj.service.services.parametres.ParametresDTO;
 import fr.amapj.service.services.parametres.ParametresService;
 import fr.amapj.service.services.session.SessionManager;
@@ -141,12 +142,13 @@ public class MenuInfo
 	public List<MenuDescription> getMenu()
 	{
 		ParametresDTO param = new ParametresService().getParametres();
+		List<ParamEcranDTO> dtos = new ParametresService().getAllParamEcranDTO();
 		List<MenuDescription> res = new ArrayList<MenuDescription>();
 		List<RoleList> roles = SessionManager.getSessionParameters().userRole;
 		
 		for (MenuDescription mn : menus)
 		{
-			if ( mn.hasRole(roles) && mn.hasModule(param) ) 
+			if ( mn.hasRole(roles) && mn.hasModule(param) && mn.complyParamEcan(roles,dtos)) 
 			{
 				res.add(mn);
 			}

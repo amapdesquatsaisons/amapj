@@ -26,6 +26,7 @@ import fr.amapj.service.services.mescontrats.MesContratsService;
 import fr.amapj.view.engine.grid.integergrid.IntegerGridParam;
 import fr.amapj.view.engine.popup.PopupListener;
 import fr.amapj.view.engine.popup.corepopup.CorePopup;
+import fr.amapj.view.engine.popup.formpopup.OnSaveException;
 
 public class SaisieContrat
 {
@@ -68,8 +69,15 @@ public class SaisieContrat
 				}
 				else if (data.modeSaisie==ModeSaisie.QTE_SEUL)
 				{
-					new MesContratsService().saveNewContrat(data.contratDTO,data.userId);
-					listener.onPopupClose();
+					try
+					{
+						new MesContratsService().saveNewContrat(data.contratDTO,data.userId);
+						listener.onPopupClose();
+					} 
+					catch (OnSaveException e)
+					{
+						e.showInNewDialogBox();
+					}
 				}
 				// Sinon on continue
 				else

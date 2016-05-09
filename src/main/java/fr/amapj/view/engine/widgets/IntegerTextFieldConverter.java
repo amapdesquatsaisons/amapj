@@ -37,6 +37,10 @@ public class IntegerTextFieldConverter implements Converter
 		if (value!=null)
 		{
 			String str = (String) value;
+			
+			// Suppression des espaces
+			str = str.trim();
+			
 			if (str.length()==0)
 			{
 				return new Integer(0);

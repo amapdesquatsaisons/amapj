@@ -20,12 +20,15 @@
  */
  package fr.amapj.view.views.common.contrattelecharger;
 
+import fr.amapj.service.services.editionspe.EditionSpeService;
 import fr.amapj.service.services.excelgenerator.EGBilanCompletCheque;
 import fr.amapj.service.services.excelgenerator.EGCollecteCheque;
 import fr.amapj.service.services.excelgenerator.EGContratUtilisateur;
 import fr.amapj.service.services.excelgenerator.EGFeuilleLivraison;
 import fr.amapj.service.services.excelgenerator.EGLiasseContratUtilisateur;
 import fr.amapj.service.services.excelgenerator.EGSyntheseContrat;
+import fr.amapj.service.services.pdfgenerator.PGEngagement;
+import fr.amapj.service.services.producteur.ProducteurService;
 import fr.amapj.view.engine.excelgenerator.TelechargerPopup;
 import fr.amapj.view.engine.popup.PopupListener;
 import fr.amapj.view.engine.popup.corepopup.CorePopup;
@@ -53,6 +56,11 @@ public class TelechargerContrat
 		popup.addGenerator(new EGBilanCompletCheque(idModeleContrat));
 		popup.addGenerator(new EGLiasseContratUtilisateur(idModeleContrat));
 		popup.addGenerator(new EGSyntheseContrat(idModeleContrat));
+		
+		if (new EditionSpeService().needEngagement(idModeleContrat))
+		{
+			// TODO popup.addGenerator(new PGEngagement(idModeleContrat));
+		}
 				
 		CorePopup.open(popup,listener);
 	}

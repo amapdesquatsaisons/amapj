@@ -55,7 +55,7 @@ public class DemarrageAppInstanceService
 	{
 		DbManager dbManager = AppInitializer.dbManager;
 		AppInstanceService service =  new AppInstanceService();
-		List<AppInstanceDTO> dtos = service.getAllInstances();
+		List<AppInstanceDTO> dtos = service.getAllInstances(false);
 		for (AppInstanceDTO dto : dtos)
 		{
 			dbManager.addDataBase(dto,AppState.ON);

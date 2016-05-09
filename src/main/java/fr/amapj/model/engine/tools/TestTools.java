@@ -23,6 +23,7 @@
 import fr.amapj.model.engine.db.DbManager;
 import fr.amapj.model.engine.transaction.DataBaseInfo;
 import fr.amapj.model.engine.transaction.DbUtil;
+import fr.amapj.service.engine.appinitializer.VelocityInitializer;
 import fr.amapj.service.services.appinstance.AppInstanceDTO;
 import fr.amapj.service.services.appinstance.AppState;
 import fr.amapj.service.services.appinstance.DemarrageAppInstanceService;
@@ -38,7 +39,7 @@ public class TestTools
 		dbManager.startAllDbms();
 		dbManager.startMasterBase();
 		
-		//new DemarrageAppInstanceService().startAllDbs();
+		VelocityInitializer.load();
 		
 		
 		AppInstanceDTO dto = new AppInstanceDTO();

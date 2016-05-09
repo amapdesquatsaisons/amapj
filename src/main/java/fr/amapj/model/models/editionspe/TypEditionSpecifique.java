@@ -26,6 +26,8 @@ public enum TypEditionSpecifique
 	ETIQUETTE_PRODUCTEUR ,
 	
 	// 
-	PLANNING_MENSUEL ;
+	PLANNING_MENSUEL ,
+	
+	ENGAGEMENT;
 
 }

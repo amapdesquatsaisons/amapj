@@ -34,6 +34,8 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 
+import fr.amapj.common.AmapjException;
+import fr.amapj.common.AmapjRuntimeException;
 import fr.amapj.common.StackUtils;
 import fr.amapj.service.services.session.SessionManager;
 import fr.amapj.service.services.session.SessionParameters;
@@ -73,10 +75,7 @@ public class ErrorPopup extends CorePopup
 		popupTitle = "Erreur";
 	}
 	
-	public ErrorPopup(Throwable throwable)
-	{
-		this(null,throwable);
-	}
+	
 	
 	
 	
@@ -158,9 +157,32 @@ public class ErrorPopup extends CorePopup
 	 */	
 	static public void open(Throwable throwable)
 	{
-		open(new ErrorPopup(throwable));
+		String msg = findMessage(throwable);
+		open(new ErrorPopup(msg,throwable));
 	}
 	
+	/**
+	 * Permet de fouiller la stack pour retrouver un message d'erreur pertinent
+	 * @param t
+	 * @return
+	 */
+	private static String findMessage(Throwable t)
+	{
+		if (t instanceof com.vaadin.server.ServerRpcManager.RpcInvocationException)
+		{
+			t = t.getCause();
+			while(t!=null)
+			{
+				if ( (t instanceof AmapjRuntimeException) || (t instanceof AmapjException) )
+				{
+					return t.getMessage();
+				}
+				t = t.getCause();
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * Attention : cette méthode rend la main tout de suite, ca n'attend pas 
 	 * le clic de l'opérateur 

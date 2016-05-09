@@ -23,6 +23,8 @@
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.amapj.view.engine.popup.messagepopup.MessagePopup;
+
 @SuppressWarnings("serial")
 public class OnSaveException extends Exception
 {
@@ -50,6 +52,16 @@ public class OnSaveException extends Exception
 	public List<String> getAllMessages()
 	{
 		return errorMessage;
+	}
+
+	/**
+	 * Ouvre un popup avec la liste des messages
+	 * Attention : cette méthode rend la main tout de suite, sans attendre le clic 
+	 * sur OK par l'utilisateur 
+	 */
+	public void showInNewDialogBox()
+	{
+		MessagePopup.open(new MessagePopup("Impossible de sauvegarder", errorMessage));
 	}
 
 }

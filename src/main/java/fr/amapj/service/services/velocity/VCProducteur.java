@@ -18,22 +18,23 @@
  * 
  * 
  */
- package fr.amapj.service.engine.excelgenerator;
+ package fr.amapj.service.services.velocity;
 
 
-
-/**
- * 
- * 
- *  
- *
- */
-public class FileInfoDTO
+public class VCProducteur extends VCPersonne
 {
-	public String nameToDisplay;
+	public String libContrat;
+
+	public String getLibContrat()
+	{
+		return libContrat;
+	}
+
+	public void setLibContrat(String libContrat)
+	{
+		this.libContrat = libContrat;
+	}
 	
-	public String fileName;
 	
-	public AbstractExcelGenerator generator;
-	
+
 }

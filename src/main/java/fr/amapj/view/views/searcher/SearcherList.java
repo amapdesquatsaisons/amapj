@@ -23,6 +23,7 @@
 import fr.amapj.model.models.contrat.modele.ModeleContrat;
 import fr.amapj.model.models.cotisation.PeriodeCotisation;
 import fr.amapj.model.models.editionspe.EditionSpecifique;
+import fr.amapj.model.models.editionspe.TypEditionSpecifique;
 import fr.amapj.model.models.fichierbase.Producteur;
 import fr.amapj.view.engine.searcher.BasicSearcher;
 import fr.amapj.view.engine.searcher.SearcherDefinition;
@@ -41,7 +42,9 @@ public class SearcherList
 	
 	static public SearcherDefinition PERIODE_COTISATION = new BasicSearcher("Période de cotisation", PeriodeCotisation.class, "nom");
 	
-	static public SearcherDefinition ETIQUETTE = new SDEtiquette();
+	static public SearcherDefinition ETIQUETTE = new SDEditionSpe(TypEditionSpecifique.ETIQUETTE_PRODUCTEUR);
+	
+	static public SearcherDefinition ENGAGEMENT = new SDEditionSpe(TypEditionSpecifique.ENGAGEMENT);
 	
 	// Searcher d'un produit lié à un producteur
 	// Permet de lister tous les produits d'un producteur donné

@@ -6,7 +6,7 @@
 	<groupId>fr.amapj</groupId>
 	<artifactId>amapj</artifactId>
 	<packaging>war</packaging>
-	<version>007</version>
+	<version>008</version>
 
 	<name>AMAPJ</name>
 
@@ -120,12 +120,29 @@
 			<artifactId>poi-ooxml</artifactId>
 			<version>3.14</version>
 		</dependency>
+		
+		<!-- ODF -->
+		<dependency>
+		    <groupId>org.odftoolkit</groupId>
+		    <artifactId>odfdom-java</artifactId>
+		    <version>0.8.7</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.odftoolkit</groupId>
+		    <artifactId>simple-odf</artifactId>
+		    <version>0.6.6</version>
+		</dependency>
 
 		<!-- Utils -->
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 			<version>2.6.2</version>
+		</dependency>
+		<dependency>
+		    <groupId>com.google.guava</groupId>
+		    <artifactId>guava</artifactId>
+		    <version>19.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.mail</groupId>
@@ -142,6 +159,11 @@
 			<artifactId>commons-lang</artifactId>
 			<version>2.6</version>
 		</dependency>
+		<dependency>
+		    <groupId>org.apache.velocity</groupId>
+		    <artifactId>velocity</artifactId>
+		    <version>1.7</version>
+		</dependency>
 
 		<!-- JEE -->
 		<dependency>
@@ -157,6 +179,7 @@
 			<version>4.12</version>
 			<!-- >scope>test</scope -->
 		</dependency>
+		
 	</dependencies>
 
 	<!-- Build -->

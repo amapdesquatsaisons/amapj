@@ -39,9 +39,9 @@ import fr.amapj.model.models.contrat.modele.ModeleContratDate;
 import fr.amapj.model.models.contrat.modele.ModeleContratProduit;
 import fr.amapj.model.models.contrat.reel.Contrat;
 import fr.amapj.model.models.fichierbase.Utilisateur;
-import fr.amapj.service.engine.excelgenerator.AbstractExcelGenerator;
-import fr.amapj.service.engine.excelgenerator.ExcelFormat;
-import fr.amapj.service.engine.excelgenerator.ExcelGeneratorTool;
+import fr.amapj.service.engine.generator.excel.AbstractExcelGenerator;
+import fr.amapj.service.engine.generator.excel.ExcelFormat;
+import fr.amapj.service.engine.generator.excel.ExcelGeneratorTool;
 import fr.amapj.service.services.editionspe.EditionSpeService;
 import fr.amapj.service.services.gestioncontrat.GestionContratService;
 import fr.amapj.service.services.mescontrats.ContratDTO;
@@ -90,7 +90,7 @@ public class EGSyntheseContrat  extends AbstractExcelGenerator
 		List<ModeleContratDate> dates = new GestionContratService().getAllDates(em, mc);
 
 		// Avec une sous requete, on obtient la liste de tous les utilisateur ayant commandé au moins un produit
-		List<Utilisateur> utilisateurs = getUtilisateur(em, mc);
+		List<Utilisateur> utilisateurs = new MesContratsService().getUtilisateur(em, mc);
 		
 		// On charge ensuite la liste de tous les contrats pour chaque utilisateur
 		Map<Utilisateur, ContratDTO> contrats = loadContrat(em,utilisateurs,mc);
@@ -354,15 +354,6 @@ public class EGSyntheseContrat  extends AbstractExcelGenerator
 		}
 		return -1;
 	}
-
-	public List<Utilisateur> getUtilisateur(EntityManager em, ModeleContrat mc)
-	{
-		Query q = em.createQuery("select u from Utilisateur u WHERE EXISTS (select c from Contrat c where c.utilisateur = u and c.modeleContrat=:mc) ORDER BY u.nom,u.prenom");
-		q.setParameter("mc",mc);
-		List<Utilisateur> us = q.getResultList();
-		return us;
-	}
-
 	
 	
 	private ContratDTO findContrat(EntityManager em,Utilisateur utilisateur,ModeleContrat mc)

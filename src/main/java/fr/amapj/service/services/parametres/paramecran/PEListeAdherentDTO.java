@@ -18,19 +18,24 @@
  * 
  * 
  */
- package fr.amapj.service.engine.excelgenerator;
-
+ package fr.amapj.service.services.parametres.paramecran;
 
 
 /**
- * Permet la gestion des extractions excels
- * 
- *  
- *
+ * Parametrage de l'écran liste des adhérents
  */
-public enum ExcelFormat
+public class PEListeAdherentDTO
 {
-	XLS , 
-	XLSX
+	// Indique si l'utiisateur courant peut accéder aux e mails 
+	public boolean canAccessEmail = true;
+
+	// Indique si l'utiisateur courant peut accéder aux numéros de telephone 1 
+	public boolean canAccessTel1 = true;
+
+	// Indique si l'utiisateur courant peut accéder aux numéros de telephone 2 
+	public boolean canAccessTel2 = true ;
+	
+	// Indique si l'utiisateur courant peut accéder aux 3 élements d'adresse
+	public boolean canAccessAdress = true ;
 
 }

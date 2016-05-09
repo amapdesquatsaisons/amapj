@@ -10,6 +10,7 @@
  <Parameter name="master.dbms" value="hi"  />
  <Parameter name="master.name" value="master"  />
 
+  <Parameter name="logDir" value="c:/dev-amapj/logs/"  />
  
 <!-- Permet de desactiver la serialisation des sessions-->
 <Manager pathname="" />

@@ -96,6 +96,32 @@ public class EditionSpeService
 	}
 	
 	
+	
+	/**
+	 * Permet de savoir si ce contrat a besoin d'un contrat d'engagement
+	 */
+	@DbRead
+	public boolean needEngagement(Long idModeleContrat)
+	{
+		EntityManager em = TransactionHelper.getEm();
+
+		ParametresDTO param = new ParametresService().getParametres();
+
+		if (param.etatEditionSpecifique != EtatModule.ACTIF)
+		{
+			return false;
+		}
+		ModeleContrat mc = em.find(ModeleContrat.class, idModeleContrat);
+
+		if (mc.getProducteur().getEngagement() == null)
+		{
+			return false;
+		}
+
+		return true;
+	}
+	
+	
 	/**
 	 * Permet de savoir si il est possible de saisir les étiquettes dans la fiche producteur
 	 * 
@@ -116,6 +142,31 @@ public class EditionSpeService
 	
 		Query q = em.createQuery("select count(p) from EditionSpecifique p WHERE p.typEditionSpecifique=:e");
 		q.setParameter("e", TypEditionSpecifique.ETIQUETTE_PRODUCTEUR);
+
+		return LongUtils.toInt(q.getSingleResult())>0;
+	}
+	
+	
+	/**
+	 * Permet de savoir si il est possible de saisir les engagements dans la fiche producteur
+	 * 
+	 * Si il y a au moins un engagement défini dans les éditions spécifiques, alors
+	 * on active la saisie du champ dans la fiche producteur
+	 */
+	@DbRead
+	public boolean ficheProducteurNeedEngagement()
+	{
+		EntityManager em = TransactionHelper.getEm();
+
+		ParametresDTO param = new ParametresService().getParametres();
+		
+		if (param.etatEditionSpecifique != EtatModule.ACTIF)
+		{
+			return false;
+		}
+	
+		Query q = em.createQuery("select count(p) from EditionSpecifique p WHERE p.typEditionSpecifique=:e");
+		q.setParameter("e", TypEditionSpecifique.ENGAGEMENT);
 
 		return LongUtils.toInt(q.getSingleResult())>0;
 	}

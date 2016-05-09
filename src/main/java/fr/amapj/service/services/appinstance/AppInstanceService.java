@@ -50,6 +50,8 @@ import fr.amapj.model.models.saas.AppInstance;
 import fr.amapj.service.engine.appinitializer.AppInitializer;
 import fr.amapj.service.services.appinstance.SqlRequestDTO.DataBaseResponseDTO;
 import fr.amapj.service.services.appinstance.SqlRequestDTO.ResponseDTO;
+import fr.amapj.service.services.mailer.MailerCounter;
+import fr.amapj.service.services.mailer.MailerCounter.MailCount;
 import fr.amapj.service.services.parametres.ParametresDTO;
 import fr.amapj.service.services.parametres.ParametresService;
 import fr.amapj.service.services.session.SessionManager;
@@ -74,7 +76,7 @@ public class AppInstanceService
 	 * Permet de charger la liste de tous les instances
 	 */
 	@DbRead
-	public List<AppInstanceDTO> getAllInstances()
+	public List<AppInstanceDTO> getAllInstances(boolean withMaster)
 	{
 		EntityManager em = TransactionHelper.getEm();	
 		
@@ -83,32 +85,48 @@ public class AppInstanceService
 		Query q = em.createQuery("select a from AppInstance a");
 
 		List<AppInstance> ps = q.getResultList();
+		List<ConnectedUserDTO> connected = SessionManager.getAllConnectedUser();
 		for (AppInstance p : ps)
 		{
-			AppInstanceDTO dto = createAppInstanceDto(em, p);
+			AppInstanceDTO dto = createAppInstanceDto(connected,p);
 			res.add(dto);
+		}
+		
+		// On ajoute ensuite la base master si besoin 
+		if (withMaster)
+		{
+			AppInstanceDTO master = AppConfiguration.getConf().getMasterConf();
+			addInfo(master,connected);
+			res.add(master);
 		}
 
 		return res;
 
 	}
 
-	public AppInstanceDTO createAppInstanceDto(EntityManager em, AppInstance a)
+	
+
+	public AppInstanceDTO createAppInstanceDto(List<ConnectedUserDTO> connected, AppInstance a)
 	{
 		AppInstanceDTO dto = new AppInstanceDTO();
 		
-		List<ConnectedUserDTO> connected = SessionManager.getAllConnectedUser();
-
 		dto.id = a.getId();
 		dto.nomInstance = a.getNomInstance();
 		dto.dateCreation = a.getDateCreation();
-		dto.state = getState(a.getNomInstance());
-		dto.nbUtilisateurs = getNbUtilisateurs(connected,a.getNomInstance());
 		dto.dbms = a.getDbms();
 		dto.dbUserName = a.getDbUserName();
 		dto.dbPassword = a.getDbPassword();		
-		
+		addInfo(dto, connected);
 		return dto;
+	}
+	
+	
+	private void addInfo(AppInstanceDTO dto, List<ConnectedUserDTO> connected)
+	{
+		dto.state = getState(dto.getNomInstance());
+		dto.nbUtilisateurs = getNbUtilisateurs(connected,dto.getNomInstance());
+		dto.nbMails = MailerCounter.getNbMails(dto.getNomInstance());
+		
 	}
 
 

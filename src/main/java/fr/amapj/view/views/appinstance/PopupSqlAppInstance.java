@@ -22,26 +22,17 @@
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.vaadin.data.util.BeanItem;
-import com.vaadin.server.ExternalResource;
-import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.Link;
-import com.vaadin.ui.RichTextArea;
 import com.vaadin.ui.TextArea;
-import com.vaadin.ui.UI;
 
-import fr.amapj.service.engine.sudo.SudoManager;
 import fr.amapj.service.services.appinstance.AppInstanceDTO;
 import fr.amapj.service.services.appinstance.AppInstanceService;
-import fr.amapj.service.services.appinstance.ChoixSudoUtilisateurDTO;
 import fr.amapj.service.services.appinstance.SqlRequestDTO;
 import fr.amapj.service.services.appinstance.SqlRequestDTO.DataBaseResponseDTO;
 import fr.amapj.service.services.appinstance.SqlRequestDTO.ResponseDTO;
-import fr.amapj.service.services.appinstance.SudoUtilisateurDTO;
 import fr.amapj.view.engine.popup.formpopup.OnSaveException;
 import fr.amapj.view.engine.popup.formpopup.WizardFormPopup;
 

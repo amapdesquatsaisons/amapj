@@ -42,6 +42,11 @@ public class ProducteurDTO implements TableItem
 	
 	public Long idEtiquette;
 	
+	public Long idEngagement;
+	
+	// Libelle qui sera utilisé sur le contrat
+	public String libContrat;
+	
 	public List<ProdUtilisateurDTO> referents = new ArrayList<>();
 	
 	public List<ProdUtilisateurDTO> utilisateurs = new ArrayList<>();
@@ -50,6 +55,16 @@ public class ProducteurDTO implements TableItem
 	public Long getId()
 	{
 		return id;
+	}
+
+	public Long getIdEngagement()
+	{
+		return idEngagement;
+	}
+
+	public void setIdEngagement(Long idEngagement)
+	{
+		this.idEngagement = idEngagement;
 	}
 
 	public void setId(Long id)
@@ -117,9 +132,15 @@ public class ProducteurDTO implements TableItem
 		this.idEtiquette = idEtiquette;
 	}
 
+	public String getLibContrat()
+	{
+		return libContrat;
+	}
 
-	
-	
-	
+	public void setLibContrat(String libContrat)
+	{
+		this.libContrat = libContrat;
+	}
+
 	
 }

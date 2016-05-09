@@ -20,52 +20,40 @@
  */
  package fr.amapj.view.views.sendmail;
 
-import java.util.List;
-
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.TextArea;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.RichTextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 
-import fr.amapj.model.models.fichierbase.Utilisateur;
-import fr.amapj.service.services.listeadherents.ListeAdherentsService;
 import fr.amapj.service.services.mailer.MailerMessage;
 import fr.amapj.service.services.mailer.MailerService;
-import fr.amapj.service.services.moncompte.MonCompteService;
+import fr.amapj.service.services.parametres.ParametresDTO;
 import fr.amapj.service.services.parametres.ParametresService;
-import fr.amapj.service.services.session.SessionManager;
-import fr.amapj.service.services.utilisateur.UtilisateurService;
-import fr.amapj.view.engine.popup.PopupListener;
-import fr.amapj.view.engine.popup.formpopup.FormPopup;
-import fr.amapj.view.engine.popup.okcancelpopup.OKCancelPopup;
-import fr.amapj.view.engine.popup.suppressionpopup.SuppressionPopup;
-import fr.amapj.view.engine.ui.AppConfiguration;
 
 
 /**
- * Page permettant à l'utilisateur de gérer son compte :
- * -> changement de l'adresse e mail 
- * -> changement du mot de passe 
+ * Page permettant l'envoi d'un mail 
  * 
  *  
  *
  */
-public class SendMailView extends VerticalLayout implements View
+public class SendMailView extends Panel implements View
 {
 
-	
 	TextField titre;
-	TextArea zoneTexte;
-	
+	TextField destinataires;
+	RichTextArea zoneTexte;	
 
 	/**
 	 * 
@@ -73,53 +61,73 @@ public class SendMailView extends VerticalLayout implements View
 	@Override
 	public void enter(ViewChangeEvent event)
 	{
-		setSizeFull();
 
+		ParametresDTO param = new ParametresService().getParametres();
+		
 		VerticalLayout layout = new VerticalLayout();
 		
-		titre = new TextField("Titre");
-		titre.setWidth("100%");
-		layout.addComponent(titre);
+		addLabel(layout, "Cet outil permet d'envoyer un mail à une personne, ou à tous les utilisateurs actifs.");
+		addLabel(layout, "Cet outil permet de tester le bon fonctionnement de l'envoi des mails");
+		addLabel(layout, "Cet outil ne devrait pas être utilisé pour une communication régulière avec les amapiens.");
+		addEmptyLine(layout);
 		
 		
-		zoneTexte = new TextArea("Message");
+		
+		
+		TextField expediteur = addTextField(layout,"Expéditeur du mail");
+		expediteur.setEnabled(false);
+		expediteur.setValue(param.sendingMailUsername);
+		
+		titre =addTextField(layout,"Titre du mail");
+				
+		destinataires = addTextField(layout,"Destinataire du mail");
+
+		zoneTexte = new RichTextArea("Message");
 		zoneTexte.setWidth("100%");
-		zoneTexte.setHeight("400px");
+		zoneTexte.setHeight("500px");
 		
 		layout.addComponent(zoneTexte);
 		
 
-		addButton(layout, "Envoi 1 mail",new Button.ClickListener()
+		addButton(layout, "Envoyer",new Button.ClickListener()
 		{
 			@Override
 			public void buttonClick(ClickEvent event)
 			{
-				String email  = SessionManager.getSessionParameters().userEmail;
-				handleEnvoi1Mail(email);
+				handleEnvoyerMail();
 			}
 		});
 		
-		
-		addButton(layout, "Envoyer à tous",new Button.ClickListener()
-		{
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				handleEnvoiAllMails();
-			}
-		});
-		
-	
 		
 		layout.setMargin(true);
 		layout.setSpacing(true);
-		addComponent(layout);
+		setSizeFull();
+		setContent(layout);
 		
 			
 	}
 
-	protected void handleEnvoi1Mail(String email)
+	private TextField addTextField(VerticalLayout layout, String lib)
 	{
+		HorizontalLayout h = new HorizontalLayout();
+		h.setSpacing(true);
+		//h.setWidth("100%");
+		
+		TextField tf = new TextField();
+		tf.setWidth("500px");
+		
+		Label l = new Label(lib);
+		l.setWidth("150px");
+		h.addComponent(l);
+		h.addComponent(tf);
+		layout.addComponent(h);
+		return tf;
+		
+	}
+
+	private void handleEnvoyerMail()
+	{
+		String email  = destinataires.getValue();
 		String link = new ParametresService().getParametres().getUrl()+"?username="+email;
 		String subject = titre.getValue();
 		String htmlContent = zoneTexte.getValue();
@@ -129,20 +137,6 @@ public class SendMailView extends VerticalLayout implements View
 		
 	}
 
-	protected void handleEnvoiAllMails()
-	{
-		List<Utilisateur> us = new ListeAdherentsService().getAllUtilisateurs(false);
-		for (Utilisateur utilisateur : us)
-		{
-			String email = utilisateur.getEmail();
-			if (email.indexOf('@')!=-1)
-			{
-				handleEnvoi1Mail(email);
-			}
-		}
-	}
-	
-	
 	
 	private void addButton(Layout layout, String str,ClickListener listener)
 	{
@@ -151,6 +145,25 @@ public class SendMailView extends VerticalLayout implements View
 		b.addClickListener(listener);
 		layout.addComponent(b);
 		
+	}
+	
+	
+	private Label addLabel(VerticalLayout layout, String str)
+	{
+		Label tf = new Label(str);
+		tf.addStyleName(ChameleonTheme.LABEL_BIG);
+		layout.addComponent(tf);
+		return tf;
+
+	}
+	
+	private Label addEmptyLine(VerticalLayout layout)
+	{
+		Label tf = new Label("<br/>",ContentMode.HTML);
+		tf.addStyleName(ChameleonTheme.LABEL_BIG);
+		layout.addComponent(tf);
+		return tf;
+
 	}
 
 }

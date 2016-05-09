@@ -250,7 +250,30 @@ abstract public class AbstractImporter<T extends TableItem> implements Receiver 
 		return false;
 		
 	}
-
+	
+	// On vérifie que la chaine est bien dans les longueurs indiqués
+	// Retourne null si tout est ok
+	protected String checkLength(String val,int minLength, int maxLength,String nomChamp)
+	{
+		if (val==null)
+		{
+			val="";
+		}
+		
+		 int len = val.length();
+	     if (len < minLength)
+	     {
+	    	 return "Le champ \""+nomChamp+"\" est trop court. Il doit contenir au moins "+minLength+" caractères";
+	     }
+	    		 
+	     if (len > maxLength)
+	     {
+	    	 return "Le champ \""+nomChamp+"\"  est trop long. Il doit contenir au maximum "+maxLength+" caractères";
+	     }
+	     
+	     return null;
+	}
+	
 	
 
 	private String getCell(Row row, int i,DataFormatter df)

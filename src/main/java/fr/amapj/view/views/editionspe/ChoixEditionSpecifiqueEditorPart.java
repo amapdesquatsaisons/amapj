@@ -49,6 +49,8 @@ public class ChoixEditionSpecifiqueEditorPart extends SwitchPopup
 		addLine("Une nouvelle étiquette", new EtiquetteProducteurEditorPart(true, null));
 		
 		addLine("Un nouveau planning mensuel", new PlanningMensuelEditorPart(true, null));
+		
+		// TODO addLine("Un nouveau modèle d'engagement", new EngagementEditorPart(true, null));
 
 	}
 	
@@ -66,6 +68,10 @@ public class ChoixEditionSpecifiqueEditorPart extends SwitchPopup
 			
 		case PLANNING_MENSUEL:
 			open(new PlanningMensuelEditorPart(false, dto), listener);
+			break;
+		
+		case ENGAGEMENT:
+			open(new EngagementEditorPart(false, dto), listener);
 			break;
 			
 		default:

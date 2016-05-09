@@ -39,7 +39,7 @@ import fr.amapj.model.engine.transaction.NewTransaction;
 import fr.amapj.model.models.distribution.DatePermanence;
 import fr.amapj.model.models.distribution.DatePermanenceUtilisateur;
 import fr.amapj.model.models.fichierbase.Utilisateur;
-import fr.amapj.service.engine.excelgenerator.AbstractExcelGenerator;
+import fr.amapj.service.engine.generator.excel.AbstractExcelGenerator;
 import fr.amapj.service.services.excelgenerator.EGPlanningPermanence;
 import fr.amapj.service.services.mailer.MailerAttachement;
 import fr.amapj.service.services.mailer.MailerMessage;

@@ -22,10 +22,13 @@
 
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.RichTextArea;
 
+import fr.amapj.model.models.param.SmtpType;
 import fr.amapj.service.services.parametres.ParametresDTO;
 import fr.amapj.service.services.parametres.ParametresService;
+import fr.amapj.service.services.session.SessionManager;
 import fr.amapj.view.engine.popup.formpopup.WizardFormPopup;
 import fr.amapj.view.engine.popup.formpopup.validator.NotNullValidator;
 
@@ -39,6 +42,12 @@ public class PopupSaisieParametres extends WizardFormPopup
 {
 
 	private ParametresDTO dto;
+	
+	// L'utilisateur est il adminFull ? 
+	private boolean adminFull;
+	
+	// L'utilisateur a t'il le droit de modifier l'adresse de l'expéditeur et son mot de passe et son quota d'expédition ? 
+	private boolean allowedModifyMailSender;
 
 	public enum Step
 	{
@@ -56,6 +65,11 @@ public class PopupSaisieParametres extends WizardFormPopup
 
 		this.dto = dto;
 		item = new BeanItem<ParametresDTO>(dto);
+		
+		adminFull = SessionManager.getSessionParameters().isAdminFull();
+		
+		// On peut modifier l'expediteur si on est admin full ou si on est avec du gmail
+		allowedModifyMailSender = adminFull || (dto.smtpType==SmtpType.GMAIL);
 
 	}
 	
@@ -101,8 +115,7 @@ public class PopupSaisieParametres extends WizardFormPopup
 		// 
 		addTextField("Nom de l'AMAP", "nomAmap");
 		
-		addTextField("Ville de l'AMAP", "villeAmap");
-		
+		addTextField("Ville de l'AMAP", "villeAmap");		
 	}
 	
 	private void addFieldMailInfo()
@@ -110,13 +123,22 @@ public class PopupSaisieParametres extends WizardFormPopup
 		// Titre
 		setStepTitle("information sur l'envoi des mails");
 		
-		addComboEnumField("Type du serveur de mail", "smtpType", new NotNullValidator());
+		AbstractField b = addComboEnumField("Type du serveur de mail", "smtpType", new NotNullValidator());
+		b.setEnabled(adminFull);
 		
-		addTextField("Adresse mail qui enverra les messages", "sendingMailUsername");
+		b = addTextField("Adresse mail qui enverra les messages", "sendingMailUsername");
+		b.setEnabled(allowedModifyMailSender);
 
-		addPasswordTextField("Password de l'adresse mail qui enverra les messages", "sendingMailPassword");
+		b = addPasswordTextField("Password de l'adresse mail qui enverra les messages", "sendingMailPassword");
+		b.setEnabled(allowedModifyMailSender);
 		
-		addTextField("URL de l'application vue par les utilisateurs", "url");
+		b = addIntegerField("Nombre maximum de mail par jour", "sendingMailNbMax");
+		b.setEnabled(adminFull);
+		
+		b = addTextField("URL de l'application utilisée dans les mails", "url");
+		b.setEnabled(adminFull);
+		
+		addTextField("Adresse mail qui sera en copie de tous les mails envoyés par le logiciel", "mailCopyTo");
 		
 		addTextField("Adresse mail du destinataire des sauvegardes quotidiennes", "backupReceiver");
 		

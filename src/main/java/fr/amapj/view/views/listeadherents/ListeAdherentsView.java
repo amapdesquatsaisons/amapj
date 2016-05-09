@@ -20,6 +20,7 @@
  */
  package fr.amapj.view.views.listeadherents;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.vaadin.data.util.BeanItemContainer;
@@ -41,11 +42,19 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.themes.ChameleonTheme;
 
+import fr.amapj.model.models.acces.RoleList;
 import fr.amapj.model.models.fichierbase.Utilisateur;
+import fr.amapj.model.models.param.paramecran.AbstractParamEcran;
+import fr.amapj.model.models.param.paramecran.PEListeAdherent;
 import fr.amapj.service.services.excelgenerator.EGListeAdherent;
 import fr.amapj.service.services.excelgenerator.EGListeAdherent.Type;
 import fr.amapj.service.services.listeadherents.ListeAdherentsService;
+import fr.amapj.service.services.parametres.ParamEcranDTO;
+import fr.amapj.service.services.parametres.ParametresService;
+import fr.amapj.service.services.parametres.paramecran.PEListeAdherentDTO;
+import fr.amapj.service.services.session.SessionManager;
 import fr.amapj.view.engine.excelgenerator.LinkCreator;
+import fr.amapj.view.engine.menu.MenuList;
 import fr.amapj.view.engine.popup.corepopup.CorePopup;
 
 
@@ -74,6 +83,9 @@ public class ListeAdherentsView extends VerticalLayout implements View
 	@Override
 	public void enter(ViewChangeEvent event)
 	{
+		// TODO code à factoriser
+		PEListeAdherentDTO p = new ParametresService().getPEListeAdherentDTO();
+		
 		listPartContainer = new BeanItemContainer<>(Utilisateur.class);
 		List<Utilisateur> us = new ListeAdherentsService().getAllUtilisateurs(false);
 		listPartContainer.addAll(us);
@@ -87,7 +99,24 @@ public class ListeAdherentsView extends VerticalLayout implements View
 		beanTable.setStyleName("big strong");
 		
 		// Gestion de la liste des colonnes visibles
-		beanTable.setVisibleColumns("nom", "prenom", "email" , "numTel1" , "numTel2" );
+		List<String> cols = new ArrayList<>();
+		cols.add("nom");
+		cols.add("prenom");
+		
+		if (p.canAccessEmail)
+		{	
+			cols.add("email");
+		}
+		if (p.canAccessTel1)
+		{	
+			cols.add("numTel1");
+		}
+		if (p.canAccessTel2)
+		{	
+			cols.add("numTel2");
+		}
+		
+		beanTable.setVisibleColumns(cols.toArray());
 		
 		beanTable.setColumnHeader("nom","Nom");
 		beanTable.setColumnHeader("prenom","Prénom");
@@ -149,9 +178,13 @@ public class ListeAdherentsView extends VerticalLayout implements View
 		searchField.addStyleName(ChameleonTheme.TEXTFIELD_BIG);
 		searchField.setWidth("50%");
 		
+		if (p.canAccessEmail)
+		{	
+			toolbar.addComponent(sendMailButton);
+		}
 		
-		toolbar.addComponent(sendMailButton);
-		toolbar.addComponent(LinkCreator.createLink(new EGListeAdherent(Type.STD)));
+		// 
+		toolbar.addComponent(LinkCreator.createLink(new EGListeAdherent(Type.STD,p)));
 		toolbar.addComponent(searchField);
 		toolbar.setWidth("100%");
 		toolbar.setExpandRatio(searchField, 1);

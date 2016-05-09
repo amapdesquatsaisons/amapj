@@ -31,18 +31,28 @@ import org.apache.poi.util.IOUtils;
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.Upload;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 
 import fr.amapj.service.services.backupdb.BackupDatabaseService;
+import fr.amapj.service.services.excelgenerator.EGListeAdherent;
+import fr.amapj.service.services.excelgenerator.EGListeAdherent.Type;
+import fr.amapj.service.services.mailer.MailerCounter;
 import fr.amapj.service.services.maintenance.MaintenanceService;
+import fr.amapj.service.services.session.SessionManager;
+import fr.amapj.view.engine.excelgenerator.LinkCreator;
 import fr.amapj.view.engine.popup.corepopup.CorePopup;
+import fr.amapj.view.views.importdonnees.UtilisateurImporter;
 
-public class MaintenanceView extends VerticalLayout implements View
+public class MaintenanceView extends Panel implements View
 {
 
 	private final static Logger logger = LogManager.getLogger();
@@ -50,21 +60,62 @@ public class MaintenanceView extends VerticalLayout implements View
 	@Override
 	public void enter(ViewChangeEvent event)
 	{
+		boolean adminFull = SessionManager.getSessionParameters().isAdminFull();
+		
 		SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-	
+		
 		VerticalLayout layout = new VerticalLayout();
+		layout.setMargin(true);
 
 		addLabelH1(layout, "Maintenance du système");
-		addLabel(layout, "");
+		addEmptyLine(layout);
+		
 		addLabel(layout, "Date et heure courante "+df.format(new Date()));
-		addLabel(layout, "");
+		addEmptyLine(layout);
+		addLabel(layout, "Version de l'application : "+getVersion());
+		addEmptyLine(layout);
+		addLabel(layout, "Nombre d'emails envoyés aujourd'hui : "+MailerCounter.getNbMails());
+		addEmptyLine(layout);
 		
-		addLabel(layout, "");
-		addLabel(layout, "Version de l'application "+getVersion());
-		addLabel(layout, "");
 		
+		Panel backupPanel = new Panel("Sauvegarde de la base et envoi par e mail");
+		backupPanel.setContent(getBackupPanel());
 		
+		Panel suppressionPanel = new Panel("Suppression complète d'un contrat vierge et des contrats associés");
+		suppressionPanel.setContent(getSuppressionPanel());
 		
+		Panel diversPanel = new Panel("Outils divers");
+		diversPanel.setContent(getDiversPanel());
+		
+		layout.addComponent(backupPanel);
+		addEmptyLine(layout);
+		layout.addComponent(suppressionPanel);
+		addEmptyLine(layout);
+		
+		//
+		if (adminFull)
+		{
+			layout.addComponent(diversPanel);
+		}
+		
+		setContent(layout);
+		setSizeFull();
+	}
+	
+	
+	
+	private Component getBackupPanel()
+	{
+		VerticalLayout layout = new VerticalLayout();
+		layout.setMargin(true);
+		
+		addEmptyLine(layout);
+		addLabel(layout, "Cet outil vous permet de faire une sauvegarde de la base et de l'envoyer par mail à l'adresse paramétrée dans les paramètres généraux.");
+		addLabel(layout, "Cet outil peut être utilisé avant de faire des modifications importantes sur la base.");
+		addLabel(layout, "Cet outil permet aussi de vérifier que les sauvegardes fonctionnent bien.");
+		
+
+		addEmptyLine(layout);
 		
 		Button b1 = new Button("Backup de la base et envoi par mail", new ClickListener()
 		{
@@ -75,8 +126,60 @@ public class MaintenanceView extends VerticalLayout implements View
 			}
 		});
 		
-		addLabel(layout, "");
+		layout.addComponent(b1);
+				
+		addEmptyLine(layout);
 		
+		return layout;
+	}
+	
+	
+	private Component getSuppressionPanel()
+	{
+		VerticalLayout layout = new VerticalLayout();
+		layout.setMargin(true);
+		
+		addEmptyLine(layout);
+		addLabel(layout, "Cet outil vous permet de supprimer complètement un contrat vierge et tous les contrats signés associés.");
+		addEmptyLine(layout);
+		addLabel(layout, "ATTENTION !!! Les suppressions sont définitives !!! ATTENTION !!!!.");
+		
+
+		addEmptyLine(layout);
+		
+
+		Button b3 = new Button("Suppression complète d'un contrat ...", new ClickListener()
+		{
+			@Override
+			public void buttonClick(ClickEvent event)
+			{
+				PopupSuppressionTotaleContrat popup = new PopupSuppressionTotaleContrat();
+				CorePopup.open(popup);
+			}
+		});
+		
+		layout.addComponent(b3);
+				
+		addEmptyLine(layout);
+		
+		return layout;
+	}
+	
+	
+	private Component getDiversPanel()
+	{
+		VerticalLayout layout = new VerticalLayout();
+		layout.setMargin(true);
+		
+		addEmptyLine(layout);
+		addLabel(layout, "Outils divers réservés aux experts.");
+		addEmptyLine(layout);
+		addLabel(layout, "ATTENTION !!! Ne pas utiliser sur une base en production !!! ATTENTION !!!!.");
+		
+
+		addEmptyLine(layout);
+		
+
 		Button b2 = new Button("Remise à zéro du cache (obligatoire après requete SQL)", new ClickListener()
 		{
 			@Override
@@ -87,34 +190,12 @@ public class MaintenanceView extends VerticalLayout implements View
 		});
 		
 		
-		
-		Button b3 = new Button("Suppression complète d'un contrat vierge et des contrats associés", new ClickListener()
-		{
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				PopupSuppressionTotaleContrat popup = new PopupSuppressionTotaleContrat();
-				CorePopup.open(popup);
-			}
-		});
-		
-		
 		Button b4 = new Button("Positionner les dates pour la base démo", new ClickListener()
 		{
 			@Override
 			public void buttonClick(ClickEvent event)
 			{
 				PopupDateDemo popup = new PopupDateDemo();
-				CorePopup.open(popup);
-			}
-		});
-		
-		Button b5 = new Button("Décalage dans le temps d'un contrat vierge et des contrats associés", new ClickListener()
-		{
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				PopupDecalageTemporelContrat popup = new PopupDecalageTemporelContrat();
 				CorePopup.open(popup);
 			}
 		});
@@ -130,22 +211,17 @@ public class MaintenanceView extends VerticalLayout implements View
 			}
 		});
 		
-		
-		
-		
-		
-				
-		
-		layout.addComponent(b1);
 		layout.addComponent(b2);
-		layout.addComponent(b3);
+		addEmptyLine(layout);
 		layout.addComponent(b4);
-		layout.addComponent(b5);
+		addEmptyLine(layout);
 		layout.addComponent(b6);
+				
+		addEmptyLine(layout);
 		
-		addComponent(layout);
-		setSizeFull();
+		return layout;
 	}
+	
 	
 	/**
 	 * Lit lenuméro de la version
@@ -182,6 +258,15 @@ public class MaintenanceView extends VerticalLayout implements View
 		return tf;
 	}
 	
+	
+	private Label addEmptyLine(VerticalLayout layout)
+	{
+		Label tf = new Label("<br/>",ContentMode.HTML);
+		tf.addStyleName(ChameleonTheme.LABEL_BIG);
+		layout.addComponent(tf);
+		return tf;
+
+	}
 	
 	
 }

@@ -29,6 +29,7 @@ import fr.amapj.service.services.mescontrats.InfoPaiementDTO;
 import fr.amapj.service.services.mescontrats.MesContratsService;
 import fr.amapj.view.engine.grid.GridHeaderLine;
 import fr.amapj.view.engine.grid.currencyvector.PopupCurrencyVector;
+import fr.amapj.view.engine.popup.formpopup.OnSaveException;
 import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
 import fr.amapj.view.views.saisiecontrat.SaisieContrat.ModeSaisie;
 import fr.amapj.view.views.saisiecontrat.SaisieContrat.SaisieContratData;
@@ -189,13 +190,13 @@ public class PopupSaisiePaiement extends PopupCurrencyVector
 
 
 
-	public boolean performSauvegarder()
+	public void performSauvegarder() throws OnSaveException
 	{
 		if (param.montant[param.nbLig-1]<0)
 		{
-			Notification.show("Les paiements saisis sont incorrects. Il y a un trop payé de "+
+			throw new OnSaveException("Les paiements saisis sont incorrects. Il y a un trop payé de "+
 								new CurrencyTextFieldConverter().convertToString(-param.montant[param.nbLig-1])+" €");
-			return false;
+			
 		}
 		
 		// Copie dans le DTO
@@ -209,8 +210,6 @@ public class PopupSaisiePaiement extends PopupCurrencyVector
 		{
 			new MesContratsService().saveNewContrat(data.contratDTO,data.userId);
 		}
-		
-		return true;
 	}
 	
 }

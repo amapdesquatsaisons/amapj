@@ -86,61 +86,6 @@ public class MaintenanceService
 		return cs;
 	}
 	
-	
-	
-
-	// PARTIE DECALAGE TEMPOREL D'UN MODELE DE CONTRAT ET DE TOUS LES CONTRATS ASSOCIES
-
-	/**
-	 * Permet de supprimer un modele de contrat et TOUS les contrats associées
-	 * Ceci est fait dans une transaction en ecriture  
-	 */
-	@DbWrite
-	public void shiftDateModeleContratAndContrats(Long modeleContratId,int deltaInMonth)
-	{
-		EntityManager em = TransactionHelper.getEm();
-		
-		ModeleContrat mc = em.find(ModeleContrat.class, modeleContratId);
-		
-		mc.setDateFinInscription(add(deltaInMonth,mc.getDateFinInscription()));
-		mc.setDateRemiseCheque(add(deltaInMonth,mc.getDateRemiseCheque()));
-		
-		
-		Query q = em.createQuery("select d from ModeleContratDatePaiement d WHERE d.modeleContrat=:mc");
-		q.setParameter("mc",mc);
-		List<ModeleContratDatePaiement> ds = q.getResultList();
-		for (ModeleContratDatePaiement modeleContratDatePaiement : ds)
-		{
-			modeleContratDatePaiement.setDatePaiement(add(deltaInMonth,modeleContratDatePaiement.getDatePaiement()));
-		}
-		
-		q = em.createQuery("select d from ModeleContratDate d WHERE d.modeleContrat=:mc");
-		q.setParameter("mc",mc);
-		List<ModeleContratDate> mcds = q.getResultList();
-		for (ModeleContratDate mcd : mcds)
-		{
-			mcd.setDateLiv(add(deltaInMonth,mcd.getDateLiv()));
-		}
-		
-		List<Contrat> cs = getAllContrats(em, mc);
-		
-		for (Contrat contrat : cs)
-		{
-			contrat.setDateCreation(add(deltaInMonth,contrat.getDateCreation()));
-			contrat.setDateModification(add(deltaInMonth,contrat.getDateModification()));
-		}
-	}
-
-
-	private Date add(int deltaInMonth, Date date)
-	{
-		if (date==null)
-		{
-			return null;
-		}
-		return DateUtils.addMonth(date, deltaInMonth);
-	}
-
 
 	
 	/**

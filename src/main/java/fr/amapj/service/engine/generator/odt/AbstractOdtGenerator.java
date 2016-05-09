@@ -18,31 +18,26 @@
  * 
  * 
  */
- package fr.amapj.service.engine.excelgenerator;
+ package fr.amapj.service.engine.generator.odt;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.List;
+import java.io.ByteArrayOutputStream;
 
 import javax.persistence.EntityManager;
 
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.odftoolkit.simple.TextDocument;
 
-import fr.amapj.model.engine.db.DbManager;
 import fr.amapj.model.engine.tools.TestTools;
-import fr.amapj.model.engine.transaction.Call;
-import fr.amapj.model.engine.transaction.NewTransaction;
-import fr.amapj.view.engine.ui.AppConfiguration;
+import fr.amapj.service.engine.generator.CoreGenerator;
+import fr.amapj.service.engine.generator.CoreGeneratorService;
 
 
 /**
- * Permet la gestion des extractions excels
+ * Permet la gestion des extractions au format ODT
  * 
  *  
  *
  */
-abstract public class AbstractExcelGenerator
+abstract public class AbstractOdtGenerator implements CoreGenerator
 {
 	
 	
@@ -50,26 +45,48 @@ abstract public class AbstractExcelGenerator
 	 * Permet de générer le fichier Excel pour un modele de contrat
 	 * @return
 	 */
-	abstract public void fillExcelFile(EntityManager em,ExcelGeneratorTool et);
+	abstract public void fillWordFile(EntityManager em,OdtGeneratorTool et);
 	
 	abstract public String getFileName(EntityManager em);
 	
 	abstract public String getNameToDisplay(EntityManager em);
 	
-	abstract public ExcelFormat getFormat();
+	
+	public String getExtension()
+	{
+		return ".odt";
+	}
 	
 	
-	public void test() throws IOException
+	@Override
+	public byte[] getContent()
+	{
+		TextDocument workbook = new CoreGeneratorService().getFichierOdt(this);
+		
+		ByteArrayOutputStream imagebuffer = new ByteArrayOutputStream();
+	
+		try
+		{
+			workbook.save(imagebuffer);
+		}
+		catch (Exception e)
+		{
+			throw new RuntimeException("Erreur inattendue");
+		}
+		return imagebuffer.toByteArray();
+	}
+	
+	
+	public void test() throws Exception
 	{
 		TestTools.init();
 		
-		String filename = "test."+this.getFormat().name().toLowerCase();
-		Workbook workbook = new ExcelGeneratorService().getFichierExcel(this); 
+		String filename = "test.odt";
+		TextDocument doc =  new CoreGeneratorService().getFichierOdt(this); 
 		
-		FileOutputStream fileOut = new FileOutputStream(filename);
-		workbook.write(fileOut);
-		fileOut.close();
-		System.out.println("Your excel file has been generated!");
+		
+		doc.save(filename);
+		System.out.println("Your odt file has been generated!");
 	}
 	
 	

@@ -59,9 +59,9 @@ public class MailerService
 
 	}
 	
-	private Message initMail(String recipient, String subject) throws AddressException, MessagingException, UnsupportedEncodingException
+	private Message initMail(ParametresDTO param, String recipient, String subject) throws AddressException, MessagingException, UnsupportedEncodingException
 	{
-		ParametresDTO param = new ParametresService().getParametres();
+		
 		
 		Session session;
 		switch (param.smtpType)
@@ -81,6 +81,11 @@ public class MailerService
 		Message message = new MimeMessage(session);
 		message.setFrom(new InternetAddress(param.sendingMailUsername,param.nomAmap));
 		message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipient));
+		if ( (param.mailCopyTo!=null) && (param.mailCopyTo.length()>0))
+		{
+			message.addRecipient(Message.RecipientType.BCC, InternetAddress.parse(param.mailCopyTo)[0]);
+			message.setReplyTo(InternetAddress.parse(param.mailCopyTo));
+		}
 		message.setSubject(subject);
 		
 		return message;
@@ -140,13 +145,20 @@ public class MailerService
 	}
 
 	/**
-	 *  Envoi d'un mail simple en utilisant TLS
+	 *  Envoi d'un mail 
 	 */
 	public void sendHtmlMail(MailerMessage mailerMessage)
 	{
+		ParametresDTO param = new ParametresService().getParametres();
+		
+		if (MailerCounter.isAllowed(param)==false)	
+		{
+			throw new AmapjRuntimeException("Impossible d'envoyer un mail car le quota par jour est dépassé (quota = "+param.sendingMailNbMax+" )");
+		}
+		
 		try
 		{
-			Message message = initMail(mailerMessage.getEmail(), mailerMessage.getTitle());
+			Message message = initMail(param,mailerMessage.getEmail(), mailerMessage.getTitle());
 			
 			Multipart mp = new MimeMultipart();
 

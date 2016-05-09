@@ -82,6 +82,8 @@ public class ProducteurService
 		dto.description = p.getDescription();
 		dto.delaiModifContrat = p.getDelaiModifContrat();
 		dto.idEtiquette = IdentifiableUtil.getId(p.getEtiquette());
+		dto.idEngagement = IdentifiableUtil.getId(p.getEngagement());
+		dto.libContrat = p.getLibContrat();
 		dto.referents = getReferents(em,p);
 		dto.utilisateurs = getUtilisateur(em,p);
 		
@@ -151,6 +153,8 @@ public class ProducteurService
 		p.setDescription(dto.description);
 		p.setDelaiModifContrat(dto.delaiModifContrat);
 		p.setEtiquette(IdentifiableUtil.findIdentifiableFromId(EditionSpecifique.class, dto.idEtiquette, em));
+		p.setEngagement(IdentifiableUtil.findIdentifiableFromId(EditionSpecifique.class, dto.idEngagement, em));
+		p.setLibContrat(dto.libContrat);
 		
 		if (create)
 		{

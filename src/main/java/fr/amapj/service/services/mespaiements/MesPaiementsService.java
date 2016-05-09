@@ -402,5 +402,20 @@ public class MesPaiementsService
 		List<Paiement> paiements = q.getResultList();
 		return paiements;
 	}
+	
+	
+	/**
+	 * Permet d'obtenir le nombre de paiement (ou chèques) pour ce contrat 
+	 * (quel que soit l'état)
+	 * @return
+	 */
+	public int getNbChequeContrat(Contrat contrat, EntityManager em)
+	{
+		// On récupère  la liste des paiements 
+		Query q = em.createQuery("select count(p) from Paiement p  WHERE p.contrat=:c ");
+		q.setParameter("c", contrat);
+		
+		return LongUtils.toInt(q.getSingleResult());
+	}
 
 }

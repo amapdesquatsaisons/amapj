@@ -46,6 +46,7 @@ import fr.amapj.view.engine.grid.GridHeaderLine;
 import fr.amapj.view.engine.grid.GridIJData;
 import fr.amapj.view.engine.grid.ShortCutManager;
 import fr.amapj.view.engine.popup.corepopup.CorePopup;
+import fr.amapj.view.engine.popup.formpopup.OnSaveException;
 import fr.amapj.view.engine.tools.BaseUiTools;
 import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
 
@@ -84,7 +85,7 @@ abstract public class PopupCurrencyVector extends CorePopup
 
 	abstract public void loadParam();
 
-	abstract public boolean performSauvegarder();
+	abstract public void performSauvegarder() throws OnSaveException;
 
 	protected void createContent(VerticalLayout mainLayout)
 	{
@@ -537,11 +538,18 @@ abstract public class PopupCurrencyVector extends CorePopup
 			return;
 		}
 
-		boolean ret = performSauvegarder();
-		if (ret==true)
+		
+		try
 		{
-			close();
+			performSauvegarder();
+		} 
+		catch (OnSaveException e)
+		{
+			e.showInNewDialogBox();
+			return;
 		}
+		
+		close();
 	}
 
 	/**

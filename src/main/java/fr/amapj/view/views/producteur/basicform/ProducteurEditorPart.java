@@ -130,6 +130,14 @@ public class ProducteurEditorPart extends WizardFormPopup
 			addSearcher("Type des étiquettes de distribution", "idEtiquette", SearcherList.ETIQUETTE ,null);
 		}
 		
+		// Champ 4
+		if (new EditionSpeService().ficheProducteurNeedEngagement())
+		{
+			// TODO addSearcher("Contrat d'engagement", "idEngagement", SearcherList.ENGAGEMENT ,null);
+			
+			// TODO addTextField("Identification du producteur sur le contrat d'engagement", "libContrat");
+		}
+		
 		
 
 	}

@@ -28,10 +28,11 @@ import java.util.List;
 import javax.persistence.EntityManager;
 
 import fr.amapj.model.models.fichierbase.Utilisateur;
-import fr.amapj.service.engine.excelgenerator.AbstractExcelGenerator;
-import fr.amapj.service.engine.excelgenerator.ExcelFormat;
-import fr.amapj.service.engine.excelgenerator.ExcelGeneratorTool;
+import fr.amapj.service.engine.generator.excel.AbstractExcelGenerator;
+import fr.amapj.service.engine.generator.excel.ExcelFormat;
+import fr.amapj.service.engine.generator.excel.ExcelGeneratorTool;
 import fr.amapj.service.services.listeadherents.ListeAdherentsService;
+import fr.amapj.service.services.parametres.paramecran.PEListeAdherentDTO;
 
 
 /**
@@ -50,11 +51,19 @@ public class EGListeAdherent extends AbstractExcelGenerator
 
 	Type type;
 	
-
+	PEListeAdherentDTO peListeAdherentDTO;
+	
 	
 	public EGListeAdherent(Type type)
 	{
 		this.type = type;
+		this.peListeAdherentDTO = new PEListeAdherentDTO(); // On met tous les droits
+	}
+	
+	public EGListeAdherent(Type type,PEListeAdherentDTO peListeAdherentDTO)
+	{
+		this.type = type;
+		this.peListeAdherentDTO = peListeAdherentDTO;
 	}
 	
 	
@@ -146,14 +155,37 @@ public class EGListeAdherent extends AbstractExcelGenerator
 	private void contructRow(ExcelGeneratorTool et, Utilisateur u)
 	{
 		et.addRow();
+		
+		// On met les cadres
+		for (int i = 0; i < 8; i++)
+		{
+			et.setCell(i, "", et.nonGrasGaucheBordure);
+		}
+		
+		
+		
+		et.setCell(0, u.getNom(), et.grasGaucheNonWrappeBordure);
+		
 		et.setCell(0, u.getNom(), et.grasGaucheNonWrappeBordure);
 		et.setCell(1, u.getPrenom(), et.nonGrasGaucheBordure);
-		et.setCell(2, u.getEmail(), et.nonGrasGaucheBordure);
-		et.setCell(3, u.getNumTel1(), et.nonGrasGaucheBordure);
-		et.setCell(4, u.getNumTel2(), et.nonGrasGaucheBordure);
-		et.setCell(5, u.getLibAdr1(), et.nonGrasGaucheBordure);
-		et.setCell(6, u.getCodePostal(), et.nonGrasGaucheBordure);
-		et.setCell(7, u.getVille(), et.nonGrasGaucheBordure);
+		if (peListeAdherentDTO.canAccessEmail)
+		{
+			et.setCell(2, u.getEmail(), et.nonGrasGaucheBordure);
+		}
+		if (peListeAdherentDTO.canAccessTel1)
+		{
+			et.setCell(3, u.getNumTel1(), et.nonGrasGaucheBordure);
+		}
+		if (peListeAdherentDTO.canAccessTel2)
+		{
+			et.setCell(4, u.getNumTel2(), et.nonGrasGaucheBordure);
+		}
+		if (peListeAdherentDTO.canAccessAdress)
+		{
+			et.setCell(5, u.getLibAdr1(), et.nonGrasGaucheBordure);
+			et.setCell(6, u.getCodePostal(), et.nonGrasGaucheBordure);
+			et.setCell(7, u.getVille(), et.nonGrasGaucheBordure);
+		}
 		
 		if (type==Type.AVEC_INACTIF)
 		{

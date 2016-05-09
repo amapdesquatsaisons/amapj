@@ -220,7 +220,7 @@ public class UtilisateurService
 	 * 
 	 * @return
 	 */
-	private String generatePassword()
+	public String generatePassword()
 	{
 
 		int len = 6;

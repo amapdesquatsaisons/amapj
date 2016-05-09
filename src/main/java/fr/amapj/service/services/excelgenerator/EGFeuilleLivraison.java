@@ -27,9 +27,9 @@ import javax.persistence.EntityManager;
 
 import fr.amapj.model.models.contrat.modele.ModeleContrat;
 import fr.amapj.model.models.contrat.modele.ModeleContratDate;
-import fr.amapj.service.engine.excelgenerator.AbstractExcelGenerator;
-import fr.amapj.service.engine.excelgenerator.ExcelFormat;
-import fr.amapj.service.engine.excelgenerator.ExcelGeneratorTool;
+import fr.amapj.service.engine.generator.excel.AbstractExcelGenerator;
+import fr.amapj.service.engine.generator.excel.ExcelFormat;
+import fr.amapj.service.engine.generator.excel.ExcelGeneratorTool;
 
 
 /**

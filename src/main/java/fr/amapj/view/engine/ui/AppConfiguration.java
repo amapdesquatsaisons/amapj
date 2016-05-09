@@ -21,6 +21,7 @@
  package fr.amapj.view.engine.ui;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -80,6 +81,10 @@ public class AppConfiguration
 	
 	// Nom de l'onglet dans le navigateur
 	private String pageTitle;
+	
+	// Indique si les administrateurs ont des droits complets ou limités
+	// Dans le cas limités, il ne peuvent pas modifier les paramètres envoi de mail , ...
+	private boolean adminFull = true;
 
 	//
 	private List<DBMSConf> dbmsConfs = new ArrayList<DBMSConf>();
@@ -99,6 +104,9 @@ public class AppConfiguration
 		// TODO verifier que c'est bien un directory
 		String logDir = param.read("logDir");
 		AmapJLogManager.setLogDir(logDir);
+		
+		// 
+		adminFull = (param.read("adminFull", "TRUE")).equalsIgnoreCase("TRUE");
 		
 		// Lecture des DBMS
 		String dbmsList =  param.read("dbms");
@@ -123,6 +131,8 @@ public class AppConfiguration
 	{
 		AppInstanceDTO dto = new AppInstanceDTO();
 		
+		dto.id = 0L;
+		
 		dto.nomInstance = param.read("master.name");
 		
 		dto.dbUserName = param.read("master.user");
@@ -130,6 +140,8 @@ public class AppConfiguration
 		dto.dbPassword = param.read("master.password");
 		
 		dto.dbms = param.read("master.dbms");
+		
+		dto.dateCreation = new Date(0);
 		
 		return dto;
 	}
@@ -181,6 +193,11 @@ public class AppConfiguration
 	public AppInstanceDTO getMasterConf()
 	{
 		return masterConf;
+	}
+	
+	public boolean isAdminFull()
+	{
+		return adminFull;
 	}
 
 	/**

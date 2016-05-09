@@ -106,13 +106,14 @@ public class AppInstanceBasicForm extends VerticalLayout implements ComponentCon
 		
 		
 		// Titre des colonnes
-		cdesTable.setVisibleColumns(new String[] { "nomInstance", "dbms","dateCreation" ,"state" ,"nbUtilisateurs"});
+		cdesTable.setVisibleColumns(new String[] { "nomInstance", "dbms","dateCreation" ,"state" ,"nbUtilisateurs" , "nbMails" });
 		
 		cdesTable.setColumnHeader("nomInstance","Nom");
 		cdesTable.setColumnHeader("dbms","Dbms");
 		cdesTable.setColumnHeader("dateCreation","Date de création");
 		cdesTable.setColumnHeader("state","Etat");
 		cdesTable.setColumnHeader("nbUtilisateurs","Nb utilisateurs");
+		cdesTable.setColumnHeader("nbMails","Mails envoyés");
 		
 		cdesTable.setConverter("dateCreation", new DateTimeToStringConverter());
 
@@ -365,7 +366,7 @@ public class AppInstanceBasicForm extends VerticalLayout implements ComponentCon
 		String[] sortColumns = new String[] { "nomInstance"  };
 		boolean[] sortAscending = new boolean[] { true } ;
 		
-		List<AppInstanceDTO> res = new AppInstanceService().getAllInstances();
+		List<AppInstanceDTO> res = new AppInstanceService().getAllInstances(true);
 		boolean enabled = TableTools.updateTableMultiselect(cdesTable, res, sortColumns, sortAscending);
 		
 		enableButtonBar(enabled);		

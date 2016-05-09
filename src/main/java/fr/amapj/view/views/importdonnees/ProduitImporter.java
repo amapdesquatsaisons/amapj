@@ -48,15 +48,46 @@ public class ProduitImporter extends AbstractImporter<ImportProduitProducteurDTO
 	@Override
 	public String checkBasic(ImportProduitProducteurDTO dto)
 	{
+		// NOM DU PRODUIT
 		if (isEmpty(dto.produit))
 		{
 			return 	"Le nom du produit n'est pas renseigné. Il est obligatoire.";
 		}
+		
+		String msg = checkLength(dto.produit, 1, 100, "nom du produit");
+		if (msg!=null)
+		{
+			return msg;
+		}
+		
 
+		// CONDITIONNEMENT DU PRODUIT
+		if (isEmpty(dto.conditionnement))
+		{
+			return 	"Le conditionnement du produit n'est pas renseigné. Il est obligatoire.";
+		}
+		
+		msg = checkLength(dto.conditionnement, 1, 500, "conditionnement du produit");
+		if (msg!=null)
+		{
+			return msg;
+		}
+		
+		
+		// PRODUCTEUR
 		if (isEmpty(dto.producteur))
 		{
-			return "Le nom du producteur n'est pas renseigné. Elle est obligatoire.";
+			return "Le nom du producteur n'est pas renseigné. Il est obligatoire.";
 		}
+		
+		msg = checkLength(dto.producteur, 1, 100, "nom du producteur");
+		if (msg!=null)
+		{
+			return msg;
+		}
+		
+		
+		
 		
 		return null;
 		

@@ -23,6 +23,7 @@
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+
 import org.apache.logging.log4j.LogManager;import org.apache.logging.log4j.Logger;
 
 import javax.persistence.EntityManager;
@@ -47,7 +48,7 @@ import fr.amapj.model.models.stats.NotificationDone;
 import fr.amapj.model.models.stats.TypNotificationDone;
 import fr.amapj.service.engine.deamons.DeamonsImpl;
 import fr.amapj.service.engine.deamons.DeamonsUtils;
-import fr.amapj.service.engine.excelgenerator.AbstractExcelGenerator;
+import fr.amapj.service.engine.generator.excel.AbstractExcelGenerator;
 import fr.amapj.service.services.excelgenerator.EGFeuilleLivraison;
 import fr.amapj.service.services.mailer.MailerAttachement;
 import fr.amapj.service.services.mailer.MailerMessage;

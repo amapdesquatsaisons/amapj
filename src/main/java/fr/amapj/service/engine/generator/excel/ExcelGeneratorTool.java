@@ -18,7 +18,7 @@
  * 
  * 
  */
- package fr.amapj.service.engine.excelgenerator;
+ package fr.amapj.service.engine.generator.excel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +36,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellReference;
+import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
@@ -277,6 +278,7 @@ public class ExcelGeneratorTool
 	 */
 	public void addSheet(String sheetName,int nbCol,int colWidth)
 	{
+		sheetName = WorkbookUtil.createSafeSheetName(sheetName);
 		sheet = wb.createSheet(sheetName);
 		currentRow = null;
 		firstLine = true;

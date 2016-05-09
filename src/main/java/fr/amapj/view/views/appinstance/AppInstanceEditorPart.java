@@ -26,14 +26,18 @@ import java.util.Date;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.shared.ui.label.ContentMode;
 
+import fr.amapj.common.DateUtils;
 import fr.amapj.common.StringUtils;
+import fr.amapj.model.models.param.SmtpType;
 import fr.amapj.model.models.saas.TypDbExemple;
 import fr.amapj.service.services.appinstance.AppInstanceDTO;
 import fr.amapj.service.services.appinstance.AppInstanceService;
 import fr.amapj.service.services.parametres.ParametresDTO;
 import fr.amapj.service.services.parametres.ParametresService;
+import fr.amapj.service.services.utilisateur.UtilisateurService;
 import fr.amapj.view.engine.popup.formpopup.OnSaveException;
 import fr.amapj.view.engine.popup.formpopup.WizardFormPopup;
+import fr.amapj.view.engine.popup.formpopup.validator.NotNullValidator;
 
 /**
  * Permet uniquement de creer des instances
@@ -125,6 +129,48 @@ public class AppInstanceEditorPart extends WizardFormPopup
 	{
 		dto.url = guessDefault();
 		
+		switch (dto.typDbExemple)
+		{
+			case BASE_EXEMPLE:
+				dto.smtpType = SmtpType.POSTFIX_LOCAL;
+				dto.adrMailSrc = "demo@contrats.amapj.fr";
+				dto.nbMailMax = 5;
+				break;
+				
+			case BASE_MINIMALE:
+				dto.smtpType = SmtpType.POSTFIX_LOCAL;
+				dto.adrMailSrc = dto.nomInstance+"@contrats.amapj.fr";
+				dto.nbMailMax = 200;
+				break;
+				
+		}
+		
+		// Calcul des dates pour la base de données exemple
+		if (dto.typDbExemple==TypDbExemple.BASE_EXEMPLE)
+		{
+			
+			Date d1 = DateUtils.addDays(new Date(), 35);
+			Date d2 = DateUtils.firstMonday(d1);
+			Date d3 = DateUtils.addDays(d2, 3);
+			Date d4 = DateUtils.addDays(d2, 7*12);
+			
+			
+			dto.dateDebut = d3;
+			dto.dateFin = d4;
+			dto.dateFinInscription = d3;
+			
+			String pass = new UtilisateurService().generatePassword().toLowerCase();
+			dto.password = pass.substring(0,4);
+		}
+		else
+		{
+			String pass1 = new UtilisateurService().generatePassword().toLowerCase();
+			String pass2 = new UtilisateurService().generatePassword();
+			dto.password = pass1+pass2;
+		}
+		
+		
+		
 		// Titre
 		setStepTitle("les informations pour la création de la base");
 		
@@ -135,7 +181,17 @@ public class AppInstanceEditorPart extends WizardFormPopup
 			
 			addTextField("Ville de l'AMAP", "villeAmap");
 			
+			//
+			
+			addComboEnumField("Type du serveur de mail", "smtpType", new NotNullValidator());
+			
+			addTextField("Adresse mail expediteur", "adrMailSrc");
+			
+			addIntegerField("Nombre maximum de mail par jour", "nbMailMax");
+			
 			addTextField("Url vue par les utilisateurs", "url");
+			
+			//
 			
 			addDateField("Date de fin des inscriptions", "dateFinInscription");
 			
@@ -152,8 +208,18 @@ public class AppInstanceEditorPart extends WizardFormPopup
 			
 			addTextField("Ville de l'AMAP", "villeAmap");
 			
+			
+			//
+			addComboEnumField("Type du serveur de mail", "smtpType", new NotNullValidator());
+			
+			addTextField("Adresse mail expediteur", "adrMailSrc");
+			
+			addIntegerField("Nombre maximum de mail par jour", "nbMailMax");
+			
 			addTextField("Url vue par les utilisateurs", "url");
 			
+			
+			//
 			addTextField("Nom de l'administrateur", "user1Nom");
 			
 			addTextField("Prénom de l'administrateur", "user1Prenom");

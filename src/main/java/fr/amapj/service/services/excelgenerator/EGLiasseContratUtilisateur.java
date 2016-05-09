@@ -29,9 +29,9 @@ import javax.persistence.Query;
 import fr.amapj.model.models.contrat.modele.ModeleContrat;
 import fr.amapj.model.models.contrat.reel.Contrat;
 import fr.amapj.model.models.fichierbase.Utilisateur;
-import fr.amapj.service.engine.excelgenerator.AbstractExcelGenerator;
-import fr.amapj.service.engine.excelgenerator.ExcelFormat;
-import fr.amapj.service.engine.excelgenerator.ExcelGeneratorTool;
+import fr.amapj.service.engine.generator.excel.AbstractExcelGenerator;
+import fr.amapj.service.engine.generator.excel.ExcelFormat;
+import fr.amapj.service.engine.generator.excel.ExcelGeneratorTool;
 
 
 /**

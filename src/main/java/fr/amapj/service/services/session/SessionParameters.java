@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.List;
 
 import fr.amapj.model.models.acces.RoleList;
+import fr.amapj.view.engine.ui.AppConfiguration;
 import fr.amapj.view.views.common.contratselector.ContratSelectorSessionInfo;
 
 
@@ -58,6 +59,8 @@ public class SessionParameters
 	
 	public Long logId;
 	
+	public boolean isSudo;
+	
 	public ContratSelectorSessionInfo contratSelectorSessionInfo = new ContratSelectorSessionInfo();
 	
 	// Nom du fichier qui contiendra les logs
@@ -76,6 +79,16 @@ public class SessionParameters
 		return nbError;
 	}
 	
+	/**
+	 * L'utilisateur est admin full si 
+	 * -> la configuration l'autorise 
+	 * OU
+	 * -> il vient en sudo
+	 */
+	public boolean isAdminFull()
+	{
+		return AppConfiguration.getConf().isAdminFull() || isSudo;
+	}
 	
 	
 }

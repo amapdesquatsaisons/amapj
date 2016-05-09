@@ -123,6 +123,7 @@ public class PasswordManager
 		p.userEmail = email;
 		p.dateConnexion = logAccessDTO.dateIn;
 		p.logId = logAccessDTO.id;
+		p.isSudo = (sudo!=null);
 		p.logFileName = logAccessDTO.logFileName;
 		SessionManager.setSessionParameters(p);
 		
@@ -319,7 +320,7 @@ public class PasswordManager
 	
 	
 	/**
-	 * Génère une clépour le reset du password , de 20 caractères en minuscules
+	 * Génère une clé pour le reset du password , de 20 caractères en minuscules
 	 * @return
 	 */
 	private String generateResetPaswordSalt()

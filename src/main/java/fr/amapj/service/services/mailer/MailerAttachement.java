@@ -20,19 +20,15 @@
  */
  package fr.amapj.service.services.mailer;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 import javax.mail.util.ByteArrayDataSource;
 
-import org.apache.poi.ss.usermodel.Workbook;
-
-import fr.amapj.service.engine.excelgenerator.AbstractExcelGenerator;
-import fr.amapj.service.engine.excelgenerator.ExcelGeneratorService;
-import fr.amapj.service.engine.excelgenerator.FileInfoDTO;
+import fr.amapj.service.engine.generator.CoreGeneratorService;
+import fr.amapj.service.engine.generator.FileInfoDTO;
+import fr.amapj.service.engine.generator.excel.AbstractExcelGenerator;
 
 /**
  * Permet de stocker une piece jointe 
@@ -66,29 +62,14 @@ public class MailerAttachement
 	 */	
 	public MailerAttachement(AbstractExcelGenerator generator)
 	{
-		ExcelGeneratorService excelGeneratorService = new ExcelGeneratorService();
-
-		Workbook workbook = excelGeneratorService.getFichierExcel(generator);
+		CoreGeneratorService excelGeneratorService = new CoreGeneratorService();
+		
 		FileInfoDTO fileInfo = excelGeneratorService.getFileInfo(generator);
+		byte[] content = generator.getContent();
 
-		ByteArrayOutputStream imagebuffer = new ByteArrayOutputStream();
-
-		try
-		{
-			workbook.write(imagebuffer);
-		}
-		catch (IOException e)
-		{
-			throw new RuntimeException("Erreur inattendue");
-		}
-
-		dataSource = new ByteArrayDataSource(imagebuffer.toByteArray(), "application/vnd.ms-excel");
-		name = fileInfo.fileName;
+		dataSource = new ByteArrayDataSource(content, "application/vnd.ms-excel");
+		name = fileInfo.fileName+"."+fileInfo.extension;
 	}
-	
-
-	
-	
 	
 	
 	

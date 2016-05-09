@@ -34,18 +34,36 @@ import fr.amapj.view.engine.searcher.SearcherDefinition;
  * Liste des étiquettes
  *
  */
-public class SDEtiquette implements SearcherDefinition
+public class SDEditionSpe implements SearcherDefinition
 {
+	
+	private TypEditionSpecifique typEditionSpecifique;
+	
+	public SDEditionSpe(TypEditionSpecifique typEditionSpecifique)
+	{
+		this.typEditionSpecifique = typEditionSpecifique;
+	}
+
 	@Override
 	public String getTitle()
 	{
-		return "Etiquette";
+		switch (typEditionSpecifique)
+		{
+		case ETIQUETTE_PRODUCTEUR:
+			return "Etiquette";
+			
+		case ENGAGEMENT:
+			return "Contrat d'engagement";
+
+		default:
+			return "Edition spécifique";
+		}
 	}
 
 	@Override
 	public List<? extends Identifiable> getAllElements(Object params)
 	{
-		return  new EditionSpeService().getEtiquetteByType(TypEditionSpecifique.ETIQUETTE_PRODUCTEUR);
+		return  new EditionSpeService().getEtiquetteByType(typEditionSpecifique);
 	}
 
 

@@ -20,6 +20,7 @@
  */
  package fr.amapj.service.services.mescontrats;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -55,6 +56,7 @@ import fr.amapj.model.models.remise.RemiseProducteur;
 import fr.amapj.service.services.gestioncontrat.GestionContratService;
 import fr.amapj.service.services.gestioncontrat.ModeleContratSummaryDTO;
 import fr.amapj.service.services.gestioncotisation.GestionCotisationService;
+import fr.amapj.view.engine.popup.formpopup.OnSaveException;
 import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
 import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
 
@@ -462,14 +464,14 @@ public class MesContratsService
 	 * Ceci est fait dans une transaction en ecriture  
 	 */
 	@DbWrite
-	public void saveNewContrat(ContratDTO contratDTO,Long userId)
+	public void saveNewContrat(ContratDTO contratDTO,Long userId) throws OnSaveException
 	{
 		EntityManager em = TransactionHelper.getEm();
 		
 		// On vérifie d'abord que le contrat n'est pas vide
 		if (contratDTO.isEmpty())
 		{
-			throw new RuntimeException("Il est impossible de sauvegarder un contrat vide");
+			throw new OnSaveException("Il est impossible de sauvegarder un contrat vide");
 		}
 		
 		ModeleContrat mc = em.find(ModeleContrat.class, contratDTO.modeleContratId);
@@ -525,7 +527,7 @@ public class MesContratsService
 		}	
 	}
 	
-	private void insertPaiement(Paiement p, DatePaiementDTO datePaiementDTO,Contrat c,ModeleContratDatePaiement mcdp,EntityManager em)
+	private void insertPaiement(Paiement p, DatePaiementDTO datePaiementDTO,Contrat c,ModeleContratDatePaiement mcdp,EntityManager em) throws OnSaveException
 	{
 		if (p==null)
 		{
@@ -562,7 +564,7 @@ public class MesContratsService
 		
 	}
 
-	private void checkRemiseNonFaite(ModeleContratDatePaiement mcdp, EntityManager em)
+	private void checkRemiseNonFaite(ModeleContratDatePaiement mcdp, EntityManager em) throws OnSaveException
 	{
 		Query q = em.createQuery("select r from RemiseProducteur r WHERE r.datePaiement=:mcdp");
 		q.setParameter("mcdp",mcdp);
@@ -571,7 +573,8 @@ public class MesContratsService
 		List<RemiseProducteur> rps = q.getResultList();
 		if (rps.size()>0)
 		{
-			throw new AmapjRuntimeException("La remise a été faite pour la date de "+mcdp.getDatePaiement()+". Il n'est donc pas possible de créer un paiement pour cette date");
+			SimpleDateFormat df = new SimpleDateFormat("MMMMM yyyy");
+			throw new OnSaveException("La remise des chèques  a été faite au producteur pour le mois de "+df.format(mcdp.getDatePaiement())+". Vous ne devez donc pas mettre de paiement pour cette date");
 		}
 		
 	}

@@ -26,9 +26,9 @@ import java.util.List;
 import javax.persistence.EntityManager;
 
 import fr.amapj.model.models.contrat.modele.ModeleContrat;
-import fr.amapj.service.engine.excelgenerator.AbstractExcelGenerator;
-import fr.amapj.service.engine.excelgenerator.ExcelFormat;
-import fr.amapj.service.engine.excelgenerator.ExcelGeneratorTool;
+import fr.amapj.service.engine.generator.excel.AbstractExcelGenerator;
+import fr.amapj.service.engine.generator.excel.ExcelFormat;
+import fr.amapj.service.engine.generator.excel.ExcelGeneratorTool;
 import fr.amapj.service.services.gestioncontratsigne.ContratSigneDTO;
 import fr.amapj.service.services.gestioncontratsigne.GestionContratSigneService;
 

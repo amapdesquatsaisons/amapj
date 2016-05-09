@@ -20,14 +20,24 @@
  */
  package fr.amapj.service.services.parametres;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
-import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
-
+import fr.amapj.common.AmapjRuntimeException;
 import fr.amapj.model.engine.transaction.DbRead;
 import fr.amapj.model.engine.transaction.DbWrite;
 import fr.amapj.model.engine.transaction.TransactionHelper;
+import fr.amapj.model.models.acces.RoleList;
 import fr.amapj.model.models.param.Parametres;
+import fr.amapj.model.models.param.paramecran.AbstractParamEcran;
+import fr.amapj.model.models.param.paramecran.PEListeAdherent;
+import fr.amapj.model.models.param.paramecran.ParamEcran;
+import fr.amapj.service.services.parametres.paramecran.PEListeAdherentDTO;
+import fr.amapj.service.services.session.SessionManager;
+import fr.amapj.view.engine.menu.MenuList;
 
 /**
  * 
@@ -61,6 +71,8 @@ public class ParametresService
 		dto.smtpType = param.getSmtpType();
 		dto.sendingMailUsername = param.getSendingMailUsername();
 		dto.sendingMailPassword = param.getSendingMailPassword();
+		dto.sendingMailNbMax = param.getSendingMailNbMax();
+		dto.mailCopyTo = param.getMailCopyTo();
 		dto.url = param.getUrl();
 		dto.backupReceiver = param.getBackupReceiver();
 		
@@ -107,6 +119,8 @@ public class ParametresService
 		param.setSmtpType(dto.smtpType);
 		param.setSendingMailUsername(dto.sendingMailUsername);
 		param.setSendingMailPassword(dto.sendingMailPassword);
+		param.setSendingMailNbMax(dto.sendingMailNbMax);
+		param.setMailCopyTo(dto.mailCopyTo);
 		param.setUrl(dto.url);
 		param.setBackupReceiver(dto.backupReceiver);
 		
@@ -126,5 +140,131 @@ public class ParametresService
 		
 		
 	}
+	
+	
+	// PARTIE REQUETAGE POUR AVOIR LA LISTE DU PARAMETRAGE DE CHAQUE ECRAN
+	
 
+	/**
+	 * Permet de charger la liste de tous les parametrages ecrans
+	 */
+	@DbRead
+	public List<ParamEcranDTO> getAllParamEcranDTO()
+	{
+		EntityManager em = TransactionHelper.getEm();
+
+		List<ParamEcranDTO> res = new ArrayList<>();
+
+		Query q = em.createQuery("select p from ParamEcran p");
+
+		List<ParamEcran> ps = q.getResultList();
+		for (ParamEcran p : ps)
+		{
+			ParamEcranDTO dto = createParamEcranDTO(em, p);
+			res.add(dto);
+		}
+
+		return res;
+
+	}
+
+	public ParamEcranDTO createParamEcranDTO(EntityManager em, ParamEcran p)
+	{
+		ParamEcranDTO dto = new ParamEcranDTO();
+
+		dto.id = p.getId();
+		dto.menu = p.getMenu();
+		dto.content = p.getContent();
+
+		return dto;
+	}
+
+	
+
+	// PARTIE MISE A JOUR DES ETIQUETTES
+	@DbWrite
+	public void update(final ParamEcranDTO dto, final boolean create)
+	{
+		EntityManager em = TransactionHelper.getEm();
+
+		ParamEcran p;
+
+		if (create)
+		{
+			p = new ParamEcran();
+			p.setMenu(dto.menu);
+		} 
+		else
+		{
+			p = em.find(ParamEcran.class, dto.id);
+		}
+
+		p.setContent(dto.content);
+		
+
+		if (create)
+		{
+			em.persist(p);
+		}
+
+	}
+
+	
+	/**
+	 * Permet de charger le parametrage d'un écran particulier
+	 */
+	@DbRead
+	public ParamEcranDTO getParamEcran(MenuList menu)
+	{
+		EntityManager em = TransactionHelper.getEm();
+
+		Query q = em.createQuery("select p from ParamEcran p where p.menu=:m ");
+		q.setParameter("m", menu);
+
+		List<ParamEcran> ps = q.getResultList();
+		
+		if (ps.size()==0)
+		{
+			return null;
+		}
+		else if (ps.size()==1)
+		{
+			return createParamEcranDTO(em, ps.get(0));
+		}
+		else
+		{
+			throw new AmapjRuntimeException("Erreur : il y a deux param ecrans pour "+menu);
+		}
+	}
+	
+	
+	/**
+	 * Permet de charger le parametrage de l'écran liste adhérent
+	 * dans le but de l'utiliser fonctionnellement
+	 */
+	public PEListeAdherentDTO getPEListeAdherentDTO()
+	{
+		ParamEcranDTO p = getParamEcran(MenuList.LISTE_ADHERENTS);
+
+		PEListeAdherent pe;
+		if (p!=null)
+		{
+			pe = (PEListeAdherent) AbstractParamEcran.load(p);
+		}
+		else
+		{
+			 pe = new PEListeAdherent();	
+		}
+		List<RoleList> roles = SessionManager.getSessionParameters().userRole;
+		
+		PEListeAdherentDTO ret = new PEListeAdherentDTO();
+		ret.canAccessEmail = roles.contains(pe.canAccessEmail);
+		ret.canAccessTel1 = roles.contains(pe.canAccessTel1);
+		ret.canAccessTel2 = roles.contains(pe.canAccessTel2);
+		ret.canAccessAdress = roles.contains(pe.canAccessAdress);	
+		
+		return ret;
+	}
+	
+	
 }

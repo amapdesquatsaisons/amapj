@@ -20,24 +20,17 @@
  */
  package fr.amapj.model.models.param;
 
-import java.util.List;
-
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderColumn;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import fr.amapj.model.engine.Identifiable;
-import fr.amapj.model.models.fichierbase.Produit;
 
 /**
  * Paramètres généraux de l'application 
@@ -72,6 +65,12 @@ public class Parametres implements Identifiable
 	
 	@Size(min = 0, max = 255)
 	private String sendingMailPassword;
+	
+	// Nombre maximum de mail qu'il est possible d'envoyer par jour 
+	private int sendingMailNbMax;
+	
+	@Size(min = 0, max = 255)
+	private String mailCopyTo;
 	
 	/**
 	 * Type du serveur pour l'envoi des mails
@@ -397,6 +396,31 @@ public class Parametres implements Identifiable
 		this.smtpType = smtpType;
 	}
 
+
+	public int getSendingMailNbMax()
+	{
+		return sendingMailNbMax;
+	}
+
+
+	public void setSendingMailNbMax(int sendingMailNbMax)
+	{
+		this.sendingMailNbMax = sendingMailNbMax;
+	}
+
+
+	public String getMailCopyTo()
+	{
+		return mailCopyTo;
+	}
+
+
+	public void setMailCopyTo(String mailCopyTo)
+	{
+		this.mailCopyTo = mailCopyTo;
+	}
+
+	
 	
 	
 }

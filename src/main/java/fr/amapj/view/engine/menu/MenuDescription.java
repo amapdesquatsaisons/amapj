@@ -27,6 +27,8 @@ import com.vaadin.navigator.View;
 import fr.amapj.common.AmapjRuntimeException;
 import fr.amapj.model.models.acces.RoleList;
 import fr.amapj.model.models.param.EtatModule;
+import fr.amapj.model.models.param.paramecran.AbstractParamEcran;
+import fr.amapj.service.services.parametres.ParamEcranDTO;
 import fr.amapj.service.services.parametres.ParametresDTO;
 
 /**
@@ -120,8 +122,40 @@ public class MenuDescription
 		}
 	}
 	
+	/**
+	 * Recherche si l'écran est accessible à cet utilisateur en fonction des
+	 * paramètrages écran effectués
+	 * @param roles
+	 * @param dtos
+	 * @return
+	 */
+	public boolean complyParamEcan(List<RoleList> roles,List<ParamEcranDTO> dtos)
+	{
+		ParamEcranDTO dto = findParamEcran(dtos);
+		
+		if (dto==null)
+		{
+			return true;
+		}
+		
+		AbstractParamEcran ape = AbstractParamEcran.load(dto);
+		
+		return roles.contains(ape.getCanAccessEcran());
+		
+	}
 	
-	
+
+	private ParamEcranDTO findParamEcran(List<ParamEcranDTO> dtos)
+	{
+		for (ParamEcranDTO dto : dtos)
+		{
+			if (dto.menu.equals(menuName))
+			{
+				return dto;
+			}
+		}
+		return null;
+	}
 
 	public String getCategorie()
 	{
@@ -133,9 +167,5 @@ public class MenuDescription
 		this.categorie = categorie;
 		return this;
 	}
-
-	
-	
-	
 	
 }

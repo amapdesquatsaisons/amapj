@@ -22,6 +22,7 @@
 
 import java.util.Date;
 
+import fr.amapj.model.models.param.SmtpType;
 import fr.amapj.model.models.saas.TypDbExemple;
 import fr.amapj.view.engine.tools.TableItem;
 
@@ -47,12 +48,20 @@ public class AppInstanceDTO implements TableItem , Comparable<AppInstanceDTO>
 	
 	public String dbPassword;
 	
+	public int nbMails;
+	
 	// Partie création de la base de démo
 	public TypDbExemple typDbExemple;
 	
 	public String nomAmap;
 	
 	public String villeAmap;
+	
+	public SmtpType smtpType;
+	
+	public String adrMailSrc;
+	
+	public int nbMailMax;
 	
 	public String url;
 	
@@ -267,6 +276,46 @@ public class AppInstanceDTO implements TableItem , Comparable<AppInstanceDTO>
 	public int compareTo(AppInstanceDTO o)
 	{
 		return id.compareTo(o.id);
+	}
+
+	public int getNbMails()
+	{
+		return nbMails;
+	}
+
+	public void setNbMails(int nbMails)
+	{
+		this.nbMails = nbMails;
+	}
+
+	public SmtpType getSmtpType()
+	{
+		return smtpType;
+	}
+
+	public void setSmtpType(SmtpType smtpType)
+	{
+		this.smtpType = smtpType;
+	}
+
+	public String getAdrMailSrc()
+	{
+		return adrMailSrc;
+	}
+
+	public void setAdrMailSrc(String adrMailSrc)
+	{
+		this.adrMailSrc = adrMailSrc;
+	}
+
+	public int getNbMailMax()
+	{
+		return nbMailMax;
+	}
+
+	public void setNbMailMax(int nbMailMax)
+	{
+		this.nbMailMax = nbMailMax;
 	}
 	
 	

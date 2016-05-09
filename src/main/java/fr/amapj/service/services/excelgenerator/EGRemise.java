@@ -29,9 +29,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import fr.amapj.model.models.contrat.modele.ModeleContrat;
 import fr.amapj.model.models.remise.RemiseProducteur;
-import fr.amapj.service.engine.excelgenerator.AbstractExcelGenerator;
-import fr.amapj.service.engine.excelgenerator.ExcelFormat;
-import fr.amapj.service.engine.excelgenerator.ExcelGeneratorTool;
+import fr.amapj.service.engine.generator.excel.AbstractExcelGenerator;
+import fr.amapj.service.engine.generator.excel.ExcelFormat;
+import fr.amapj.service.engine.generator.excel.ExcelGeneratorTool;
 import fr.amapj.service.services.remiseproducteur.PaiementRemiseDTO;
 import fr.amapj.service.services.remiseproducteur.RemiseDTO;
 import fr.amapj.service.services.remiseproducteur.RemiseProducteurService;

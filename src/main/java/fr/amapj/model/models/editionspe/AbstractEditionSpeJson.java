@@ -24,6 +24,7 @@ import com.google.gson.Gson;
 
 import fr.amapj.common.AmapjRuntimeException;
 import fr.amapj.model.engine.Identifiable;
+import fr.amapj.model.models.editionspe.engagement.EngagementJson;
 import fr.amapj.model.models.editionspe.etiquette.EtiquetteProducteurJson;
 import fr.amapj.model.models.editionspe.planningmensuel.PlanningMensuelJson;
 import fr.amapj.service.services.editionspe.EditionSpeDTO;
@@ -51,7 +52,7 @@ public class AbstractEditionSpeJson implements Identifiable
 	 */
 	static public AbstractEditionSpeJson load(EditionSpeDTO p)
 	{
-		Class<? extends AbstractEditionSpeJson> clazz = findClazz(p.typEditionSpecifique);
+		Class clazz = findClazz(p.typEditionSpecifique);
 	
 		
 		AbstractEditionSpeJson etiquetteDTO = new Gson().fromJson(p.content, clazz);
@@ -64,7 +65,7 @@ public class AbstractEditionSpeJson implements Identifiable
 	
 	static public AbstractEditionSpeJson load(EditionSpecifique p)
 	{
-		Class<? extends AbstractEditionSpeJson> clazz = findClazz(p.getTypEditionSpecifique());
+		Class clazz = findClazz(p.getTypEditionSpecifique());
 	
 		
 		AbstractEditionSpeJson etiquetteDTO = new Gson().fromJson(p.getContent(), clazz);
@@ -76,7 +77,7 @@ public class AbstractEditionSpeJson implements Identifiable
 	}
 	
 
-	private static Class<? extends AbstractEditionSpeJson> findClazz(TypEditionSpecifique typ)
+	private static Class findClazz(TypEditionSpecifique typ)
 	{
 		switch (typ)
 		{
@@ -85,6 +86,9 @@ public class AbstractEditionSpeJson implements Identifiable
 			
 		case PLANNING_MENSUEL:
 			return PlanningMensuelJson.class;
+			
+		case ENGAGEMENT:
+			return EngagementJson.class;
 		
 		default:
 			throw new AmapjRuntimeException("Type non pris en compte");

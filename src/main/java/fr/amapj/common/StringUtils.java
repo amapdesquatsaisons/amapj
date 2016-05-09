@@ -20,7 +20,9 @@
  */
  package fr.amapj.common;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import fr.amapj.service.services.saisiepermanence.PermanenceUtilisateurDTO;
 
@@ -122,6 +124,29 @@ public class StringUtils
 		
 		return htmlContent;
 	}
+	
+	
+	public static List<String> asList(String input)
+	{
+		List<String> res = new ArrayList<String>();
+		
+		if (input==null)
+		{
+			return res;
+		}
+		
+		input = input.replaceAll("\r\n", "\n");
+		input = input.replaceAll("\r", "\n");
+		
+		String[] rs = input.split("\n");
+		
+		for (int i = 0; i < rs.length; i++)
+		{
+			res.add(rs[i]);
+		}
+		return res;
+	}
+	
 	
 
 }

@@ -43,6 +43,10 @@ public class ParametresDTO
 	
 	public String sendingMailPassword;
 	
+	public int sendingMailNbMax;
+	
+	public String mailCopyTo;
+	
 	public String url;
 	
 	public String backupReceiver;
@@ -265,8 +269,25 @@ public class ParametresDTO
 		this.serviceMailActif = serviceMailActif;
 	}
 
-	
-	
-	
+	public int getSendingMailNbMax()
+	{
+		return sendingMailNbMax;
+	}
+
+	public void setSendingMailNbMax(int sendingMailNbMax)
+	{
+		this.sendingMailNbMax = sendingMailNbMax;
+	}
+
+	public String getMailCopyTo()
+	{
+		return mailCopyTo;
+	}
+
+	public void setMailCopyTo(String mailCopyTo)
+	{
+		this.mailCopyTo = mailCopyTo;
+	}
+
 	
 }

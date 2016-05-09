@@ -27,10 +27,6 @@ import com.vaadin.data.util.converter.Converter;
 
 /**
  * Gestion des quantités
- * TODO interdire les nombres négatifs
- * 
- * 
- *  
  *
  */
 public class QteTextFieldConverter implements Converter
@@ -96,6 +92,9 @@ public class QteTextFieldConverter implements Converter
 	 */
 	public Integer convertToInteger(String str)
 	{
+		// Suppression des espaces
+		str = str.trim();
+				
 		if (str.length()==0)
 		{
 			return new Integer(0);

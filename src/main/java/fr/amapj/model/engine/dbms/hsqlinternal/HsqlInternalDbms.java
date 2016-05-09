@@ -50,6 +50,7 @@ import fr.amapj.model.engine.tools.SpecificDbUtils;
 import fr.amapj.model.engine.tools.TestTools;
 import fr.amapj.model.engine.transaction.DataBaseInfo;
 import fr.amapj.model.engine.transaction.DbUtil;
+import fr.amapj.model.models.param.SmtpType;
 import fr.amapj.model.models.saas.TypDbExemple;
 import fr.amapj.service.engine.appinitializer.AppInitializer;
 import fr.amapj.service.services.appinstance.AppInstanceDTO;
@@ -404,6 +405,9 @@ public class HsqlInternalDbms implements DBMS
 		
 		dto.nomAmap = "MASTER";
 		dto.villeAmap = "MASTER";
+		dto.smtpType = SmtpType.GMAIL;
+		dto.adrMailSrc = "";
+		dto.nbMailMax = 0;
 		dto.url = "xx";
 		dto.typDbExemple = TypDbExemple.BASE_MASTER;
 		
@@ -411,17 +415,19 @@ public class HsqlInternalDbms implements DBMS
 		
 		// Création de la base a1
 		dto = new AppInstanceDTO();
-		SimpleDateFormat df = new SimpleDateFormat("dd/MM/yy");
 		
 		dto.nomInstance="a1";
 		dto.dbms="hi";
 		
 		dto.nomAmap = "AMAP1";
 		dto.villeAmap = "VILLE AMAP1";
+		dto.smtpType = SmtpType.GMAIL;
+		dto.adrMailSrc = "";
+		dto.nbMailMax = 200;
 		dto.url = "http://amapj.fr/";
 		
-		
-		Date d1 = DateUtils.addDays(new Date(), 25);
+		// La base est valable 80 jours, donc la fin des inscriptions est placée dans 80 jours
+		Date d1 = DateUtils.addDays(new Date(), 80);
 		Date d2 = DateUtils.firstMonday(d1);
 		Date d3 = DateUtils.addDays(d2, 3);
 		Date d4 = DateUtils.addDays(d2, 7*12);
@@ -436,8 +442,18 @@ public class HsqlInternalDbms implements DBMS
 		
 		dbms.createOneBase(dto);
 		
-		
 		dbManager.stopAllDbms();
+	
+		SimpleDateFormat df = new SimpleDateFormat("dd MMMMM yyyy");
+		System.out.println("===================================================");
+		System.out.println("f[\"d1\"]=\""+df.format(d3)+"\";");
+		System.out.println("f[\"d2\"]=\""+df.format(d3)+"\";");
+		System.out.println("f[\"d3\"]=\""+df.format(d3)+"\";");
+		System.out.println("f[\"d4\"]=\""+df.format(d4)+"\";");
+		System.out.println("===================================================");
+		
+		
+		
 		
 	}
 

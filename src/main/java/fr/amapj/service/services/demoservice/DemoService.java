@@ -75,7 +75,7 @@ public class DemoService
 	{
 		EntityManager em = TransactionHelper.getEm();
 
-		createParamGeneraux(em, dto.nomAmap, dto.villeAmap, dto.url);
+		createParamGeneraux(em, dto);
 		
 		if (dto.typDbExemple==TypDbExemple.BASE_EXEMPLE)
 		{
@@ -101,19 +101,36 @@ public class DemoService
 
 
 
-	private void createParamGeneraux(EntityManager em, String nomAmap,String villeAmap, String url)
+	private void createParamGeneraux(EntityManager em, AppInstanceDTO dto)
 	{
 		Parametres p = new Parametres();
 		
 		p.setId(1L);
-		p.setSmtpType(SmtpType.GMAIL);
-		p.setEnvoiMailPeriodique(ChoixOuiNon.NON);
-		p.setEnvoiMailRappelPermanence(ChoixOuiNon.NON);
+		
+		// Etape 1 - Nom et ville Amap
+		p.setNomAmap(dto.nomAmap);
+		p.setVilleAmap(dto.villeAmap);
+		
+		// Etape 2 - Les mails 
+		p.setSmtpType(dto.smtpType);
+		p.setSendingMailUsername(dto.adrMailSrc);
+		p.setSendingMailPassword("");
+		p.setSendingMailNbMax(dto.nbMailMax);
+		p.setUrl(dto.url);
+		p.setMailCopyTo("");
+		p.setBackupReceiver("");
+		
+		// Etape 3
 		p.setEtatPlanningDistribution(EtatModule.INACTIF);
+		p.setEnvoiMailRappelPermanence(ChoixOuiNon.NON);
+		
+		// Etape 4
+		p.setEnvoiMailPeriodique(ChoixOuiNon.NON);
+		
+		// Etape 5
 		p.setEtatGestionCotisation(EtatModule.INACTIF);
-		p.setNomAmap(nomAmap);
-		p.setUrl(url);
-		p.setVilleAmap(villeAmap);
+		
+		// Etape 6
 		p.setEtatEditionSpecifique(EtatModule.INACTIF);
 		
 		

@@ -60,13 +60,9 @@ public class ImportDonneesView extends Panel implements View
 		Panel produitPanel = new Panel("Importations des produits et des producteurs");
 		produitPanel.setContent(getProduitPanel());
 		
-		/*Panel vidagePanel = new Panel("Importations des produits et des producteurs");
-		vidagePanel.setContent(getUtilisateurPanel());*/
-		
-
 		layout.addComponent(utilisateurPanel);
+		addEmptyLine(layout);
 		layout.addComponent(produitPanel);
-		//layout.addComponent(vidagePanel);
 	
 
 		setContent(layout);
@@ -76,6 +72,7 @@ public class ImportDonneesView extends Panel implements View
 	private Component getUtilisateurPanel()
 	{
 		VerticalLayout layout = new VerticalLayout();
+		layout.setMargin(true);
 		
 		addEmptyLine(layout);
 		addLabel(layout, "Pour importer les utilisateurs en masse, vous devez remplir un fichier Excel à un certain format.");
@@ -106,14 +103,13 @@ public class ImportDonneesView extends Panel implements View
 	private Component getProduitPanel()
 	{
 		VerticalLayout layout = new VerticalLayout();
+		layout.setMargin(true);
 		
 		addEmptyLine(layout);
-		addLabel(layout, "Pour importer les produits et ls producteurs en masse, vous devez remplir un fichier Excel à un certain format.");
+		addLabel(layout, "Pour importer les produits et les producteurs en masse, vous devez remplir un fichier Excel à un certain format.");
 		addLabel(layout, "Pour avoir un exemple du fichier à remplir, merci de cliquer sur ce lien :");
 		layout.addComponent(LinkCreator.createLink(new EGListeProduitProducteur(fr.amapj.service.services.excelgenerator.EGListeProduitProducteur.Type.EXAMPLE)));
 		addEmptyLine(layout);
-		
-		// TODO add  button fichier exemple 
 		
 		addLabel(layout, "Une fois que votre fichier Excel est prêt, vous pouvez le charger dans l'application."
 				+ " Pour cela, cliquez sur le bouton \"Charger les produits et les producteurs\", sélectionnez votre fichier, cliquez sur OK. Les produits et les producteurs seront alors automatiquement créés.");
@@ -127,6 +123,7 @@ public class ImportDonneesView extends Panel implements View
 		upload.setImmediate(true);
 		upload.setButtonCaption("Charger les produits et les producteurs");
 		
+		addEmptyLine(layout);
 		layout.addComponent(upload);
 		addEmptyLine(layout);
 		

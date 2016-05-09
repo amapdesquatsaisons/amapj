@@ -25,6 +25,8 @@ import static org.quartz.JobBuilder.newJob;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -36,6 +38,8 @@ import javax.servlet.ServletContextListener;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -119,6 +123,9 @@ public class AppInitializer implements ServletContextListener
 
 		// Chargement du fichier de configuration
 		AppConfiguration.load(new StandardServletParameter(event.getServletContext()));
+		
+		// Démarrage de Velocity
+		VelocityInitializer.load();
 
 		// Demarrage des DBMS
 		logger.info("Debut de démarrage des DBMS");

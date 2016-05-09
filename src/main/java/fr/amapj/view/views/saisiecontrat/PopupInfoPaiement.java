@@ -31,6 +31,7 @@ import com.vaadin.ui.VerticalLayout;
 import fr.amapj.service.services.mescontrats.InfoPaiementDTO;
 import fr.amapj.service.services.mescontrats.MesContratsService;
 import fr.amapj.view.engine.popup.corepopup.CorePopup;
+import fr.amapj.view.engine.popup.formpopup.OnSaveException;
 import fr.amapj.view.views.saisiecontrat.SaisieContrat.ModeSaisie;
 import fr.amapj.view.views.saisiecontrat.SaisieContrat.SaisieContratData;
 
@@ -122,7 +123,15 @@ public class PopupInfoPaiement extends CorePopup
 	{
 		if (data.modeSaisie!=ModeSaisie.FOR_TEST)
 		{
-			new MesContratsService().saveNewContrat(data.contratDTO,data.userId);
+			try
+			{
+				new MesContratsService().saveNewContrat(data.contratDTO,data.userId);
+			} 
+			catch (OnSaveException e)
+			{
+				e.showInNewDialogBox();
+				return;
+			}
 		}
 		
 		close();

@@ -65,6 +65,17 @@ public class Producteur implements Identifiable
 	@ManyToOne
     private EditionSpecifique etiquette;
 	
+	/**
+	 * Type engagement utilisé par ce producteur
+	 * null si il n'utilise pas d'engagement  
+	 */
+	@ManyToOne
+    private EditionSpecifique engagement;
+	
+	// Libelle qui sera utilisé sur le contrat
+	@Size(min = 0, max = 255)
+	private String libContrat;
+	
 
 	public enum P implements Mdm
 	{ 
@@ -137,6 +148,26 @@ public class Producteur implements Identifiable
 	public void setEtiquette(EditionSpecifique etiquette)
 	{
 		this.etiquette = etiquette;
+	}
+
+	public EditionSpecifique getEngagement()
+	{
+		return engagement;
+	}
+
+	public void setEngagement(EditionSpecifique engagement)
+	{
+		this.engagement = engagement;
+	}
+
+	public String getLibContrat()
+	{
+		return libContrat;
+	}
+
+	public void setLibContrat(String libContrat)
+	{
+		this.libContrat = libContrat;
 	}
 
 	

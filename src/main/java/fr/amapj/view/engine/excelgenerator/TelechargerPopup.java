@@ -33,9 +33,10 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.VerticalLayout;
 
-import fr.amapj.service.engine.excelgenerator.AbstractExcelGenerator;
-import fr.amapj.service.engine.excelgenerator.ExcelGeneratorService;
-import fr.amapj.service.engine.excelgenerator.FileInfoDTO;
+import fr.amapj.service.engine.generator.CoreGenerator;
+import fr.amapj.service.engine.generator.CoreGeneratorService;
+import fr.amapj.service.engine.generator.FileInfoDTO;
+import fr.amapj.service.engine.generator.excel.AbstractExcelGenerator;
 import fr.amapj.view.engine.popup.corepopup.CorePopup;
 
 /**
@@ -46,7 +47,7 @@ import fr.amapj.view.engine.popup.corepopup.CorePopup;
 public class TelechargerPopup extends CorePopup
 {
 	
-	private List<AbstractExcelGenerator> generators = new ArrayList<>();
+	private List<CoreGenerator> generators = new ArrayList<>();
 	
 	// Mémorise l'index des generators qui sont suivis par un espace
 	private List<Integer> separators = new ArrayList<>();
@@ -55,7 +56,7 @@ public class TelechargerPopup extends CorePopup
 	{	
 	}
 	
-	public void addGenerator(AbstractExcelGenerator generator)
+	public void addGenerator(CoreGenerator generator)
 	{
 		generators.add(generator);
 	}
@@ -72,7 +73,7 @@ public class TelechargerPopup extends CorePopup
 		contentLayout.addComponent(new Label("Veuillez cliquer sur le lien du fichier que vous souhaitez télécharger<br/>",ContentMode.HTML));
 		
 		
-		List<FileInfoDTO> fileInfoDTOs = new ExcelGeneratorService().getFileInfo(generators);
+		List<FileInfoDTO> fileInfoDTOs = new CoreGeneratorService().getFileInfo(generators);
 		int i=0;
 		for (FileInfoDTO fileInfoDTO : fileInfoDTOs)
 		{
@@ -90,8 +91,8 @@ public class TelechargerPopup extends CorePopup
 	{
 		String titre = fileInfoDTO.nameToDisplay;
 		String fileName = fileInfoDTO.fileName;
-		String extension = fileInfoDTO.generator.getFormat().name().toLowerCase();
-		Link extractFile = new Link(titre,new StreamResource(new ExcelResource(fileInfoDTO.generator), fileName+"."+extension));
+		String extension = fileInfoDTO.extension;
+		Link extractFile = new Link(titre,new StreamResource(new CoreResource(fileInfoDTO.generator), fileName+"."+extension));
 		contentLayout.addComponent(extractFile);
 	}
 

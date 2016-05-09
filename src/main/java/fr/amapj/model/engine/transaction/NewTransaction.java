@@ -29,7 +29,7 @@ import org.apache.logging.log4j.Logger;
 /**
  * Outil permettant de faire une nouvelle transaction basique au sein d'une transaction existante
  * 
- * Attention : dans la méthode appelée, il ne faire aucun appel de service, car ils seraient
+ * Attention : dans la méthode appelée, il ne faut faire aucun appel de service, car ils seraient
  * appeler dans l'ancienne transaction
  * 
  */

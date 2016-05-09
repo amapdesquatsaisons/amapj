@@ -561,7 +561,7 @@ abstract public class WizardFormPopup extends CorePopup
 		return f;
 	}
 	
-	protected Field addPasswordTextField(String title, Object propertyId)
+	protected PasswordField addPasswordTextField(String title, Object propertyId)
 	{
 		PasswordField f = new PasswordField(title);
 		binder.bind(f, propertyId);

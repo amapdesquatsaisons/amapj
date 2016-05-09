@@ -22,6 +22,7 @@
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -31,10 +32,13 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 
+import fr.amapj.model.models.param.EtatModule;
 import fr.amapj.service.services.parametres.ParametresDTO;
 import fr.amapj.service.services.parametres.ParametresService;
 import fr.amapj.view.engine.popup.PopupListener;
+import fr.amapj.view.engine.popup.corepopup.CorePopup;
 import fr.amapj.view.engine.popup.formpopup.FormPopup;
+import fr.amapj.view.views.parametres.paramecran.PEListeAdherentEditorPart;
 
 
 /**
@@ -49,12 +53,14 @@ public class ParametresView extends VerticalLayout implements View, PopupListene
 	
 	TextField nomAmap;
 	TextField villeAmap;
-	TextField sendingMailUsername;
-	TextField sendingMailPassword;
-	TextField url;
 	
+	TextField sendingMailUsername;
+	TextField url;
 	TextField backupReceiver;
+	
 	TextField modulePlanningDistribution;
+	TextField moduleGestionCotisation;
+	TextField moduleEditionSpecifique;
 
 	
 
@@ -65,26 +71,28 @@ public class ParametresView extends VerticalLayout implements View, PopupListene
 	public void enter(ViewChangeEvent event)
 	{
 
-		GridLayout layout = new GridLayout(3, 8);
+		GridLayout layout = new GridLayout(3, 12);
 		layout.setWidth("80%");
 		layout.setColumnExpandRatio(0, 0);
 		
 		
 		// Une ligne vide
-		addLabel(layout," ");
-		addLabel(layout," ");
-		addLabel(layout," ");	
+		addEmptyLine(layout);
 		
 		// 
 		nomAmap = addLine(layout,"Nom de l'AMAP:");
 		villeAmap = addLine(layout,"Ville de l'AMAP:");
+		addEmptyLine(layout);
+		
 		sendingMailUsername = addLine(layout,"Adresse mail qui enverra les messages");
-		sendingMailPassword = addLine(layout,"Password de l'adresse mail qui enverra les messages");
-		url = addLine(layout,"URL de l'application vue par les utilisateurs");
-
+		url = addLine(layout,"URL de l'application utilisée dans les mails");
 		backupReceiver = addLine(layout,"Adresse mail du destinataire des sauvegardes quotidiennes");
+		addEmptyLine(layout);
 		
 		modulePlanningDistribution = addLine(layout, "Activation du module Planning de distribution");
+		moduleGestionCotisation = addLine(layout, "Activation du module Gestion des cotisations");
+		moduleEditionSpecifique = addLine(layout, "Activation du module Etiquettes et autres éditions spécifiques");
+		
 		
 		addLabel(layout, "...");
 		addLabel(layout," ");
@@ -100,6 +108,21 @@ public class ParametresView extends VerticalLayout implements View, PopupListene
 			}
 		});
 		
+		addLabel(layout," ");
+		addLabel(layout," ");	
+		addEmptyLine(layout);
+		
+		final PopupListener listener = this;
+		
+		addButton(layout, "Ecran \"Liste des adhérents\"",new Button.ClickListener()
+		{
+			@Override
+			public void buttonClick(ClickEvent event)
+			{
+				CorePopup.open(new PEListeAdherentEditorPart(),listener);
+			}
+		});
+		
 		
 		
 		refresh();
@@ -110,7 +133,17 @@ public class ParametresView extends VerticalLayout implements View, PopupListene
 		addComponent(layout);
 		
 		
-		
+	}
+
+
+
+	private void addEmptyLine(GridLayout layout)
+	{
+		for(int i=0;i<3;i++)
+		{
+			Label tf = new Label("<br/>",ContentMode.HTML);
+			layout.addComponent(tf);
+		}
 	}
 
 
@@ -177,11 +210,14 @@ public class ParametresView extends VerticalLayout implements View, PopupListene
 		
 		nomAmap.setValue(dto.nomAmap);
 		villeAmap.setValue(dto.villeAmap);
+		
 		sendingMailUsername.setValue(dto.sendingMailUsername);
-		sendingMailPassword.setValue("**********");
 		url.setValue(dto.url);
 		backupReceiver.setValue(dto.backupReceiver);
+		
 		modulePlanningDistribution.setValue(dto.etatPlanningDistribution.toString());
+		moduleGestionCotisation.setValue(dto.etatGestionCotisation.toString());
+		moduleEditionSpecifique.setValue(dto.etatEditionSpecifique.toString());
 					
 	}
 
