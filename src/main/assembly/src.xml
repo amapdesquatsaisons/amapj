@@ -36,7 +36,7 @@
 			<filtered>false</filtered>
 		</fileSet>
 		<fileSet>
-			<directory>${project.basedir}/src/main/assembly</directory>
+			<directory>${project.basedir}</directory>
 			<outputDirectory>/</outputDirectory>
 			<includes>
 				<include>*.txt</include>

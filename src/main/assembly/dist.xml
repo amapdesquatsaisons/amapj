@@ -34,5 +34,13 @@
 				<include>*src*.zip</include>
 			</includes>
 		</fileSet>
+		<fileSet>
+			<directory>${project.basedir}</directory>
+			<outputDirectory>/</outputDirectory>
+			<includes>
+				<include>*.txt</include>
+			</includes>
+			<filtered>false</filtered>
+		</fileSet>
 	</fileSets>
 </assembly>
