@@ -16,11 +16,12 @@
 		<!-- Configuration -->
 		<java.source>1.8</java.source>
 		<java.target>1.8</java.target>
-		 <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
 		<!-- Plugins -->
 		<maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
-
+		<maven-assembly-plugin.version>2.6</maven-assembly-plugin.version>
+		
 		<!-- Logging -->
 		<org.apache.logging.log4j.version>2.5</org.apache.logging.log4j.version>
 
@@ -160,7 +161,6 @@
 
 	<!-- Build -->
 	<build>
-
 		<plugins>
 
 			<plugin>
@@ -175,4 +175,59 @@
 		</plugins>
 	</build>
 
+	<profiles>
+		<profile>
+			<id>dist</id>
+			<build>
+				<finalName>amapj</finalName>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<version>${maven-assembly-plugin.version}</version>
+						<configuration>
+							<descriptors>
+								<descriptor>src/main/assembly/tmp.xml</descriptor>
+								<descriptor>src/main/assembly/dist.xml</descriptor>
+							</descriptors>
+						</configuration>
+						<executions>
+							<execution>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<phase>package</phase>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>src</id>
+			<build>
+				<finalName>amapj</finalName>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<version>${maven-assembly-plugin.version}</version>
+						<configuration>
+							<descriptors>
+								<descriptor>src/main/assembly/src.xml</descriptor>
+							</descriptors>
+						</configuration>
+						<executions>
+							<execution>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<phase>package</phase>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
