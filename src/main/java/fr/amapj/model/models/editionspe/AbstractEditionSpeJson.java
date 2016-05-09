@@ -51,7 +51,7 @@ public class AbstractEditionSpeJson implements Identifiable
 	 */
 	static public AbstractEditionSpeJson load(EditionSpeDTO p)
 	{
-		Class clazz = findClazz(p.typEditionSpecifique);
+		Class<? extends AbstractEditionSpeJson> clazz = findClazz(p.typEditionSpecifique);
 	
 		
 		AbstractEditionSpeJson etiquetteDTO = new Gson().fromJson(p.content, clazz);
@@ -64,7 +64,7 @@ public class AbstractEditionSpeJson implements Identifiable
 	
 	static public AbstractEditionSpeJson load(EditionSpecifique p)
 	{
-		Class clazz = findClazz(p.getTypEditionSpecifique());
+		Class<? extends AbstractEditionSpeJson> clazz = findClazz(p.getTypEditionSpecifique());
 	
 		
 		AbstractEditionSpeJson etiquetteDTO = new Gson().fromJson(p.getContent(), clazz);
@@ -76,7 +76,7 @@ public class AbstractEditionSpeJson implements Identifiable
 	}
 	
 
-	private static Class findClazz(TypEditionSpecifique typ)
+	private static Class<? extends AbstractEditionSpeJson> findClazz(TypEditionSpecifique typ)
 	{
 		switch (typ)
 		{

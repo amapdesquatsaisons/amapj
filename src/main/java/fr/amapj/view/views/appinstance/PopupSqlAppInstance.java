@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.apache.tools.ant.taskdefs.Sleep;
-
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.server.ExternalResource;

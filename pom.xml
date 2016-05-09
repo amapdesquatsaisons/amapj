@@ -1,0 +1,178 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0  http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<!-- Basics -->
+	<groupId>fr.amapj</groupId>
+	<artifactId>amapj</artifactId>
+	<packaging>war</packaging>
+	<version>007</version>
+
+	<name>AMAPJ</name>
+
+	<!-- Properties -->
+	<properties>
+
+		<!-- Configuration -->
+		<java.source>1.8</java.source>
+		<java.target>1.8</java.target>
+		 <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		
+		<!-- Plugins -->
+		<maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
+
+		<!-- Logging -->
+		<org.apache.logging.log4j.version>2.5</org.apache.logging.log4j.version>
+
+		<!-- Persistence -->
+		<org.hsqldb.version>2.3.3</org.hsqldb.version>
+		<org.eclipse.persistence.version>2.1.1</org.eclipse.persistence.version>
+		<javax.validation.version>1.1.0.Final</javax.validation.version>
+		<org.eclipse.persistence.eclipselink.version>2.6.2</org.eclipse.persistence.eclipselink.version>
+
+		<!-- Vaadin -->
+		<com.vaadin.version>7.6.5</com.vaadin.version>
+
+		<!-- Ordonnanceur -->
+		<org.quartz-scheduler.version>2.2.3</org.quartz-scheduler.version>
+	</properties>
+
+	<!-- Dependencies -->
+	<dependencies>
+
+		<!-- Logging -->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>${org.apache.logging.log4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>${org.apache.logging.log4j.version}</version>
+		</dependency>
+
+		<!-- Persistence -->
+		<dependency>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>${org.hsqldb.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>javax.persistence</artifactId>
+			<version>${org.eclipse.persistence.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<version>${javax.validation.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>eclipselink</artifactId>
+			<version>${org.eclipse.persistence.eclipselink.version}</version>
+		</dependency>
+
+		<!-- Vaadin -->
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-push</artifactId>
+			<version>${com.vaadin.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-server</artifactId>
+			<version>${com.vaadin.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-shared</artifactId>
+			<version>${com.vaadin.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-themes</artifactId>
+			<version>${com.vaadin.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-client-compiled</artifactId>
+			<version>${com.vaadin.version}</version>
+		</dependency>
+
+		<!-- Ordonnanceur -->
+		<dependency>
+			<groupId>org.quartz-scheduler</groupId>
+			<artifactId>quartz</artifactId>
+			<version>${org.quartz-scheduler.version}</version>
+		</dependency>
+
+		<!-- Apache POI -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>3.14</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>3.14</version>
+		</dependency>
+
+		<!-- Utils -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.6.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.mail</groupId>
+			<artifactId>javax.mail</artifactId>
+			<version>1.5.5</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.4</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.6</version>
+		</dependency>
+
+		<!-- JEE -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+		</dependency>
+
+		<!-- Tests -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<!-- >scope>test</scope -->
+		</dependency>
+	</dependencies>
+
+	<!-- Build -->
+	<build>
+
+		<plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-plugin.version}</version>
+				<configuration>
+					<source>${java.source}</source>
+					<target>${java.target}</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
