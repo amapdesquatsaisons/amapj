@@ -34,6 +34,8 @@ import org.apache.logging.log4j.Logger;
 
 import com.vaadin.ui.UI;
 
+import fr.amapj.common.RandomUtils;
+import fr.amapj.model.engine.tools.TestTools;
 import fr.amapj.model.engine.transaction.DbRead;
 import fr.amapj.model.engine.transaction.DbUtil;
 import fr.amapj.model.engine.transaction.DbWrite;
@@ -292,7 +294,8 @@ public class PasswordManager
 		}
 		
 		u.setResetPasswordDate(new Date());
-		u.setResetPasswordSalt(generateResetPaswordSalt());
+		// Génère une clé pour le reset du password , de 20 caractères en minuscules
+		u.setResetPasswordSalt(RandomUtils.generatePasswordMin(20));
 
 		ParametresDTO parametresDTO = new ParametresService().getParametres(); 
 		
@@ -306,36 +309,18 @@ public class PasswordManager
 		buf.append("Merci de cliquer sur le lien ci dessous pour saisir votre nouveau mot de passe");
 		buf.append("<br/>");
 		buf.append("<br/>");
-		buf.append("<a href=\""+link+"\">Cliquez ici pour réinitiliser le mot de passe</a>");
+		buf.append("<a href=\""+link+"\">Cliquez ici pour changer votre mot de passe</a>");
 		buf.append("<br/>");
 		buf.append("<br/>");
 		buf.append("Si vous n'avez pas demandé à changer de mot de passe, merci de ne pas tenir compte de ce mail");
 		buf.append("<br/>");
 		
-		new MailerService().sendHtmlMail(new MailerMessage(email, "Re  initialisation de votre mot de passe", buf.toString()));
+		new MailerService().sendHtmlMail(new MailerMessage(email, "Changement de votre mot de passe", buf.toString()));
 		
 		return null;
 		
 	}
 	
-	
-	/**
-	 * Génère une clé pour le reset du password , de 20 caractères en minuscules
-	 * @return
-	 */
-	private String generateResetPaswordSalt()
-	{
-		int len = 20;
-		byte[] buf = new byte[len];
-		
-		for (int i = 0; i < 20; i++)
-		{
-			int random = ( (int) (Math.random()*26.0) ) % 26; 
-			buf[i] = (byte) ('a'+random);
-		}
-		
-		return new String(buf);
-	}
 
 	
 	/**
@@ -409,11 +394,12 @@ public class PasswordManager
 
 	public static void main(String[] args)
 	{
-		//new PasswordManager().setUserPassword(new Long(1051), "j");
+		TestTools.init();
+		new PasswordManager().setUserPassword(new Long(1052), "a");
 		//new PasswordManager().setUserPassword(new Long(1052), "e");
 		
-		String str = new PasswordManager().generateResetPaswordSalt();
-		System.out.println("str="+str);
+		//String str = new PasswordManager().generateResetPaswordSalt();
+		//System.out.println("str="+str);
 	}
 	
 	

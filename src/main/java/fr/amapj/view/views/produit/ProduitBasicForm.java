@@ -42,6 +42,7 @@ import fr.amapj.service.services.session.SessionManager;
 import fr.amapj.view.engine.basicform.BasicFormListPart;
 import fr.amapj.view.engine.basicform.FormInfo;
 import fr.amapj.view.engine.excelgenerator.LinkCreator;
+import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
 import fr.amapj.view.engine.searcher.Searcher;
 import fr.amapj.view.views.searcher.SearcherList;
 
@@ -135,6 +136,12 @@ public class ProduitBasicForm extends BasicFormListPart
 	{
 		new ProduitService().update( (ProduitDTO) dto, isNew);
 		
+	}
+	
+	@Override
+	public void deleteItem(Long idItemToSuppress) throws UnableToSuppressException
+	{
+		new ProduitService().deleteProduit(idItemToSuppress);
 	}
 	
 	

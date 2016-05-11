@@ -27,6 +27,7 @@ import com.vaadin.data.util.BeanItem;
 import com.vaadin.shared.ui.label.ContentMode;
 
 import fr.amapj.common.DateUtils;
+import fr.amapj.common.RandomUtils;
 import fr.amapj.common.StringUtils;
 import fr.amapj.model.models.param.SmtpType;
 import fr.amapj.model.models.saas.TypDbExemple;
@@ -159,14 +160,11 @@ public class AppInstanceEditorPart extends WizardFormPopup
 			dto.dateFin = d4;
 			dto.dateFinInscription = d3;
 			
-			String pass = new UtilisateurService().generatePassword().toLowerCase();
-			dto.password = pass.substring(0,4);
+			dto.password = RandomUtils.generatePasswordMin(4);
 		}
 		else
 		{
-			String pass1 = new UtilisateurService().generatePassword().toLowerCase();
-			String pass2 = new UtilisateurService().generatePassword();
-			dto.password = pass1+pass2;
+			dto.password = RandomUtils.generatePasswordMin(12);
 		}
 		
 		

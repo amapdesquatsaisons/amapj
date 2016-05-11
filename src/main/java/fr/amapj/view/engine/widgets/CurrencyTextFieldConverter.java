@@ -176,13 +176,19 @@ public class CurrencyTextFieldConverter implements Converter
 			String tok1 = toks[0];
 			String tok2 = toks[1];
 			
+			int racine = 0;
+			if (tok1.length()>0)
+			{
+				racine = new Integer(Integer.parseInt(tok1)*100);
+			}
+			
 			if (tok2.length()==1)
 			{
-				return new Integer(Integer.parseInt(tok1)*100+Integer.parseInt(tok2)*10);
+				return new Integer(racine+Integer.parseInt(tok2)*10);
 			} 
 			else if (tok2.length()==2)
 			{
-				return new Integer(Integer.parseInt(tok1)*100+Integer.parseInt(tok2));
+				return new Integer(racine+Integer.parseInt(tok2));
 			}
 		}
 		

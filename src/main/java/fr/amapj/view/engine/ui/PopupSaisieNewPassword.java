@@ -52,7 +52,7 @@ public class PopupSaisieNewPassword extends FormPopup
 	 */
 	public PopupSaisieNewPassword(String resetPasswordSalt)
 	{
-		popupTitle = "Changement de votre password"; 
+		popupTitle = "Changement de votre mot de passe"; 
 		this.resetPasswordSalt = resetPasswordSalt;	
 	}
 	

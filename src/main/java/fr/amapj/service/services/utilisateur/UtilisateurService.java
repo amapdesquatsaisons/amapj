@@ -27,6 +27,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import fr.amapj.common.LongUtils;
+import fr.amapj.common.RandomUtils;
 import fr.amapj.model.engine.transaction.DbRead;
 import fr.amapj.model.engine.transaction.DbWrite;
 import fr.amapj.model.engine.transaction.TransactionHelper;
@@ -173,7 +174,8 @@ public class UtilisateurService
 			return null;
 		}
 
-		String clearPassword = generatePassword();
+		// Génère un mot de passe de 8 caractères majuscules
+		String clearPassword = RandomUtils.generatePasswordMaj(8);
 
 		new PasswordManager().setUserPassword(u.getId(), clearPassword);
 		
@@ -215,26 +217,7 @@ public class UtilisateurService
 		}
 	}
 
-	/**
-	 * Génère un mot de passe de 6 caractères majuscules
-	 * 
-	 * @return
-	 */
-	public String generatePassword()
-	{
-
-		int len = 6;
-		byte[] buf = new byte[len];
-
-		for (int i = 0; i < len; i++)
-		{
-			int random = ((int) (Math.random() * 26.0)) % 26;
-			buf[i] = (byte) ('A' + random);
-		}
-
-		return new String(buf);
-
-	}
+	
 	
 	// PARTIE SUPPRESSION
 
@@ -354,7 +337,8 @@ public class UtilisateurService
 		for (EnvoiMailUtilisateurDTO dto : envoiMail.utilisateurs)
 		{
 			Utilisateur utilisateur = em.find(Utilisateur.class, dto.idUtilisateur);
-			String clearPassword = generatePassword();
+			// Génère un mot de passe de 8 caractères majuscules
+			String clearPassword = RandomUtils.generatePasswordMaj(8);
 			new PasswordManager().setUserPassword(utilisateur.getId(), clearPassword);
 			
 			sendEmail(em, utilisateur,  envoiMail.texteMail,clearPassword);

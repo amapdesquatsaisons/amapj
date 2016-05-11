@@ -39,6 +39,10 @@ public class TestCurrencyTextFieldConverter
 		assertIntEqual(12300, c.convertToCurrency("123."));
 		assertIntEqual(12310, c.convertToCurrency("123.1"));
 		assertIntEqual(12312, c.convertToCurrency("123.12"));
+		assertIntEqual(12, c.convertToCurrency(".12"));
+		assertIntEqual(10, c.convertToCurrency(".1"));
+		
+		assertNull(c.convertToCurrency("."));
 		assertNull(c.convertToCurrency("a123"));
 		assertNull(c.convertToCurrency("-123"));
 		assertNull(c.convertToCurrency("-123.1"));

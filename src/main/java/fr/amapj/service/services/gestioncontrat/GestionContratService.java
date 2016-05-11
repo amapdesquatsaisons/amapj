@@ -52,6 +52,7 @@ import fr.amapj.model.models.contrat.modele.ModeleContratProduit;
 import fr.amapj.model.models.fichierbase.Producteur;
 import fr.amapj.model.models.fichierbase.Produit;
 import fr.amapj.model.models.fichierbase.Utilisateur;
+import fr.amapj.model.models.stats.NotificationDone;
 import fr.amapj.service.services.authentification.PasswordManager;
 import fr.amapj.service.services.mescontrats.ContratColDTO;
 import fr.amapj.service.services.mescontrats.ContratDTO;
@@ -587,6 +588,7 @@ public class GestionContratService
 
 		suppressAllDatesPaiement(em, mc);
 		deleteAllDateBarreesModeleContrat(em, mc);
+		deleteAllNotificationDoneDateModeleContrat(em, mc);
 		suppressAllDates(em, mc);
 		suppressAllProduits(em, mc);
 
@@ -688,6 +690,9 @@ public class GestionContratService
 		// Avec une sous requete, on obtient la liste de toutes les dates
 		// exclues actuellement en base et on les efface
 		deleteAllDateBarreesModeleContrat(em, mc);
+		
+		// On efface aussi toutes les notification relatives à cette date 
+		deleteAllNotificationDoneDateModeleContrat(em, mc);
 
 		// Avec une sous requete, on obtient la liste de toutes les dates de
 		// livraison
@@ -789,6 +794,31 @@ public class GestionContratService
 			em.remove(exclude);
 		}
 	}
+	
+	/**
+	 * Methode utilitaire permettant de supprimer toutes les notifications faites sur les dates d'un modele de contrat
+	 * @param em
+	 * @param mc
+	 */
+	public void deleteAllNotificationDoneDateModeleContrat(EntityManager em, ModeleContrat mc)
+	{
+		// 
+		List<NotificationDone> notifs = getAllNotificationDone(em, mc);
+		for (NotificationDone notif : notifs)
+		{
+			em.remove(notif);
+		}
+	}
+	
+	private List<NotificationDone> getAllNotificationDone(EntityManager em, ModeleContrat mc)
+	{
+		Query q = em.createQuery("select n from NotificationDone n WHERE n.modeleContratDate.modeleContrat=:mc");
+		q.setParameter("mc",mc);
+		
+		return q.getResultList();
+	}
+	
+	
 	
 	/**
 	 * Perlet la mise à jour des produits d'un contrat dans une transaction

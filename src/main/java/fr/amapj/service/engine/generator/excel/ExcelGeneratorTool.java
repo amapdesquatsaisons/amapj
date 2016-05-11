@@ -306,7 +306,7 @@ public class ExcelGeneratorTool
 		}
 		else
 		{
-			((XSSFCellStyle) style).setFillForegroundColor(new XSSFColor(new java.awt.Color((byte) 0xF0, (byte)0xF0,(byte) 0xF0)));
+			((XSSFCellStyle) style).setFillForegroundColor(new XSSFColor(new java.awt.Color(0xF0,0xF0,0xF0)));
 		}
 	}
 	

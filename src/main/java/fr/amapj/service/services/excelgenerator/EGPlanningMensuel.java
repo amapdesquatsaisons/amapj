@@ -84,7 +84,7 @@ public class EGPlanningMensuel extends AbstractExcelGenerator
 		Entete entete = getEntetePlanning(em,planningJson,libInfo);
 		
 		// Recherche de tous les utilisateurs du document
-		List<Utilisateur> utilisateurs = getUtilisateur(em,libInfo);
+		List<Utilisateur> utilisateurs = getUtilisateur(em,libInfo,planningJson);
 		
 		
 		// Les colonnes en + sont le nom, prenom et telephone
@@ -241,17 +241,27 @@ public class EGPlanningMensuel extends AbstractExcelGenerator
 
 	/**
 	 * Retourne la liste de tous les utilisateurs qui ont commandé au moins une fois dans le mois
+	 * un des prdouits dans la liste des produits paramètrés
 	 * @param em
 	 * @return
 	 */
-	private List<Utilisateur> getUtilisateur(EntityManager em,LibInfo libInfo)
+	private List<Utilisateur> getUtilisateur(EntityManager em,LibInfo libInfo, PlanningMensuelJson planningJson)
 	{
+		// On crée la liste de produits concernés 
+		List<Long> ids = new ArrayList<Long>();
+		for (ParametresProduitsJson pp : planningJson.getParametresProduits())
+		{
+			ids.add(pp.getIdProduit());
+		}
+		
+		// On fait la requete
 		Query q = em.createQuery("select distinct(c.contrat.utilisateur) from ContratCell c WHERE "
-				+ " c.modeleContratDate.dateLiv >= :d1 AND c.modeleContratDate.dateLiv<:d2 "
-				+ "ORDER BY c.contrat.utilisateur.nom , c.contrat.utilisateur.prenom");
+				+ " c.modeleContratDate.dateLiv >= :d1 AND c.modeleContratDate.dateLiv<:d2 AND c.modeleContratProduit.produit.id IN :ids "
+				+ " ORDER BY c.contrat.utilisateur.nom , c.contrat.utilisateur.prenom");
 		
 		q.setParameter("d1",libInfo.debut);
 		q.setParameter("d2",libInfo.fin);
+		q.setParameter("ids",ids);
 		
 		List<Utilisateur> us = q.getResultList();
 		return us;

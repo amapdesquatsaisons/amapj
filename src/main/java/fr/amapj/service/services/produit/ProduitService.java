@@ -20,13 +20,21 @@
  */
  package fr.amapj.service.services.produit;
 
-import javax.persistence.EntityManager;
+import java.util.List;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+
+import fr.amapj.common.CollectionUtils;
+import fr.amapj.common.DebugUtil;
+import fr.amapj.common.LongUtils;
 import fr.amapj.model.engine.transaction.DbRead;
 import fr.amapj.model.engine.transaction.DbWrite;
 import fr.amapj.model.engine.transaction.TransactionHelper;
+import fr.amapj.model.models.contrat.modele.ModeleContrat;
 import fr.amapj.model.models.fichierbase.Producteur;
 import fr.amapj.model.models.fichierbase.Produit;
+import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
 
 /**
  * Permet la gestion des producteurs
@@ -36,7 +44,7 @@ public class ProduitService
 {
 	
 	
-	// PARTIE REQUETAGE POUR AVOIR LA LISTE DES PRODUCTEURS
+	// PARTIE REQUETAGE POUR AVOIR LA LISTE DES PRODUITS
 	
 	/**
 	 * Permet de charger un produit
@@ -97,4 +105,45 @@ public class ProduitService
 			em.persist(p);
 		}
 	}
+
+
+
+	/**
+	 * Permet la suppression d'un produit
+	 */
+	@DbWrite
+	public void deleteProduit(Long idItemToSuppress) throws UnableToSuppressException
+	{
+		EntityManager em = TransactionHelper.getEm();
+		Produit p = em.find(Produit.class, idItemToSuppress);
+		
+		// 
+		verifContrat(p,em);
+		
+		em.remove(p);
+	}
+	
+	
+	private void verifContrat(Produit p, EntityManager em) throws UnableToSuppressException
+	{
+		Query q = em.createQuery("select distinct(c.modeleContrat) from ModeleContratProduit c WHERE c.produit=:p");
+		q.setParameter("p", p);
+			
+		List<ModeleContrat> mcs = q.getResultList();
+
+		if (mcs.size()>0)
+		{
+			String str = CollectionUtils.asStdString(mcs, new CollectionUtils.ToString<ModeleContrat>()
+			{
+				@Override
+				public String toString(ModeleContrat t)
+				{
+					return t.getNom();
+				}
+			});
+			throw new UnableToSuppressException("Cet produit est présent dans "+mcs.size()+" contrats : "+str);
+		}
+	}
+	
+	
 }

@@ -6,7 +6,7 @@
 	<groupId>fr.amapj</groupId>
 	<artifactId>amapj</artifactId>
 	<packaging>war</packaging>
-	<version>009</version>
+	<version>010</version>
 
 	<name>AMAPJ</name>
 

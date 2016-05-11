@@ -64,4 +64,85 @@ public class CollectionUtils
 		
 		return res;
 	}
+	
+	
+	static public interface ToString<T>
+	{
+		public String toString(T t);
+	}
+	
+	/**
+	 * Convertit une liste d'objet en une String 
+	 * Exemple : ls = [ "Bob" , "Marc" , "Paul" ]
+	 * 
+	 *  asString(ls,",") =>  "Bob,Marc,Paul"
+	 * 
+	 */
+	public static <T> String asString(List<T> ls,String sep,ToString<T> f)
+	{
+		if (ls.size()==0)
+		{
+			return "";
+		}
+		
+		StringBuffer str = new StringBuffer();
+		for (int i = 0; i < ls.size()-1; i++)
+		{
+			T l = ls.get(i);
+			if (l!=null)
+			{
+				str.append(f.toString(l));
+			}
+			else
+			{
+				str.append("null");
+			}
+			str.append(sep);
+		}
+		
+		T l = ls.get(ls.size()-1);
+		if (l!=null)
+		{
+			str.append(f.toString(l));
+		}
+		else
+		{
+			str.append("null");
+		}
+		
+		return str.toString();
+	}
+	
+	
+	/**
+	 * Convertit une liste d'objet en une String 
+	 * Exemple : ls = [ "Bob" , "Marc" , "Paul" ]
+	 * 
+	 *  asString(ls) =>  "(Bob,Marc,Paul)"
+	 * 
+	 */
+	public static <T> String asStdString(List<T> ls,ToString<T> f)
+	{
+		return "("+asString(ls, ",", f)+")";
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }
