@@ -71,6 +71,7 @@ public class SaisiePermanenceListPart extends VerticalLayout implements Componen
 	private Button editButton;
 	private Button planifButton;
 	private Button rappelButton;
+	private Button deleteListButton;
 	
 
 	private String textFilter;
@@ -208,6 +209,19 @@ public class SaisiePermanenceListPart extends VerticalLayout implements Componen
 			}
 		});
 		
+		deleteListButton = new Button("Supprimer plusieurs permanences");
+		deleteListButton.addClickListener(new Button.ClickListener()
+		{
+
+			@Override
+			public void buttonClick(ClickEvent event)
+			{
+				handleDeleteList();
+			}
+		});
+		
+		
+		
 		
 
 		searchField = new TextField();
@@ -229,6 +243,7 @@ public class SaisiePermanenceListPart extends VerticalLayout implements Componen
 		toolbar.addComponent(deleteButton);
 		toolbar.addComponent(planifButton);
 		toolbar.addComponent(rappelButton);
+		toolbar.addComponent(deleteListButton);
 		
 		
 		toolbar.addComponent(searchField);
@@ -293,6 +308,12 @@ public class SaisiePermanenceListPart extends VerticalLayout implements Componen
 		new PermanenceService().deleteDistribution(idItemToSuppress);
 	}
 
+
+	protected void handleDeleteList()
+	{
+		
+		PopupDeletePermanence.open(new PopupDeletePermanence(), this);
+	}
 
 
 

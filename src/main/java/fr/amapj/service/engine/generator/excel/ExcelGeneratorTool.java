@@ -24,8 +24,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
+import org.apache.poi.hssf.usermodel.HSSFPalette;
 import org.apache.poi.hssf.usermodel.HSSFPrintSetup;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.DataFormat;
@@ -37,6 +39,8 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.ss.util.WorkbookUtil;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
@@ -61,19 +65,31 @@ public class ExcelGeneratorTool
 	Font fontGrasPetit;
 
 	
+	
+	
+	
+	
+	
+	
+	
 	public CellStyle grasGaucheNonWrappe;
 	public CellStyle grasGaucheNonWrappeColor;
 	public CellStyle grasGaucheNonWrappeBordure;
+	public CellStyle grasGaucheNonWrappeBordureGray;
 	
+	public CellStyle grasCentre;
 	public CellStyle grasCentreBordure;
 	public CellStyle grasCentreBordureColor;
 	public CellStyle grasCentreBordureColorPetit;
+	public CellStyle grasCentreBordureGray;
 	
 	
 	public CellStyle nonGrasCentreBordure;
 	public CellStyle nonGrasCentreBordureColor;
+	public CellStyle nonGrasCentreBordureGray;
 	public CellStyle nonGrasGaucheBordure;
 	public CellStyle nongrasGaucheWrappe;
+	public CellStyle nonGrasGaucheBordureGray;
 	
 	public CellStyle prixCentreBordure;
 	public CellStyle prixCentreBordureColor;
@@ -173,22 +189,31 @@ public class ExcelGeneratorTool
 		grasGaucheNonWrappeBordure.setWrapText(false);
 		addBorderedStyle(grasGaucheNonWrappeBordure);
 		beWhite(grasGaucheNonWrappeBordure);
+		
+		grasGaucheNonWrappeBordureGray = duplicate(grasGaucheNonWrappeBordure);
+		beGray(grasGaucheNonWrappeBordureGray);
+		
 
-		grasCentreBordure = wb.createCellStyle();
-		grasCentreBordure.setAlignment(CellStyle.ALIGN_CENTER);
-		grasCentreBordure.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
-		grasCentreBordure.setFont(fontGras);
+		grasCentre = wb.createCellStyle();
+		grasCentre.setAlignment(CellStyle.ALIGN_CENTER);
+		grasCentre.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+		grasCentre.setFont(fontGras);
+		grasCentre.setWrapText(true);
+		beWhite(grasCentre);
+		
+		grasCentreBordure = duplicate(grasCentre);
 		addBorderedStyle(grasCentreBordure);
-		grasCentreBordure.setWrapText(true);
-		beWhite(grasCentreBordure);
 
-		grasCentreBordureColor = wb.createCellStyle();
-		grasCentreBordureColor.cloneStyleFrom(grasCentreBordure);
+		grasCentreBordureColor = duplicate(grasCentreBordure);
 		beOrange(grasCentreBordureColor);
 		
-		grasCentreBordureColorPetit = wb.createCellStyle();
-		grasCentreBordureColorPetit.cloneStyleFrom(grasCentreBordureColor);
+		grasCentreBordureColorPetit = duplicate(grasCentreBordureColor);
 		grasCentreBordureColorPetit.setFont(fontGrasPetit);
+		
+		grasCentreBordureGray = duplicate(grasCentreBordure);
+		beGray(grasCentreBordureGray);
+		
+		
 
 		nonGrasCentreBordure = wb.createCellStyle();
 		nonGrasCentreBordure.setAlignment(CellStyle.ALIGN_CENTER);
@@ -198,9 +223,12 @@ public class ExcelGeneratorTool
 		nonGrasCentreBordure.setWrapText(true);
 		beWhite(nonGrasCentreBordure);
 
-		nonGrasCentreBordureColor = wb.createCellStyle();
-		nonGrasCentreBordureColor.cloneStyleFrom(nonGrasCentreBordure);
+		nonGrasCentreBordureColor = duplicate(nonGrasCentreBordure);
 		beOrange(nonGrasCentreBordureColor);
+		
+		nonGrasCentreBordureGray = duplicate(nonGrasCentreBordure);
+		beGray(nonGrasCentreBordureGray);
+		
 
 		nonGrasGaucheBordure = wb.createCellStyle();
 		nonGrasGaucheBordure.setAlignment(CellStyle.ALIGN_LEFT);
@@ -209,6 +237,12 @@ public class ExcelGeneratorTool
 		addBorderedStyle(nonGrasGaucheBordure);
 		nonGrasGaucheBordure.setWrapText(true);
 		beWhite(nonGrasGaucheBordure);
+		
+		
+		nonGrasGaucheBordureGray = duplicate(nonGrasGaucheBordure);
+		beGray(nonGrasGaucheBordureGray);
+		
+		
 
 		prixCentreBordure = wb.createCellStyle();
 		prixCentreBordure.setAlignment(CellStyle.ALIGN_CENTER);
@@ -219,8 +253,7 @@ public class ExcelGeneratorTool
 		prixCentreBordure.setDataFormat(df.getFormat("#,##0.00€"));
 		beWhite(prixCentreBordure);
 
-		prixCentreBordureColor = wb.createCellStyle();
-		prixCentreBordureColor.cloneStyleFrom(prixCentreBordure);
+		prixCentreBordureColor = duplicate(prixCentreBordure);
 		beOrange(prixCentreBordureColor);
 		
 	    
@@ -239,19 +272,44 @@ public class ExcelGeneratorTool
 
 	}
 	
-	private void beWhite(CellStyle grasGaucheNonWrappe)
+	private CellStyle duplicate(CellStyle style)
 	{
-		grasGaucheNonWrappe.setFillPattern(CellStyle.SOLID_FOREGROUND);
-		grasGaucheNonWrappe.setFillForegroundColor(IndexedColors.WHITE.getIndex());
+		CellStyle ret = wb.createCellStyle();
+		ret.cloneStyleFrom(style);
+		return ret;
+	}
+
+
+	private void beWhite(CellStyle style)
+	{
+		style.setFillPattern(CellStyle.SOLID_FOREGROUND);
+		style.setFillForegroundColor(IndexedColors.WHITE.getIndex());
 
 	}
 
-	private void beOrange(CellStyle grasGaucheNonWrappe)
+	private void beOrange(CellStyle style)
 	{
-		grasGaucheNonWrappe.setFillPattern(CellStyle.SOLID_FOREGROUND);
-		grasGaucheNonWrappe.setFillForegroundColor(IndexedColors.LIGHT_YELLOW.getIndex());
+		style.setFillPattern(CellStyle.SOLID_FOREGROUND);
+		style.setFillForegroundColor(IndexedColors.LIGHT_YELLOW.getIndex());
 
 	}
+	
+	private void beGray(CellStyle style)
+	{
+		style.setFillPattern(CellStyle.SOLID_FOREGROUND);
+		
+		if (wb instanceof HSSFWorkbook )
+		{
+			HSSFPalette palette = ((HSSFWorkbook )wb ).getCustomPalette();
+		    palette.setColorAtIndex(HSSFColor.LAVENDER.index,(byte) 0xF0, (byte)0xF0,(byte) 0xF0);
+		    style.setFillForegroundColor(IndexedColors.LAVENDER.getIndex());
+		}
+		else
+		{
+			((XSSFCellStyle) style).setFillForegroundColor(new XSSFColor(new java.awt.Color((byte) 0xF0, (byte)0xF0,(byte) 0xF0)));
+		}
+	}
+	
 
 	private void addBorderedStyle(CellStyle style)
 	{
@@ -559,6 +617,39 @@ public class ExcelGeneratorTool
 			else if (style == nonGrasCentreBordure)
 			{
 				return nonGrasCentreBordureColor;
+			}
+			else
+			{
+				throw new RuntimeException("erreur de programme");
+			}
+		}
+	}
+	
+	
+	// Gestion du grisé
+	public CellStyle switchGray(CellStyle style, int i)
+	{
+		if ((i%2)==0)
+		{
+			return style;
+		}
+		else
+		{
+			if (style==grasGaucheNonWrappeBordure)
+			{
+				return grasGaucheNonWrappeBordureGray;
+			}
+			else if (style==nonGrasGaucheBordure)
+			{
+				return nonGrasGaucheBordureGray;
+			}
+			else if (style == grasCentreBordure)
+			{
+				return grasCentreBordureGray;
+			}
+			else if (style == nonGrasCentreBordure)
+			{
+				return nonGrasCentreBordureGray;
 			}
 			else
 			{

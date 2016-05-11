@@ -50,6 +50,9 @@ public class PlanningMensuelJson extends AbstractEditionSpeJson
 	
 	// Role pouvant accéder à ce planning 
 	private RoleList accessibleBy = RoleList.ADHERENT;
+	
+	//
+	private TypPlanning typPlanning = TypPlanning.MENSUEL;
 
 	
 
@@ -122,6 +125,18 @@ public class PlanningMensuelJson extends AbstractEditionSpeJson
 	public void setAccessibleBy(RoleList accessibleBy)
 	{
 		this.accessibleBy = accessibleBy;
+	}
+
+
+	public TypPlanning getTypPlanning()
+	{
+		return typPlanning;
+	}
+
+
+	public void setTypPlanning(TypPlanning typPlanning)
+	{
+		this.typPlanning = typPlanning;
 	}
 
 

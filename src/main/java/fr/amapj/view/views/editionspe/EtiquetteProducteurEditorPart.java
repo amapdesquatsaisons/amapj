@@ -23,11 +23,9 @@
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gson.Gson;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.ui.TextField;
 
-import fr.amapj.common.AmapjRuntimeException;
 import fr.amapj.model.models.editionspe.AbstractEditionSpeJson;
 import fr.amapj.model.models.editionspe.TypEditionSpecifique;
 import fr.amapj.model.models.editionspe.etiquette.EtiquetteColJson;
@@ -37,6 +35,7 @@ import fr.amapj.service.services.editionspe.EditionSpeService;
 import fr.amapj.view.engine.collectioneditor.CollectionEditor;
 import fr.amapj.view.engine.collectioneditor.FieldType;
 import fr.amapj.view.engine.popup.formpopup.WizardFormPopup;
+import fr.amapj.view.engine.popup.formpopup.validator.NotNullValidator;
 
 /**
  * Permet la saisie des étiquettes producteurs
@@ -177,13 +176,15 @@ public class EtiquetteProducteurEditorPart extends WizardFormPopup
 	private void addFieldMarges()
 	{
 		// Titre
-		setStepTitle("les marges");
+		setStepTitle("les marges et les bordures");
 		
  
 		addIntegerField("Marge droite (en mm)", "margeDroite");
 		addIntegerField("Marge gauche (en mm)", "margeGauche");
 		addIntegerField("Marge en haut (en mm)", "margeHaut");
 		addIntegerField("Marge en bas (en mm)", "margeBas");
+		
+		addComboEnumField("Dessiner une bordure", "bordure", new NotNullValidator());
 		
 	}
 

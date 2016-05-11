@@ -32,6 +32,7 @@ import javax.persistence.TemporalType;
 
 import org.apache.commons.lang.time.DateUtils;
 
+import fr.amapj.common.LongUtils;
 import fr.amapj.model.engine.transaction.DbRead;
 import fr.amapj.model.engine.transaction.TransactionHelper;
 import fr.amapj.model.models.acces.RoleList;
@@ -43,6 +44,7 @@ import fr.amapj.model.models.editionspe.AbstractEditionSpeJson;
 import fr.amapj.model.models.editionspe.EditionSpecifique;
 import fr.amapj.model.models.editionspe.TypEditionSpecifique;
 import fr.amapj.model.models.editionspe.planningmensuel.PlanningMensuelJson;
+import fr.amapj.model.models.editionspe.planningmensuel.TypPlanning;
 import fr.amapj.model.models.fichierbase.Producteur;
 import fr.amapj.model.models.fichierbase.Utilisateur;
 import fr.amapj.service.services.access.AccessManagementService;
@@ -231,27 +233,44 @@ public class MesLivraisonsService
 		// Récupération de la liste des mois
 		List<Date> months = getMonth(em,dateDebut,dateFin);
 		
+		boolean hasLivraison = hasLivraison(em, dateDebut, dateFin);
+		
 		// Récupération de la liste des editions
 		List<EditionSpecifique> editions = new EditionSpeService().getEtiquetteByType(TypEditionSpecifique.PLANNING_MENSUEL);
 		
-		for (Date month : months)
+		
+		for (EditionSpecifique editionSpecifique : editions)
 		{
-			for (EditionSpecifique editionSpecifique : editions)
-			{
-				if (canAccess(roles,editionSpecifique))
-				{	
-					// Le nom de l'edition est mis en suffixe uniquement si il y en a plusieurs 
-					String suffix = "";
-					if (editions.size()!=1)
+			if (canAccess(roles,editionSpecifique))
+			{	
+				// Le nom de l'edition est mis en suffixe uniquement si il y en a plusieurs 
+				String suffix = "";
+				if (editions.size()!=1)
+				{
+					suffix = editionSpecifique.getNom();
+				}
+				
+				PlanningMensuelJson planningJson = (PlanningMensuelJson) AbstractEditionSpeJson.load(editionSpecifique);
+				
+				if(planningJson.getTypPlanning()==TypPlanning.MENSUEL)
+				{
+					for (Date month : months)
 					{
-						suffix = editionSpecifique.getNom();
+						EGPlanningMensuel planningMensuel = new EGPlanningMensuel(editionSpecifique.getId(), month, suffix);
+						res.add(planningMensuel);
 					}
-					
-					EGPlanningMensuel planningMensuel = new EGPlanningMensuel(editionSpecifique.getId(), month, suffix);
-					res.add(planningMensuel);
+				}
+				else
+				{
+					if (hasLivraison)
+					{
+						EGPlanningMensuel planningMensuel = new EGPlanningMensuel(editionSpecifique.getId(), dateDebut, suffix);
+						res.add(planningMensuel);
+					}
 				}
 			}
 		}
+		
 		
 		return res;
 	}
@@ -297,6 +316,26 @@ public class MesLivraisonsService
 		}
 		return res;
 	}
+	
+	
+	/**
+	 * Indique si il y a au moins une livraison cette semaine
+	 * @param dto
+	 * @return
+	 */
+	private boolean hasLivraison(EntityManager em, Date dateDebut, Date dateFin)
+	{
+		// On extrait toutes les livraisons sur l'intervalle 
+		Query q = em.createQuery("select count(mcd.dateLiv) from ModeleContratDate mcd WHERE " +
+				"mcd.dateLiv>=:deb AND " +
+				"mcd.dateLiv<=:fin ");
+		q.setParameter("deb", dateDebut, TemporalType.DATE);
+		q.setParameter("fin", dateFin, TemporalType.DATE);
+		
+		return LongUtils.toInt(q.getSingleResult())>0;
+	}
+	
+	
 
 	// PARTIE REQUETAGE POUR AVOIR LA LISTE DES LIVRAISONS POUR UN PRODUCTEUR
 

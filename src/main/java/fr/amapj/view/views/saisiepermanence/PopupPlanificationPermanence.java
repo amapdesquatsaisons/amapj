@@ -21,6 +21,7 @@
  package fr.amapj.view.views.saisiepermanence;
 
 import com.vaadin.data.util.BeanItem;
+import com.vaadin.shared.ui.label.ContentMode;
 
 import fr.amapj.service.services.saisiepermanence.planif.PlanifDTO;
 import fr.amapj.service.services.saisiepermanence.planif.PlanifDateDTO;
@@ -48,7 +49,7 @@ public class PopupPlanificationPermanence extends WizardFormPopup
 
 	public enum Step
 	{
-		INFO_GENERALES, CHOIX_DATES , UTILISATEURS;
+		AIDE , INFO_GENERALES, CHOIX_DATES , UTILISATEURS;
 	}
 
 	/**
@@ -71,6 +72,10 @@ public class PopupPlanificationPermanence extends WizardFormPopup
 	{
 		switch ( (Step) step)
 		{
+		case AIDE:
+			addAide();
+			break;
+			
 		case INFO_GENERALES:
 			addFieldInfoGenerales();
 			break;
@@ -88,6 +93,25 @@ public class PopupPlanificationPermanence extends WizardFormPopup
 			break;
 		}
 	}
+	
+	private void addAide()
+	{
+		// Titre
+		setStepTitle("explication sur le fonctionnement de cet outil");
+		
+		String str = 	"Cet outil va vous permettre de planifier les permanences sur une année complète.</br>"+
+				"<br/>"+
+				"Cet outil positionne lui même les amapiens sur les dates de distributions, de façon aléatoire<br/>"+
+				"Par contre, cet outil essaye autant que possible de mettre les amapiens à des permanences où ils ont un panier à venir chercher<br/>"+
+				"<br/><br/>"+
+				"Il est possible d'attribuer un bonus à un amapien : s'il a un bonus de 2, alors il fera 2 distributions en moins<br/>"+
+				"De même, il est possible d'affranchir complètement une personne de permanence.<br/>";
+			
+								
+
+		addLabel(str, ContentMode.HTML);
+
+	}
 
 	private void addFieldInfoGenerales()
 	{
@@ -102,10 +126,25 @@ public class PopupPlanificationPermanence extends WizardFormPopup
 		addDateField("Date de fin", "dateFin",notNull);
 		
 		//
-		addComboEnumField("Fréquence des permanences",  "frequence",notNull);
+		Enum[] enumsToExclude = new Enum[] { FrequenceLivraison.AUTRE , FrequenceLivraison.UNE_SEULE_LIVRAISON };
+		addComboEnumField("Fréquence des permanences",  "frequence",enumsToExclude,notNull);
 		
-		// Champ 
+		//  
 		addIntegerField("Nombre de personnes par permanence", "nbPersonne");
+		
+		//
+		addSearcher("Période de cotisation à prendre en compte ", "idPeriodeCotisation", SearcherList.PERIODE_COTISATION, null);
+		
+		String str = 	"Le champ précédent permet de préciser les personnes à prendre en compte pour les permanences.</br>"+
+				"<br/>"+
+				"Si vous saississez une période de cotisation, alors uniquement les amapiens ayant cotisé sur cette période et qui sont ACTIF seront affectées aux permanences.<br/>"+
+				"Si vous laissez ce champ vide, alors tous les utilisateurs ACTIF  seront affectées aux permanences.<br/>"+
+				"<br/><br/>"+
+				"A noter : en étape 4, il vous sera possible de supprimer une personne en particulier si vous le souhaitez<br/>";
+			
+								
+
+		addLabel(str, ContentMode.HTML);
 
 	}
 	

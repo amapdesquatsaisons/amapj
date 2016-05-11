@@ -25,6 +25,7 @@ import java.util.List;
 import fr.amapj.model.engine.db.DbManager;
 import fr.amapj.model.engine.transaction.DbRead;
 import fr.amapj.service.engine.appinitializer.AppInitializer;
+import fr.amapj.service.engine.deamons.DeamonsContext;
 import fr.amapj.service.engine.deamons.DeamonsImpl;
 import fr.amapj.service.engine.deamons.DeamonsUtils;
 
@@ -42,7 +43,7 @@ public class DemarrageAppInstanceService
 		DeamonsUtils.executeAsDeamon(getClass(), new DeamonsImpl()
 		{
 			@Override
-			public void perform()
+			public void perform(DeamonsContext deamonsContext)
 			{
 				startAllDatabase();
 			}

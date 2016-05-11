@@ -365,14 +365,39 @@ public class GestionCotisationService
 		q.setParameter("idPeriode", idPeriodeCotisation);
 		List<Utilisateur> us = q.getResultList();
 		
-		for (Utilisateur utilisateur : us)
-		{
-			DebugUtil.trace("u="+utilisateur.getNom()+" "+utilisateur.getPrenom());
-		}
-		
 		
 		return us;
 	}
+	
+	
+	/**
+	 * Récupère la liste de tous les utilisateurs qui sont adherents sur la periode
+	 * indiquée et qui sont actifs 
+	 * 
+	 * @param idPeriodeCotisation
+	 * @return
+	 */
+	@DbRead
+	public List<Utilisateur> getAllUtilisateurAvecAdhesion(Long idPeriodeCotisation)
+	{
+		EntityManager em = TransactionHelper.getEm();
+		
+		PeriodeCotisation p = em.find(PeriodeCotisation.class, idPeriodeCotisation);
+		
+		Query q = em.createQuery("select pu.utilisateur from PeriodeCotisationUtilisateur pu " 
+									+ "WHERE pu.periodeCotisation=:p  AND "
+									+ " pu.utilisateur.etatUtilisateur=:etat "
+									+ " order by pu.utilisateur.nom, pu.utilisateur.prenom");
+		q.setParameter("p",p);
+		q.setParameter("etat", EtatUtilisateur.ACTIF);
+		
+		List<Utilisateur> us = q.getResultList();
+		
+		return us;
+	}
+	
+	
+	
 
 	
 	/**

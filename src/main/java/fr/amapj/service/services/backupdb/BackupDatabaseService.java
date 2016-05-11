@@ -23,7 +23,9 @@
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
 import org.apache.logging.log4j.LogManager;import org.apache.logging.log4j.Logger;
+import org.apache.velocity.VelocityContext;
 
 import javax.persistence.EntityManager;
 
@@ -31,10 +33,14 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
+import fr.amapj.common.AmapjRuntimeException;
+import fr.amapj.common.RuntimeUtils;
+import fr.amapj.common.VelocityUtils;
 import fr.amapj.model.engine.tools.TestTools;
 import fr.amapj.model.engine.transaction.DbUtil;
 import fr.amapj.model.engine.transaction.DbWrite;
 import fr.amapj.model.engine.transaction.TransactionHelper;
+import fr.amapj.service.engine.deamons.DeamonsContext;
 import fr.amapj.service.engine.deamons.DeamonsImpl;
 import fr.amapj.service.engine.deamons.DeamonsUtils;
 import fr.amapj.service.services.mailer.MailerAttachement;
@@ -64,9 +70,9 @@ public class BackupDatabaseService implements Job
 		DeamonsUtils.executeAsDeamon(getClass(), new DeamonsImpl()
 		{
 			@Override
-			public void perform()
+			public void perform(DeamonsContext deamonsContext)
 			{
-				backupDatabase();
+				backupDatabase(deamonsContext);
 			}
 		});
 	}
@@ -77,7 +83,7 @@ public class BackupDatabaseService implements Job
 	 * Ceci est vérifié dans une transaction en ecriture  
 	 */
 	@DbWrite
-	public void backupDatabase()
+	public void backupDatabase(DeamonsContext deamonsContext)
 	{
 		EntityManager em = TransactionHelper.getEm();
 		
@@ -88,19 +94,48 @@ public class BackupDatabaseService implements Job
 		String backupDir = AppConfiguration.getConf().getBackupDirectory();
 		if (backupDir==null)
 		{
-			throw new RuntimeException("Le répertoire de stockage des sauvegardes n'est pas défini");
+			throw new AmapjRuntimeException("Le répertoire de stockage des sauvegardes n'est pas défini");
 		}
-		SimpleDateFormat df = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
-		String fileName = backupDir+"/"+dbName+"_"+df.format(new Date())+".tar.gz";
 		
-		em.createNativeQuery("BACKUP DATABASE TO '"+fileName+"' BLOCKING").executeUpdate();
+		Date ref = new Date();
+		SimpleDateFormat df1 = new SimpleDateFormat("yyyy_MM_dd");
+		SimpleDateFormat df2 = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
+		String shortRepName = df1.format(ref);
+		String shortFileName = dbName+"_"+df2.format(ref)+".tar.gz";
 		
-		File file= new File(fileName);
+		String fullRepName = backupDir+"/"+shortRepName;
+		String fullFileName = fullRepName+"/"+shortFileName;
+		
+		
+		File rep = new File(fullRepName);
+		if (rep.exists()==false)
+		{
+			boolean ret = rep.mkdir();
+			if (ret==false)
+			{
+				throw new AmapjRuntimeException("Impossible de créer le repertoire :"+fullRepName);
+			}
+		}
+		
+		
+		
+		em.createNativeQuery("BACKUP DATABASE TO '"+fullFileName+"' BLOCKING").executeUpdate();
+		
+		File file= new File(fullFileName);
 		if (file.canRead()==false)
 		{
-			throw new RuntimeException("Erreur lors de la sauvegarde pour "+dbName);
+			throw new AmapjRuntimeException("Erreur lors de la sauvegarde. Impossible de lire le fichier");
 		}
+		
+		// Si besoin, on copie ce fichier avec la commande système complétementaire
+		String addCommandBackup = AppConfiguration.getConf().getBackupCommand();
+		if (addCommandBackup!=null)
+		{
+			performCommandBackup(addCommandBackup,shortRepName,shortFileName,fullFileName,deamonsContext);
+		}
+		
 	
+		// On envoie ensuite le fichier par mail 
 		ParametresDTO param = new ParametresService().getParametres();
 		String htmlContent = "Sauvegarde de la base "+param.nomAmap;
 		MailerMessage message = new MailerMessage(param.backupReceiver,"Backup de la base de "+param.nomAmap,htmlContent);
@@ -113,11 +148,39 @@ public class BackupDatabaseService implements Job
 		
 	}
 	
+	
+	private void performCommandBackup(String addCommandBackup, String shortRepName, String shortFileName,String fullFileName, DeamonsContext deamonsContext)
+	{
+		VelocityContext ctx = new VelocityContext();
+		ctx.put("shortRepName", shortRepName);
+		ctx.put("shortFileName", shortFileName);
+		ctx.put("fullFileName", fullFileName);
+		
+		String exec = VelocityUtils.evaluate(ctx, addCommandBackup);
+		
+		try
+		{
+			logger.info("Execution de la commande ="+exec);
+			int ret = RuntimeUtils.executeCommandLine(exec, 30000);
+			if (ret!=0)
+			{
+				logger.error("Erreur lors de l'execution de la commande complémentaire ret="+ret);
+				deamonsContext.nbError++;
+			}
+		}
+		catch(Exception e)
+		{
+			logger.error("Erreur lors de l'execution de la commande complémentaire",e);
+			deamonsContext.nbError++;
+		}
+		
+	}
+
 	public static void main(String[] args)
 	{
 		TestTools.init();
 		
-		new BackupDatabaseService().backupDatabase();
+		new BackupDatabaseService().backupDatabase(new DeamonsContext());
 	}
 
 

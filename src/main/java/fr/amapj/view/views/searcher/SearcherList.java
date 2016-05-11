@@ -58,5 +58,7 @@ public class SearcherList
 	static public SearcherDefinition UTILISATEUR_SANS_ADHESION = new SDUtilisateurSansAdhesion();
 	
 	static public SearcherDefinition UTILISATEUR_ACTIF = new SDUtilisateur();
+	
+	static public SearcherDefinition UTILISATEUR_TOUS = new SDUtilisateurTous();
 		
 }

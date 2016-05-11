@@ -57,7 +57,7 @@ public class DeamonsUtils
 			if (dataBaseInfo.getState()==AppState.ON)
 			{
 				LogAccessDTO dto = new LogViewService().saveAccess(deamonName, null, null, null, null, dataBaseInfo.getDbName(), TypLog.DEAMON,false);
-				int nbError=0;
+				DeamonsContext deamonsContext = new DeamonsContext();
 				DbUtil.setDbForDeamonThread(dataBaseInfo);
 				logger.info("Début du démon "+deamonName+" pour la base "+dataBaseInfo.getDbName());
 				
@@ -66,11 +66,11 @@ public class DeamonsUtils
 					DeamonsImpl deamonsImpl = deamons[i];
 					try
 					{	
-						deamonsImpl.perform();
+						deamonsImpl.perform(deamonsContext);
 					}
 					catch(Throwable t)
 					{
-						nbError++;
+						deamonsContext.nbError++;
 						logger.info("Erreur sur le démon "+deamonName+" pour la base "+dataBaseInfo.getDbName()+"\n"+StackUtils.asString(t));
 					}
 				}
@@ -78,7 +78,7 @@ public class DeamonsUtils
 				logger.info("Fin du démon "+deamonName+" pour la base "+dataBaseInfo.getDbName());
 				
 				DbUtil.setDbForDeamonThread(null);
-				new LogViewService().endAccess(dto.id,nbError);
+				new LogViewService().endAccess(dto.id,deamonsContext.nbError);
 				AmapJLogManager.endLog(true);
 			}
 		}

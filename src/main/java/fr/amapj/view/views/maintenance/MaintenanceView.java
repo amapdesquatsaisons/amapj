@@ -42,6 +42,7 @@ import com.vaadin.ui.Upload;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 
+import fr.amapj.service.engine.deamons.DeamonsContext;
 import fr.amapj.service.services.backupdb.BackupDatabaseService;
 import fr.amapj.service.services.excelgenerator.EGListeAdherent;
 import fr.amapj.service.services.excelgenerator.EGListeAdherent.Type;
@@ -122,7 +123,7 @@ public class MaintenanceView extends Panel implements View
 			@Override
 			public void buttonClick(ClickEvent event)
 			{
-				new BackupDatabaseService().backupDatabase();
+				new BackupDatabaseService().backupDatabase(new DeamonsContext());
 			}
 		});
 		

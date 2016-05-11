@@ -79,6 +79,9 @@ public class AppConfiguration
 	// Répertoire pour la sauvegarde de la base
 	private String backupDirectory;
 	
+	// Commande additionnelle qui sera executée après la sauvegarde (par exemple, copie sur un autre disque, ...)
+	private String backupCommand;
+	
 	// Nom de l'onglet dans le navigateur
 	private String pageTitle;
 	
@@ -100,6 +103,8 @@ public class AppConfiguration
 
 		// TODO verifier que c'est bien un directory
 		backupDirectory = param.read("database.backupdir");
+		
+		backupCommand = param.read("database.backupCmd");
 		
 		// TODO verifier que c'est bien un directory
 		String logDir = param.read("logDir");
@@ -198,6 +203,13 @@ public class AppConfiguration
 	public boolean isAdminFull()
 	{
 		return adminFull;
+	}
+	
+	
+
+	public String getBackupCommand()
+	{
+		return backupCommand;
 	}
 
 	/**

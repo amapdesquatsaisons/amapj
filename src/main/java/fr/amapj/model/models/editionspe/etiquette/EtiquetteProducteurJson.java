@@ -25,9 +25,8 @@ import java.util.List;
 
 import com.google.gson.Gson;
 
-import fr.amapj.model.engine.Identifiable;
 import fr.amapj.model.models.editionspe.AbstractEditionSpeJson;
-import fr.amapj.model.models.editionspe.TypEditionSpecifique;
+import fr.amapj.model.models.param.ChoixOuiNon;
 
 
 public class EtiquetteProducteurJson extends AbstractEditionSpeJson
@@ -53,6 +52,9 @@ public class EtiquetteProducteurJson extends AbstractEditionSpeJson
 	
 	//
 	private int margeBas;
+	
+	// 
+	private ChoixOuiNon bordure = ChoixOuiNon.OUI; 
 
 
 	public int getNbColonne()
@@ -138,8 +140,16 @@ public class EtiquetteProducteurJson extends AbstractEditionSpeJson
 		this.margeBas = margeBas;
 	} 
 
-	
-	
+	public ChoixOuiNon getBordure()
+	{
+		return bordure;
+	}
+
+
+	public void setBordure(ChoixOuiNon bordure)
+	{
+		this.bordure = bordure;
+	}
 
 
 	public static void main(String[] args)

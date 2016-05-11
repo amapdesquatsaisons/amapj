@@ -28,6 +28,8 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.apache.poi.ss.usermodel.CellStyle;
+
 import fr.amapj.common.CollectionUtils;
 import fr.amapj.model.models.contrat.modele.ModeleContrat;
 import fr.amapj.model.models.contrat.modele.ModeleContratDate;
@@ -37,6 +39,7 @@ import fr.amapj.model.models.editionspe.EditionSpecifique;
 import fr.amapj.model.models.editionspe.etiquette.EtiquetteProducteurJson;
 import fr.amapj.model.models.fichierbase.Produit;
 import fr.amapj.model.models.fichierbase.Utilisateur;
+import fr.amapj.model.models.param.ChoixOuiNon;
 import fr.amapj.service.engine.generator.excel.AbstractExcelGenerator;
 import fr.amapj.service.engine.generator.excel.ExcelFormat;
 import fr.amapj.service.engine.generator.excel.ExcelGeneratorTool;
@@ -141,7 +144,12 @@ public class EGEtiquetteDistribution extends AbstractExcelGenerator
 		for (ContratCellNumber cell : line)
 		{
 			String content = getContent(cell,df);
-			et.setCell(index,content , et.grasCentreBordure);
+			CellStyle style = et.grasCentreBordure;
+			if (etiquette.getBordure()==ChoixOuiNon.NON)
+			{
+				style = et.grasCentre;
+			}
+			et.setCell(index,content , style);
 			index++;
 		}
 	}

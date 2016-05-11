@@ -29,6 +29,6 @@
 public interface DeamonsImpl 
 {
 	
-	public void perform();
+	public void perform(DeamonsContext deamonsContext);
 		
 }

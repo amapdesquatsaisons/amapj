@@ -43,6 +43,9 @@ import fr.amapj.model.models.fichierbase.EtatUtilisateur;
 import fr.amapj.model.models.fichierbase.Utilisateur;
 import fr.amapj.service.services.gestioncontrat.DateModeleContratDTO;
 import fr.amapj.service.services.gestioncontrat.GestionContratService;
+import fr.amapj.service.services.gestioncotisation.GestionCotisationService;
+import fr.amapj.service.services.saisiepermanence.PermanenceService;
+import fr.amapj.service.services.utilisateur.UtilisateurService;
 import fr.amapj.view.engine.ui.AppConfiguration;
 import fr.amapj.view.views.gestioncontrat.editorpart.FrequenceLivraison;
 
@@ -77,7 +80,7 @@ public class PlanifPermanenceService
 		
 		// On charge les utilisateurs
 		dto.utilisateurs.clear();
-		List<Utilisateur> utilisateurs = getAllUtilisateursCotisants(em);
+		List<Utilisateur> utilisateurs = getAllUtilisateursCotisants(em,dto.idPeriodeCotisation);
 		for (Utilisateur utilisateur : utilisateurs)
 		{
 			PlanifUtilisateurDTO e = new PlanifUtilisateurDTO();
@@ -91,18 +94,23 @@ public class PlanifPermanenceService
 	}
 	
 	/**
-	 * Retourne la liste des utilisateurs cotisants
+	 * Retourne la liste des utilisateurs cotisants 
 	 * 
-	 * TODO regarder l'année de cotisation 
+	 * Si idPeriodeCotisation est null, alors retourne tous les utilisateurs actifs
 	 * 
 	 * @return
 	 */
-	public List<Utilisateur> getAllUtilisateursCotisants(EntityManager em)
+	public List<Utilisateur> getAllUtilisateursCotisants(EntityManager em,Long idPeriodeCotisation)
 	{
-		Query q = em.createQuery("select u from Utilisateur u where u.etatUtilisateur=:etat order by u.nom,u.prenom");
-		q.setParameter("etat", EtatUtilisateur.ACTIF);
-		List<Utilisateur> us = q.getResultList();
-		return us;
+		if (idPeriodeCotisation==null)
+		{
+			return new UtilisateurService().getAllUtilisateursActif();
+			
+		}
+		else
+		{
+			return new GestionCotisationService().getAllUtilisateurAvecAdhesion(idPeriodeCotisation);
+		}
 	}
 
 	
@@ -259,11 +267,9 @@ public class PlanifPermanenceService
 		// On trie ensuite suivant cette information
 		Collections.sort(utilisateurs);
 		
-		System.out.println("Numero de session"+numSession);
 		for (UtilisateurInfo u : utilisateurs)
 		{
 			Utilisateur ut = em.find(Utilisateur.class, u.idUtilisateur);
-			System.out.println(ut.getNom()+" "+ut.getPrenom()+" "+u.dateLivraison.size());
 		}
 		
 		// On itere ensuite sur chaque utilisateur et on le place
@@ -383,6 +389,37 @@ public class PlanifPermanenceService
 		}
 	}
 	
+	
+	
+	// PARTIE SUPPRESSION EN MASSE
+	
+	@DbWrite
+	public void deletePlanification(PlanifDTO planif)
+	{
+		EntityManager em = TransactionHelper.getEm();
+		
+		PermanenceService service = new PermanenceService();
+		
+		Query q = em.createQuery("select d from DatePermanence d WHERE " +
+				"d.datePermanence>=:deb AND " +
+				"d.datePermanence<=:fin " +
+				"order by d.datePermanence, d.id");
+		q.setParameter("deb", planif.dateDebut, TemporalType.DATE);
+		q.setParameter("fin", planif.dateFin, TemporalType.DATE);
+		
+		List<DatePermanence> dds = q.getResultList();
+		
+		for (DatePermanence dd : dds)
+		{
+			service.deleteDistribution(dd.getId());
+		}
+		
+		
+	}
+	
+	
+	
+	
 	public static void main(String[] args) throws ParseException
 	{
 		TestTools.init();
@@ -416,6 +453,8 @@ public class PlanifPermanenceService
 		System.out.println("Fin.");
 
 	}
+
+	
 
 
 

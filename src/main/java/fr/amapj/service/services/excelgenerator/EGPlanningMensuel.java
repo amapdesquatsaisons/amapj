@@ -31,11 +31,13 @@ import javax.persistence.Query;
 
 import fr.amapj.common.DateUtils;
 import fr.amapj.common.LongUtils;
+import fr.amapj.common.StringUtils;
 import fr.amapj.model.models.contrat.reel.ContratCell;
 import fr.amapj.model.models.editionspe.AbstractEditionSpeJson;
 import fr.amapj.model.models.editionspe.EditionSpecifique;
 import fr.amapj.model.models.editionspe.planningmensuel.ParametresProduitsJson;
 import fr.amapj.model.models.editionspe.planningmensuel.PlanningMensuelJson;
+import fr.amapj.model.models.editionspe.planningmensuel.TypPlanning;
 import fr.amapj.model.models.fichierbase.Produit;
 import fr.amapj.model.models.fichierbase.Utilisateur;
 import fr.amapj.service.engine.generator.excel.AbstractExcelGenerator;
@@ -55,43 +57,44 @@ public class EGPlanningMensuel extends AbstractExcelGenerator
 {
 	
 	private Long editionSpecifiqueId;
-	private Date month;
+	private Date ref;
 	private String suffix;
 	
-	public EGPlanningMensuel(Long editionSpecifiqueId,Date month,String suffix)
+	public EGPlanningMensuel(Long editionSpecifiqueId,Date ref,String suffix)
 	{
 		this.suffix = suffix;
 		this.editionSpecifiqueId = editionSpecifiqueId;
-		this.month = DateUtils.firstDayInMonth(month);
+		this.ref = ref ;
 	}
 	
 	@Override
 	public void fillExcelFile(EntityManager em,ExcelGeneratorTool et)
 	{
+		//
 		SimpleDateFormat df = new SimpleDateFormat("dd MMMMM");
-		SimpleDateFormat df2 = new SimpleDateFormat("MMMMM yyyy");
-		
-		
+	
+		//
 		EditionSpecifique editionSpe = em.find(EditionSpecifique.class, editionSpecifiqueId);
 		PlanningMensuelJson planningJson = (PlanningMensuelJson) AbstractEditionSpeJson.load(editionSpe);
 		
+		// 
+		LibInfo libInfo = getLibForName(em);
+		
 		// Recherche de toutes les colonnes du document 
-		Entete entete = getEntetePlanning(em,planningJson);
+		Entete entete = getEntetePlanning(em,planningJson,libInfo);
 		
 		// Recherche de tous les utilisateurs du document
-		List<Utilisateur> utilisateurs = getUtilisateur(em);
-		
-		
+		List<Utilisateur> utilisateurs = getUtilisateur(em,libInfo);
 		
 		
 		// Les colonnes en + sont le nom, prenom et telephone
 		int nbCol =  entete.prodCols.size()+3;
-		et.addSheet("Planning mensuel "+df2.format(month), nbCol, 25);
+		et.addSheet("Planning "+libInfo.lib2+" "+libInfo.lib1, nbCol, 25);
 		et.setModePaysage();
 		
 		// Ecriture de la ligne des dates
 		et.addRow();
-		et.setCell(0, "DISTRIBUTIONS "+df2.format(month).toUpperCase(), et.grasCentreBordure);
+		et.setCell(0, "DISTRIBUTIONS "+libInfo.lib1.toUpperCase(), et.grasCentreBordure);
 		et.mergeCellsRight(0, 2);
 		
 		int index = 2;
@@ -149,22 +152,24 @@ public class EGPlanningMensuel extends AbstractExcelGenerator
 		et.setColumnWidthInMm(index, planningJson.getLgColnumTel1());
 		
 		//
+		int numLigne = 0;
 		for (Utilisateur utilisateur : utilisateurs)
 		{
-			addRowUtilisateur(et,utilisateur,em,entete);
+			addRowUtilisateur(et,utilisateur,em,entete,numLigne,libInfo);
+			numLigne++;
 		}
 		
 	}
 	
 	
 
-	private void addRowUtilisateur(ExcelGeneratorTool et, Utilisateur utilisateur, EntityManager em, Entete entete)
+	private void addRowUtilisateur(ExcelGeneratorTool et, Utilisateur utilisateur, EntityManager em, Entete entete,int numLigne,LibInfo libInfo)
 	{
-		int[] qtes = getQte(utilisateur, em, entete.prodCols);
+		int[] qtes = getQte(utilisateur, em, entete.prodCols,libInfo);
 		
 		et.addRow();
-		et.setCell(0, utilisateur.getNom(), et.grasGaucheNonWrappeBordure);
-		et.setCell(1, utilisateur.getPrenom(), et.nonGrasGaucheBordure);
+		et.setCell(0, utilisateur.getNom(), et.switchGray(et.grasGaucheNonWrappeBordure,numLigne));
+		et.setCell(1, utilisateur.getPrenom(), et.switchGray(et.nonGrasGaucheBordure,numLigne));
 		
 		int index = 2;
 		for (int i = 0; i < qtes.length; i++)
@@ -174,7 +179,7 @@ public class EGPlanningMensuel extends AbstractExcelGenerator
 			
 			if (prodCol.idProduit!=null)
 			{
-				et.setCell(index, str, et.grasCentreBordure);
+				et.setCell(index, str, et.switchGray(et.grasCentreBordure,numLigne));
 			}
 			else
 			{
@@ -186,20 +191,19 @@ public class EGPlanningMensuel extends AbstractExcelGenerator
 		}
 		
 		// Numéro de telephone
-		et.setCell(index, utilisateur.getNumTel1(), et.nonGrasCentreBordure);
+		et.setCell(index, utilisateur.getNumTel1(), et.switchGray(et.nonGrasCentreBordure,numLigne));
 		
 	}
 	
 
-	private int[] getQte(Utilisateur u,EntityManager em,List<ProduitColonne> prodCols)
+	private int[] getQte(Utilisateur u,EntityManager em,List<ProduitColonne> prodCols,LibInfo libInfo)
 	{
 		Query q = em.createQuery("select c from ContratCell c WHERE "
 				+ " c.modeleContratDate.dateLiv >= :d1 AND c.modeleContratDate.dateLiv<:d2 AND "
 				+ "c.contrat.utilisateur=:u");
 		
-		Date d2 = DateUtils.addMonth(month,1);
-		q.setParameter("d1",month);
-		q.setParameter("d2",d2);
+		q.setParameter("d1",libInfo.debut);
+		q.setParameter("d2",libInfo.fin);
 		q.setParameter("u",u);
 		
 		int[] res = new int[prodCols.size()];
@@ -225,8 +229,9 @@ public class EGPlanningMensuel extends AbstractExcelGenerator
 		{
 			ProduitColonne produitColonne= prodCols.get(i);
 			
-			if (	LongUtils.equals(produitColonne.idProduit,cc.getModeleContratProduit().getProduit().getId()) &&
-					cc.getModeleContratDate().getDateLiv().equals(produitColonne.dateColonne.date))
+			if (	(produitColonne.idProduit!=null) 
+				&&  (produitColonne.idProduit.contains(cc.getModeleContratProduit().getProduit().getId())) 
+				&&	(cc.getModeleContratDate().getDateLiv().equals(produitColonne.dateColonne.date))    )
 			{
 				return i;
 			}
@@ -239,15 +244,14 @@ public class EGPlanningMensuel extends AbstractExcelGenerator
 	 * @param em
 	 * @return
 	 */
-	private List<Utilisateur> getUtilisateur(EntityManager em)
+	private List<Utilisateur> getUtilisateur(EntityManager em,LibInfo libInfo)
 	{
 		Query q = em.createQuery("select distinct(c.contrat.utilisateur) from ContratCell c WHERE "
 				+ " c.modeleContratDate.dateLiv >= :d1 AND c.modeleContratDate.dateLiv<:d2 "
 				+ "ORDER BY c.contrat.utilisateur.nom , c.contrat.utilisateur.prenom");
 		
-		Date d2 = DateUtils.addMonth(month,1);
-		q.setParameter("d1",month);
-		q.setParameter("d2",d2);
+		q.setParameter("d1",libInfo.debut);
+		q.setParameter("d2",libInfo.fin);
 		
 		List<Utilisateur> us = q.getResultList();
 		return us;
@@ -259,15 +263,15 @@ public class EGPlanningMensuel extends AbstractExcelGenerator
 	 * @param planningJson
 	 * @return
 	 */
-	private Entete getEntetePlanning(EntityManager em, PlanningMensuelJson planningJson)
+	private Entete getEntetePlanning(EntityManager em, PlanningMensuelJson planningJson,LibInfo libInfo)
 	{
 		Entete entete = new Entete();
 		
 		// Recherche des distributions dans ce mois
-		List<PermanenceDTO> permanenceDTOs = getPermanence(em);
+		List<PermanenceDTO> permanenceDTOs = getPermanence(em,libInfo);
 		
 		// On recherche toutes les dates de livraisons sur ce mois, ordonnées par ordre croissant
-		List<Date> dateLivs = getDateLivs(em);
+		List<Date> dateLivs = getDateLivs(em,libInfo);
 		
 		// Pour chaque date, on fait la liste des produits concernés
 		for (Date dateLiv : dateLivs)
@@ -279,20 +283,18 @@ public class EGPlanningMensuel extends AbstractExcelGenerator
 		return entete;
 	}
 	
-	private List<PermanenceDTO> getPermanence(EntityManager em)
+	private List<PermanenceDTO> getPermanence(EntityManager em,LibInfo libInfo)
 	{
-		Date d2 = DateUtils.addMonth(month,1);
-		return new PermanenceService().getAllDistributions(em, month, d2);
+		return new PermanenceService().getAllDistributions(em, libInfo.debut, libInfo.fin);
 	}
 	
 	
-	private List<Date> getDateLivs(EntityManager em)
+	private List<Date> getDateLivs(EntityManager em,LibInfo libInfo)
 	{
 		Query q = em.createQuery("select distinct(mcd.dateLiv) from ModeleContratDate mcd WHERE mcd.dateLiv >= :d1 AND mcd.dateLiv<:d2 ORDER BY mcd.dateLiv");
 		
-		Date d2 = DateUtils.addMonth(month,1);
-		q.setParameter("d1",month);
-		q.setParameter("d2",d2);
+		q.setParameter("d1",libInfo.debut);
+		q.setParameter("d2",libInfo.fin);
 		
 		List<Date> us = q.getResultList();
 		return us;
@@ -334,12 +336,14 @@ public class EGPlanningMensuel extends AbstractExcelGenerator
 	private List<ProduitColonne> computeProdCol(EntityManager em, Date dateLiv, PlanningMensuelJson planningJson)
 	{
 		List<ProduitColonne> res = new ArrayList<>();
+		ProduitColonne previous = null;
 		for (ParametresProduitsJson prodJson : planningJson.getParametresProduits())
 		{
 			Produit p = em.find(Produit.class, prodJson.getIdProduit());
-			ProduitColonne prodCol = constructProdCol(em,p,dateLiv,prodJson);
+			ProduitColonne prodCol = constructProdCol(em,p,dateLiv,prodJson,previous);
 			if (prodCol!=null)
 			{
+				previous = prodCol;
 				res.add(prodCol);
 			}
 		}
@@ -347,7 +351,7 @@ public class EGPlanningMensuel extends AbstractExcelGenerator
 	}
 	
 	
-	private ProduitColonne constructProdCol(EntityManager em, Produit p, Date dateLiv, ParametresProduitsJson prodJson)
+	private ProduitColonne constructProdCol(EntityManager em, Produit p, Date dateLiv, ParametresProduitsJson prodJson, ProduitColonne previous)
 	{
 		Query q = em.createQuery("select count(c) from ContratCell c WHERE "
 				+ " c.modeleContratProduit.produit=:p AND "
@@ -360,8 +364,19 @@ public class EGPlanningMensuel extends AbstractExcelGenerator
 		{
 			return null;
 		}
+		
+		// Si la colonne précédente a le même nom que celle que l'on va créer, alors on fusionne les deux
+		if ((previous!=null) && (StringUtils.equals(previous.nomColonne, prodJson.getTitreColonne())))
+		{
+			previous.idProduit.add(p.getId());
+			return null;
+		}
+		
+		
+		
 		ProduitColonne prodCol = new ProduitColonne();
-		prodCol.idProduit = p.getId();
+		prodCol.idProduit = new ArrayList<Long>(); 
+		prodCol.idProduit.add(p.getId());
 		prodCol.largeurColonne = prodJson.getLargeurColonne();
 		prodCol.nomColonne = prodJson.getTitreColonne();
 		
@@ -391,22 +406,75 @@ public class EGPlanningMensuel extends AbstractExcelGenerator
 	@Override
 	public String getFileName(EntityManager em)
 	{
-		SimpleDateFormat df = new SimpleDateFormat("MMMMM-yyyy");
-			
-		return "planning-mensuel-"+df.format(month)+suffix;
+		LibInfo libInfo = getLibForName(em);
+		return libInfo.fileName+suffix;
 	}
+	
 
 	@Override
 	public String getNameToDisplay(EntityManager em)
 	{
-		SimpleDateFormat df = new SimpleDateFormat("MMMMM yyyy");
-		String str = "le planning mensuel de "+df.format(month);
+		LibInfo libInfo = getLibForName(em);
+		String str = libInfo.displayName;
 		if ( (suffix!=null) && (suffix.length()>0) )
 		{
-			str = str +"("+suffix+")";
+			str = str +" ("+suffix+")";
 		}
 		return str;
 	}
+	
+	public LibInfo getLibForName(EntityManager em)
+	{
+		LibInfo res = new LibInfo();
+		
+		SimpleDateFormat df2 = new SimpleDateFormat("MMMMM yyyy");
+		SimpleDateFormat df3 = new SimpleDateFormat("ww");
+		SimpleDateFormat df4 = new SimpleDateFormat("MMMMM-yyyy");
+		SimpleDateFormat df5 = new SimpleDateFormat("dd-MMMMM");
+		
+		
+		EditionSpecifique editionSpe = em.find(EditionSpecifique.class, editionSpecifiqueId);
+		PlanningMensuelJson planningJson = (PlanningMensuelJson) AbstractEditionSpeJson.load(editionSpe);
+		
+		if (planningJson.getTypPlanning()==TypPlanning.MENSUEL)
+		{
+			res.debut = DateUtils.firstDayInMonth(ref);
+			res.fin =  DateUtils.addMonth(res.debut,1);
+			res.lib1 = df2.format(res.debut);
+			res.lib2 = "mensuel";
+			res.fileName = "planning-mensuel-"+df4.format(res.debut);
+			res.displayName = "le planning mensuel de "+df2.format(res.debut);
+		}
+		else
+		{
+			res.debut = DateUtils.firstMonday(ref);
+			res.fin = DateUtils.addDays(res.debut,7);
+			res.lib1 = "S"+df3.format(res.debut);
+			res.lib2 = "hebdomadaire";
+			res.fileName = "planning-hebdomadaire-"+df5.format(res.debut);
+			res.displayName = "le planning hebdomadaire semaine "+df3.format(res.debut);
+		}
+		
+		return res;
+	}
+	
+	static public class LibInfo
+	{
+		// lib1 contient les dates du planning , lib2 contient "hebdomadaire" ou "mensuel"
+		public String lib1;
+		public String lib2;
+		
+		// Contient le nom du fichier
+		public String fileName;
+		
+		// Contient le nom affiché
+		public String displayName;
+		
+		public Date debut;
+		public Date fin;
+	}
+	
+	
 	
 	@Override
 	public ExcelFormat getFormat()
@@ -416,7 +484,10 @@ public class EGPlanningMensuel extends AbstractExcelGenerator
 
 
 	
-	
+	/**
+	 * Un "ProduitColonne" correspond à n produits (par exemple les oeufs par 6 et les oeufs par 12)
+	 *
+	 */
 	static public class ProduitColonne
 	{
 		public String nomColonne;
@@ -424,7 +495,7 @@ public class EGPlanningMensuel extends AbstractExcelGenerator
 		public int largeurColonne;
 		
 		// est égal à null pour la colonne Présence
-		public Long idProduit;
+		public List<Long> idProduit;
 		
 		public DateColonne dateColonne;
 		

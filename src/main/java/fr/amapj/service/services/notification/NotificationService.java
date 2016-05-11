@@ -24,6 +24,7 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
+import fr.amapj.service.engine.deamons.DeamonsContext;
 import fr.amapj.service.engine.deamons.DeamonsImpl;
 import fr.amapj.service.engine.deamons.DeamonsUtils;
 
@@ -43,7 +44,7 @@ public class NotificationService implements Job
 		new DeamonsImpl()
 		{
 			@Override
-			public void perform()
+			public void perform(DeamonsContext deamonsContext)
 			{
 				new ProducteurNotificationService().sendProducteurNotification();
 			}
@@ -51,7 +52,7 @@ public class NotificationService implements Job
 		new DeamonsImpl()
 		{
 			@Override
-			public void perform()
+			public void perform(DeamonsContext deamonsContext)
 			{
 				new PermanenceNotificationService().sendPermanenceNotification();
 			}
@@ -59,7 +60,7 @@ public class NotificationService implements Job
 		new DeamonsImpl()
 		{
 			@Override
-			public void perform()
+			public void perform(DeamonsContext deamonsContext)
 			{
 				new PeriodiqueNotificationService().sendPermanenceNotification();
 			}

@@ -56,6 +56,7 @@ public class LogDeleteService implements Job
 	
 	/**
 	 * Permet l'effacement de tous les logs plus vieux de 30 jours dans la base master
+	 * les logs avec erreur sont conservés par contre pendant 90 jours
 	 */
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException
@@ -75,10 +76,14 @@ public class LogDeleteService implements Job
 	
 	private void deleteAllLog(EntityManager em)
 	{
-		Query q = em.createQuery("select a from LogAccess a where a.dateOut<=:d and a.logFileName is not null");
+		Query q = em.createQuery("select a from LogAccess a where "
+				+ " ( (a.dateOut<=:d1 and a.nbError=0) or (a.dateOut<=:d2 and a.nbError>0) ) "
+				+ " and a.logFileName is not null");
 
-		Date ref = DateUtils.addDays(new Date(), -30);
-		q.setParameter("d", ref);
+		Date d1 = DateUtils.addDays(new Date(), -30);
+		Date d2 = DateUtils.addDays(new Date(), -90);
+		q.setParameter("d1", d1);
+		q.setParameter("d2", d2);
 		
 		List<LogAccess> ps = q.getResultList();
 		for (LogAccess logAccess : ps)

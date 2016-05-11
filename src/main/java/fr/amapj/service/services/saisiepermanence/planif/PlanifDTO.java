@@ -42,6 +42,9 @@ public class PlanifDTO
 	// Nb de personnes par permanence
 	public int nbPersonne;
 	
+	// Peut être null
+	public Long idPeriodeCotisation;
+	
 	//
 	public List<PlanifDateDTO> dates = new ArrayList<>();
 	
@@ -106,5 +109,17 @@ public class PlanifDTO
 	{
 		this.dates = dates;
 	}
+
+	public Long getIdPeriodeCotisation()
+	{
+		return idPeriodeCotisation;
+	}
+
+	public void setIdPeriodeCotisation(Long idPeriodeCotisation)
+	{
+		this.idPeriodeCotisation = idPeriodeCotisation;
+	}
+	
+	
 
 }

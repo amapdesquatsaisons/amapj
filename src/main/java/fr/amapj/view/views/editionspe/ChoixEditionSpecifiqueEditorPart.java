@@ -48,7 +48,7 @@ public class ChoixEditionSpecifiqueEditorPart extends SwitchPopup
 
 		addLine("Une nouvelle étiquette", new EtiquetteProducteurEditorPart(true, null));
 		
-		addLine("Un nouveau planning mensuel", new PlanningMensuelEditorPart(true, null));
+		addLine("Un nouveau planning mensuel ou hebdomadaire", new PlanningMensuelEditorPart(true, null));
 		
 		// TODO addLine("Un nouveau modèle d'engagement", new EngagementEditorPart(true, null));
 

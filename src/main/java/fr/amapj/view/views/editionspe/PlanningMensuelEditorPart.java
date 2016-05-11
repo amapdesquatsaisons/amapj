@@ -21,7 +21,6 @@
  package fr.amapj.view.views.editionspe;
 
 import com.vaadin.data.util.BeanItem;
-import com.vaadin.ui.TextField;
 
 import fr.amapj.model.models.acces.RoleList;
 import fr.amapj.model.models.editionspe.AbstractEditionSpeJson;
@@ -32,7 +31,6 @@ import fr.amapj.service.services.editionspe.EditionSpeDTO;
 import fr.amapj.service.services.editionspe.EditionSpeService;
 import fr.amapj.view.engine.collectioneditor.CollectionEditor;
 import fr.amapj.view.engine.collectioneditor.FieldType;
-import fr.amapj.view.engine.enumselector.EnumBean;
 import fr.amapj.view.engine.popup.formpopup.WizardFormPopup;
 import fr.amapj.view.engine.popup.formpopup.validator.NotNullValidator;
 import fr.amapj.view.views.searcher.SearcherList;
@@ -67,13 +65,13 @@ public class PlanningMensuelEditorPart extends WizardFormPopup
 		
 		if (create)
 		{
-			popupTitle = "Création d'un planning mensuel";
+			popupTitle = "Création d'un planning mensuel ou hebdomadaire";
 			this.etiquetteDTO = new PlanningMensuelJson();
 			this.etiquetteDTO.setTypEditionSpecifique(TypEditionSpecifique.PLANNING_MENSUEL);
 		}
 		else
 		{
-			popupTitle = "Modification d'un planning mensuel";
+			popupTitle = "Modification d'un planning mensuel ou hebdomadaire";
 			
 			
 			this.etiquetteDTO = (PlanningMensuelJson) AbstractEditionSpeJson.load(p);
@@ -105,9 +103,12 @@ public class PlanningMensuelEditorPart extends WizardFormPopup
 	private void addFieldGeneral()
 	{
 		// Titre
-		setStepTitle("les informations générales du planning mensuel");
+		setStepTitle("les informations générales du planning mensuel ou hebdomadaire");
 		
 		addTextField("Nom", "nom");
+		
+		addComboEnumField("Type de planning", "typPlanning", new NotNullValidator());
+		
 		
 		addIntegerField("Largeur (en mm) de la colonne Nom", "lgColNom");
 		
