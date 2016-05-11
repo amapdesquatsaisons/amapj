@@ -48,6 +48,17 @@ public class PlanningMensuelJson extends AbstractEditionSpeJson
 	// Largeur en mm pour la colonne Telephone
 	private int lgColnumTel1;
 	
+	// Largeur en mm pour la colonne Commentaire
+	private int lgColCommentaire;
+	
+	// Hauteur en mm pour les lignes (ajustement automatique si 0)
+	private int hauteurLigne;
+	
+	
+	// Contenu des cellules (par défaut, c'est une croix)
+	private ContenuCellule contenuCellule = ContenuCellule.CROIX;
+
+	
 	// Role pouvant accéder à ce planning 
 	private RoleList accessibleBy = RoleList.ADHERENT;
 	
@@ -140,6 +151,39 @@ public class PlanningMensuelJson extends AbstractEditionSpeJson
 	}
 
 
-	
+	public int getLgColCommentaire() 
+	{
+		return lgColCommentaire;
+	}
+
+
+	public void setLgColCommentaire(int lgColCommentaire) 
+	{
+		this.lgColCommentaire = lgColCommentaire;
+	}
+
+
+	public ContenuCellule getContenuCellule() 
+	{
+		return contenuCellule;
+	}
+
+
+	public void setContenuCellule(ContenuCellule contenuCellule) 
+	{
+		this.contenuCellule = contenuCellule;
+	}
+
+
+	public int getHauteurLigne() 
+	{
+		return hauteurLigne;
+	}
+
+
+	public void setHauteurLigne(int hauteurLigne) 
+	{
+		this.hauteurLigne = hauteurLigne;
+	}
 	
 }

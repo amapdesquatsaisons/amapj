@@ -38,6 +38,8 @@ public class PeriodeCotisationDTO implements TableItem
 	
 	public int montantConseille;
 	
+	public Date dateDebutInscription;
+	
 	public Date dateFinInscription;
 	
 	public String textPaiement;
@@ -205,9 +207,15 @@ public class PeriodeCotisationDTO implements TableItem
 	{
 		this.mntTotalAdhesion = mntTotalAdhesion;
 	}
-	
-	
-	
-	
+
+	public Date getDateDebutInscription()
+	{
+		return dateDebutInscription;
+	}
+
+	public void setDateDebutInscription(Date dateDebutInscription)
+	{
+		this.dateDebutInscription = dateDebutInscription;
+	}
 
 }

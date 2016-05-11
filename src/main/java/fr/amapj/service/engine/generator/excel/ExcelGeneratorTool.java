@@ -63,19 +63,16 @@ public class ExcelGeneratorTool
 	Font fontGrasBlue;
 	Font fontGrasHaut;
 	Font fontGrasPetit;
-
-	
-	
-	
-	
-	
-	
-	
 	
 	public CellStyle grasGaucheNonWrappe;
 	public CellStyle grasGaucheNonWrappeColor;
 	public CellStyle grasGaucheNonWrappeBordure;
 	public CellStyle grasGaucheNonWrappeBordureGray;
+	
+	public CellStyle grasGaucheWrappe;
+	public CellStyle grasGaucheWrappeColor;
+	public CellStyle grasGaucheWrappeBordure;
+	public CellStyle grasGaucheWrappeBordureGray;
 	
 	public CellStyle grasCentre;
 	public CellStyle grasCentreBordure;
@@ -175,6 +172,7 @@ public class ExcelGeneratorTool
 		// Création des styles
 		grasGaucheNonWrappe = wb.createCellStyle();
 		grasGaucheNonWrappe.setAlignment(CellStyle.ALIGN_LEFT);
+		grasGaucheNonWrappe.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
 		grasGaucheNonWrappe.setFont(fontGras);
 		grasGaucheNonWrappe.setWrapText(false);
 		beWhite(grasGaucheNonWrappe);
@@ -185,6 +183,7 @@ public class ExcelGeneratorTool
 
 		grasGaucheNonWrappeBordure = wb.createCellStyle();
 		grasGaucheNonWrappeBordure.setAlignment(CellStyle.ALIGN_LEFT);
+		grasGaucheNonWrappeBordure.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
 		grasGaucheNonWrappeBordure.setFont(fontGras);
 		grasGaucheNonWrappeBordure.setWrapText(false);
 		addBorderedStyle(grasGaucheNonWrappeBordure);
@@ -193,7 +192,25 @@ public class ExcelGeneratorTool
 		grasGaucheNonWrappeBordureGray = duplicate(grasGaucheNonWrappeBordure);
 		beGray(grasGaucheNonWrappeBordureGray);
 		
-
+		
+		
+		// 
+		
+		grasGaucheWrappe = duplicate(grasGaucheNonWrappe);
+		grasGaucheWrappe.setWrapText(true);
+		
+		grasGaucheWrappeColor = duplicate(grasGaucheNonWrappeColor);
+		grasGaucheWrappeColor.setWrapText(true);
+		
+		grasGaucheWrappeBordure = duplicate(grasGaucheNonWrappeBordure);
+		grasGaucheWrappeBordure.setWrapText(true);
+		
+		grasGaucheWrappeBordureGray = duplicate(grasGaucheNonWrappeBordureGray);
+		grasGaucheWrappeBordureGray.setWrapText(true);
+		
+		
+		//
+		
 		grasCentre = wb.createCellStyle();
 		grasCentre.setAlignment(CellStyle.ALIGN_CENTER);
 		grasCentre.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
@@ -266,6 +283,7 @@ public class ExcelGeneratorTool
 	 	
 	 	nongrasGaucheWrappe = wb.createCellStyle(); 
 		nongrasGaucheWrappe.setAlignment(CellStyle.ALIGN_LEFT);
+		nongrasGaucheWrappe.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
 		nongrasGaucheWrappe.setFont(fontNonGras);
 		nongrasGaucheWrappe.setWrapText(true);
 		beWhite(nongrasGaucheWrappe);
@@ -650,6 +668,10 @@ public class ExcelGeneratorTool
 			else if (style == nonGrasCentreBordure)
 			{
 				return nonGrasCentreBordureGray;
+			}
+			else if (style == grasGaucheWrappeBordure)
+			{
+				return grasGaucheWrappeBordureGray;
 			}
 			else
 			{

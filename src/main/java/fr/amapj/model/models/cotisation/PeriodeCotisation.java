@@ -24,8 +24,6 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -63,6 +61,9 @@ public class PeriodeCotisation implements Identifiable
 	// Montant conseillé
 	private int montantConseille;
 	
+	@NotNull
+	@Temporal(TemporalType.DATE)
+	private Date dateDebutInscription;
 	
 	@NotNull
 	@Temporal(TemporalType.DATE)
@@ -193,6 +194,16 @@ public class PeriodeCotisation implements Identifiable
 	public void setDateFin(Date dateFin)
 	{
 		this.dateFin = dateFin;
+	}
+
+	public Date getDateDebutInscription()
+	{
+		return dateDebutInscription;
+	}
+
+	public void setDateDebutInscription(Date dateDebutInscription)
+	{
+		this.dateDebutInscription = dateDebutInscription;
 	}
 	
 	

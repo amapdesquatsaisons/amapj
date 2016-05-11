@@ -118,6 +118,12 @@ public class PlanningMensuelEditorPart extends WizardFormPopup
 		
 		addIntegerField("Largeur (en mm) de la colonne Tel", "lgColnumTel1");
 		
+		addIntegerField("Largeur (en mm) de la colonne Commentaire", "lgColCommentaire");
+		
+		addIntegerField("Hauteur (en mm) des lignes (ajustement automatique si 0)", "hauteurLigne");
+		
+		addComboEnumField("Contenu des cellules ", "contenuCellule", new NotNullValidator());
+		
 		Enum[] enumsToExclude = new Enum[] { RoleList.MASTER };
 		
 		addComboEnumField("Accessible par ", "accessibleBy", enumsToExclude,new NotNullValidator());

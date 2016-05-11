@@ -177,11 +177,10 @@ public class MailerService
 			message.setContent(mp);
 			Transport.send(message);
 			logger.info("Envoi d'un message a : "+mailerMessage.getEmail());
-
 		}
 		catch (MessagingException | UnsupportedEncodingException e)
 		{
-			throw new RuntimeException(e);
+			throw new RuntimeException(e.getMessage(),e);
 		}
 	}
 	

@@ -89,6 +89,7 @@ public class GestionCotisationService
 		dto.nom = a.getNom();
 		dto.montantMini = a.getMontantMini();
 		dto.montantConseille = a.getMontantConseille();
+		dto.dateDebutInscription = a.getDateDebutInscription();
 		dto.dateFinInscription = a.getDateFinInscription();
 		dto.textPaiement = a.getTextPaiement();
 		dto.libCheque = a.getLibCheque();
@@ -167,6 +168,7 @@ public class GestionCotisationService
 		a.setNom(dto.nom);
 		a.setMontantMini(dto.montantMini);
 		a.setMontantConseille(dto.montantConseille);
+		a.setDateDebutInscription(dto.dateDebutInscription);
 		a.setDateFinInscription(dto.dateFinInscription);
 		a.setTextPaiement(dto.textPaiement);
 		a.setLibCheque(dto.libCheque);
@@ -211,7 +213,7 @@ public class GestionCotisationService
 		
 		// Récupération de la liste des cotisations
 		Query q = em.createQuery("select p from PeriodeCotisation p " +
-				"WHERE p.dateDebut<=:d and p.dateFinInscription>=:d");
+				"WHERE p.dateDebutInscription<=:d and p.dateFinInscription>=:d");
 
 		Date d = DateUtils.suppressTime(new Date());
 		q.setParameter("d",d);

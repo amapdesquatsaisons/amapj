@@ -42,6 +42,8 @@ import fr.amapj.service.services.parametres.ParametresDTO;
 import fr.amapj.service.services.parametres.ParametresService;
 import fr.amapj.service.services.utilisateur.envoimail.EnvoiMailDTO;
 import fr.amapj.service.services.utilisateur.envoimail.EnvoiMailUtilisateurDTO;
+import fr.amapj.service.services.utilisateur.envoimail.StatusEnvoiMailDTO;
+import fr.amapj.service.services.utilisateur.util.UtilisateurUtil;
 import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
 
 /**
@@ -320,40 +322,79 @@ public class UtilisateurService
 		
 		for (Utilisateur u : us)
 		{
-			EnvoiMailUtilisateurDTO emu = new EnvoiMailUtilisateurDTO();
-			emu.idUtilisateur = u.getId();
-			emu.sendMail = true;
-			dto.utilisateurs.add(emu);
+			if (UtilisateurUtil.canSendMailTo(u))
+			{
+				EnvoiMailUtilisateurDTO emu = new EnvoiMailUtilisateurDTO();
+				emu.idUtilisateur = u.getId();
+				emu.sendMail = true;
+				dto.utilisateurs.add(emu);
+			}
 		}
 		
 		return dto;
 	}
 
-	@DbWrite
-	public void envoiEmailBienvenue(EnvoiMailDTO envoiMail)
+	/**
+	 * Envoi un e mail a chauqe utilisateur, dans une transaction separée 
+	 * pour chaque utilisateur 
+	 * 
+	 * ATTENTION : NE PAS AJOUTER ICI un tag DbWrite ou DbRead !!
+	 *  
+	 */
+	public StatusEnvoiMailDTO envoiEmailBienvenue(EnvoiMailDTO envoiMail)
 	{
-		EntityManager em = TransactionHelper.getEm();
+		StatusEnvoiMailDTO ret = new StatusEnvoiMailDTO();
 		
 		for (EnvoiMailUtilisateurDTO dto : envoiMail.utilisateurs)
 		{
-			Utilisateur utilisateur = em.find(Utilisateur.class, dto.idUtilisateur);
-			// Génère un mot de passe de 8 caractères majuscules
-			String clearPassword = RandomUtils.generatePasswordMaj(8);
-			new PasswordManager().setUserPassword(utilisateur.getId(), clearPassword);
-			
-			sendEmail(em, utilisateur,  envoiMail.texteMail,clearPassword);
+			if (dto.sendMail)
+			{
+				
+				// Récupération de l'email seul dans une transaction en lecture 
+				String email = getEmail(dto.idUtilisateur);
+				
+				// Génère un mot de passe de 8 caractères majuscules 
+				String clearPassword = RandomUtils.generatePasswordMaj(8);
+					
+				try
+				{
+					// Envoi du mail , sans transaction 
+					sendEmail(email,  envoiMail.texteMail,clearPassword);
+				
+					// positionne le mot de passe pour cet utilisateur dans une transaction en ecriture independante 
+					new PasswordManager().setUserPassword(dto.idUtilisateur, clearPassword);
+					
+					ret.nbMailOK++;
+
+				}
+				catch(Exception e)
+				{
+					String msg = "Impossible d'envoyer un e mail à "+email+" car :"+e.getMessage();
+					ret.erreurs.add(msg);
+				}
+			}
 		}
+		
+		return ret;
 		
 	}
 	
+	@DbRead
+	private String getEmail(Long idUtilisateur)
+	{
+		EntityManager em = TransactionHelper.getEm();
+		Utilisateur utilisateur = em.find(Utilisateur.class, idUtilisateur);
+		String email=utilisateur.getEmail();
+		return email;
+	}
+
+
 	
-	
-	private void sendEmail(EntityManager em, Utilisateur utilisateur, String texte, String clearPassword)
+	private void sendEmail(String email, String texte, String clearPassword)
 	{
 		ParametresDTO param = new ParametresService().getParametres();
 		
 		//
-		String email=utilisateur.getEmail();
 		
 		String subject = param.nomAmap+" - Bienvenue";
 		String htmlContent = texte;
@@ -370,7 +411,7 @@ public class UtilisateurService
 		htmlContent = htmlContent.replaceAll("#LINK#", link);
 		
 		htmlContent = htmlContent.replaceAll("#PASSWORD#", clearPassword);
-		htmlContent = htmlContent.replaceAll("#EMAIL#", utilisateur.getEmail());
+		htmlContent = htmlContent.replaceAll("#EMAIL#", email);
 		
 		// Construction du message
 		MailerMessage message  = new MailerMessage();

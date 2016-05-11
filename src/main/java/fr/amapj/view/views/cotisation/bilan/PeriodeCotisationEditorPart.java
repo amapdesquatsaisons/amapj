@@ -121,6 +121,8 @@ public class PeriodeCotisationEditorPart extends WizardFormPopup
 		
 		addTextAeraField("Texte explicatif pour le paiement","textPaiement");
 		
+		addDateField("Date de début des inscription","dateDebutInscription");
+		
 		addDateField("Date de fin des inscription","dateFinInscription");
 		
 		addDateField("Date de remise des chèques","dateRemiseCheque");

@@ -1,5 +1,7 @@
 /*
  *  Copyright 2013-2015 AmapJ Team
+ * 
+ *  This file is part of AmapJ.
  *  
  *  AmapJ is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as published by
@@ -13,6 +15,17 @@
  *
  *  You should have received a copy of the GNU Affero General Public License
  *  along with AmapJ.  If not, see <http://www.gnu.org/licenses/>.
- *  
+ * 
+ * 
  */
- 
+ package fr.amapj.model.models.editionspe.planningmensuel;
+
+public enum ContenuCellule
+{
+	// 
+	CROIX ,
+	
+	// 
+	QUANTITE;
+
+}

@@ -35,6 +35,7 @@ import fr.amapj.common.StringUtils;
 import fr.amapj.model.models.contrat.reel.ContratCell;
 import fr.amapj.model.models.editionspe.AbstractEditionSpeJson;
 import fr.amapj.model.models.editionspe.EditionSpecifique;
+import fr.amapj.model.models.editionspe.planningmensuel.ContenuCellule;
 import fr.amapj.model.models.editionspe.planningmensuel.ParametresProduitsJson;
 import fr.amapj.model.models.editionspe.planningmensuel.PlanningMensuelJson;
 import fr.amapj.model.models.editionspe.planningmensuel.TypPlanning;
@@ -87,8 +88,8 @@ public class EGPlanningMensuel extends AbstractExcelGenerator
 		List<Utilisateur> utilisateurs = getUtilisateur(em,libInfo,planningJson);
 		
 		
-		// Les colonnes en + sont le nom, prenom et telephone
-		int nbCol =  entete.prodCols.size()+3;
+		// Les colonnes en + sont le nom, prenom et telephone et commentaire
+		int nbCol =  entete.prodCols.size()+4;
 		et.addSheet("Planning "+libInfo.lib2+" "+libInfo.lib1, nbCol, 25);
 		et.setModePaysage();
 		
@@ -106,6 +107,8 @@ public class EGPlanningMensuel extends AbstractExcelGenerator
 		}
 		
 		et.setCell(index, "Téléphone portable ", et.grasCentreBordure);
+		index++;
+		et.setCell(index, "Commentaire ", et.grasCentreBordure);
 		
 		// Ecriture de la ligne des responsables de la distribution
 		et.addRow();
@@ -120,6 +123,8 @@ public class EGPlanningMensuel extends AbstractExcelGenerator
 			index = index + dateCol.nbColProduit;
 		}
 		
+		et.setCell(index, "", et.grasCentreBordure);
+		index++;
 		et.setCell(index, "", et.grasCentreBordure);
 		
 		// Ecriture de la ligne avec les noms des produits
@@ -151,11 +156,18 @@ public class EGPlanningMensuel extends AbstractExcelGenerator
 		et.mergeCellsUp(index, 3);
 		et.setColumnWidthInMm(index, planningJson.getLgColnumTel1());
 		
+		index++;
+		et.setCell(index, "", et.grasCentreBordure);
+		et.mergeCellsUp(index, 3);
+		et.setColumnWidthInMm(index, planningJson.getLgColCommentaire());
+		
+		
+		
 		//
 		int numLigne = 0;
 		for (Utilisateur utilisateur : utilisateurs)
 		{
-			addRowUtilisateur(et,utilisateur,em,entete,numLigne,libInfo);
+			addRowUtilisateur(et,utilisateur,em,entete,numLigne,libInfo,planningJson.getContenuCellule(),planningJson.getHauteurLigne());
 			numLigne++;
 		}
 		
@@ -163,23 +175,35 @@ public class EGPlanningMensuel extends AbstractExcelGenerator
 	
 	
 
-	private void addRowUtilisateur(ExcelGeneratorTool et, Utilisateur utilisateur, EntityManager em, Entete entete,int numLigne,LibInfo libInfo)
+	private void addRowUtilisateur(ExcelGeneratorTool et, Utilisateur utilisateur, EntityManager em, Entete entete,int numLigne,LibInfo libInfo, ContenuCellule contenuCellule, int hauteurLigne)
 	{
 		int[] qtes = getQte(utilisateur, em, entete.prodCols,libInfo);
 		
 		et.addRow();
-		et.setCell(0, utilisateur.getNom(), et.switchGray(et.grasGaucheNonWrappeBordure,numLigne));
+		if (hauteurLigne>0)
+		{
+			et.setRowHeigthInMm(hauteurLigne);
+		}
+		et.setCell(0, utilisateur.getNom(), et.switchGray(et.grasGaucheWrappeBordure,numLigne));
 		et.setCell(1, utilisateur.getPrenom(), et.switchGray(et.nonGrasGaucheBordure,numLigne));
 		
 		int index = 2;
 		for (int i = 0; i < qtes.length; i++)
 		{
-			String str = qtes[i]>0 ? "X" : " ";
+			
 			ProduitColonne prodCol = entete.prodCols.get(i);
 			
 			if (prodCol.idProduit!=null)
 			{
-				et.setCell(index, str, et.switchGray(et.grasCentreBordure,numLigne));
+				if (contenuCellule==ContenuCellule.QUANTITE)
+				{
+					et.setCellQte(index, qtes[i], et.switchGray(et.grasCentreBordure,numLigne));
+				}
+				else
+				{
+					String str = qtes[i]>0 ? "X" : " ";
+					et.setCell(index, str, et.switchGray(et.grasCentreBordure,numLigne));	
+				}
 			}
 			else
 			{
@@ -192,6 +216,10 @@ public class EGPlanningMensuel extends AbstractExcelGenerator
 		
 		// Numéro de telephone
 		et.setCell(index, utilisateur.getNumTel1(), et.switchGray(et.nonGrasCentreBordure,numLigne));
+		
+		// Commentaire
+		index++;
+		et.setCell(index, "", et.switchGray(et.nonGrasCentreBordure,numLigne));
 		
 	}
 	

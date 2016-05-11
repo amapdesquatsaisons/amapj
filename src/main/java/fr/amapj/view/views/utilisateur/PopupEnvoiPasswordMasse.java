@@ -29,6 +29,7 @@ import fr.amapj.service.services.parametres.ParametresService;
 import fr.amapj.service.services.utilisateur.UtilisateurService;
 import fr.amapj.service.services.utilisateur.envoimail.EnvoiMailDTO;
 import fr.amapj.service.services.utilisateur.envoimail.EnvoiMailUtilisateurDTO;
+import fr.amapj.service.services.utilisateur.envoimail.StatusEnvoiMailDTO;
 import fr.amapj.view.engine.collectioneditor.CollectionEditor;
 import fr.amapj.view.engine.collectioneditor.FieldType;
 import fr.amapj.view.engine.popup.formpopup.WizardFormPopup;
@@ -48,7 +49,7 @@ public class PopupEnvoiPasswordMasse extends WizardFormPopup
 
 	public enum Step
 	{
-		INFO_GENERALES, UTILISATEURS , SAISIE_TEXTE_MAIL;
+		INFO_GENERALES, UTILISATEURS , SAISIE_TEXTE_MAIL , AVERTISSEMENT , RESULTAT;
 	}
 
 	/**
@@ -58,7 +59,8 @@ public class PopupEnvoiPasswordMasse extends WizardFormPopup
 	{
 		popupWidth = "80%";
 		popupHeight = "60%";
-		popupTitle = "Envoi des password en masse";
+		popupTitle = "Envoi des mots de passe en masse";
+		saveButtonTitle = "Quitter";
 
 		// Chargement de l'objet à créer
 		envoiMail = new UtilisateurService().getEnvoiMailDTO();
@@ -84,6 +86,17 @@ public class PopupEnvoiPasswordMasse extends WizardFormPopup
 		case SAISIE_TEXTE_MAIL:
 			addFieldTexteMail();
 			break;
+			
+		case AVERTISSEMENT:
+			addFieldAvertissement();
+			break;
+			
+		case RESULTAT:
+			addFieldResultat();
+			break;
+
+
+			
 
 		default:
 			break;
@@ -133,6 +146,57 @@ public class PopupEnvoiPasswordMasse extends WizardFormPopup
 		f.setHeight(10, Unit.CM);
 		
 	}
+	
+	
+	private void addFieldAvertissement()
+	{
+		// Titre
+		setStepTitle("Etes vous sûr ? ");
+		
+		int count=0;
+		for (EnvoiMailUtilisateurDTO u : envoiMail.utilisateurs)
+		{
+			if (u.sendMail)
+			{
+				count++;
+			}
+		}
+		
+		String str = 	"Vous allez envoyer "+count+" mails.</br>"+
+						"Etes vous sûr de vouloir continuer ?<br/>"+
+						"Quand vous allez cliquer sur Etape suivante, les mails seront envoyés<br/>";
+				
+		
+		addLabel(str, ContentMode.HTML);
+	}
+	
+	
+	private void addFieldResultat()
+	{
+		StatusEnvoiMailDTO ret = new UtilisateurService().envoiEmailBienvenue(envoiMail);
+		
+		
+		// Titre
+		setStepTitle("Résultats");
+		
+		String str = 	ret.nbMailOK+" mails ont été envoyés avec succés";
+		addLabel(str, ContentMode.HTML);
+		
+		
+		if (ret.erreurs.size()>0)
+		{
+			str = 	"Il y a eu "+ret.erreurs.size()+" erreurs.</br></br>";
+			for (String err : ret.erreurs)
+			{
+				str = str+err+"</br>";
+			}
+			addLabel(str, ContentMode.HTML);
+		}
+		
+		previousButton.setEnabled(false);
+		
+		
+	}
 
 
 	
@@ -140,7 +204,7 @@ public class PopupEnvoiPasswordMasse extends WizardFormPopup
 	@Override
 	protected void performSauvegarder()
 	{
-		new UtilisateurService().envoiEmailBienvenue(envoiMail);
+		
 	}
 
 	@Override
