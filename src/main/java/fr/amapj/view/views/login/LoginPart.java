@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -20,8 +20,7 @@
  */
  package fr.amapj.view.views.login;
 
-import com.vaadin.event.ShortcutAction.KeyCode;
-import com.vaadin.event.ShortcutListener;
+import com.ejt.vaadin.loginform.LoginForm;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
@@ -30,6 +29,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
@@ -42,34 +42,19 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 
-import fr.amapj.service.engine.sudo.SudoManager;
+import fr.amapj.common.DebugUtil;
 import fr.amapj.service.services.authentification.PasswordManager;
 import fr.amapj.service.services.parametres.ParametresService;
 import fr.amapj.view.engine.popup.formpopup.FormPopup;
 import fr.amapj.view.engine.ui.AmapUI;
-import fr.amapj.view.engine.ui.AppConfiguration;
 
 public class LoginPart
 {
 	private PasswordManager passwordManager = new PasswordManager();
 	
 	public GridLayout loginLayout = new GridLayout(8, 8);
-	
-	private TextField username;
-	
-	private PasswordField password;
-	
-	private Button signin;
-	
-	private Button lostPwd ;
-	
-	private VerticalLayout fields;
-	
-	private ShortcutListener enter;
-	
+		
 	private AmapUI ui;
-	
-	private String sudo;
 	
 	public LoginPart()
 	{
@@ -79,7 +64,6 @@ public class LoginPart
 	public void buildLoginView(boolean exit,CssLayout root,AmapUI ui,String loginFromUrl,String passwordFromUrl,String sudo)
 	{
 		this.ui = ui;
-		this.sudo = sudo;
 		if (exit)
 		{
 			root.removeAllComponents();
@@ -106,96 +90,10 @@ public class LoginPart
 		image.setSizeFull();
 		loginLayout.addComponent(image,1,2,3,5);
 		
-		// Zone de saisie login/password sur la gauche 
-		fields = new VerticalLayout();
-		fields.setSpacing(true);
-		fields.setMargin(true);
-		fields.setWidth("100%");
-
-		username = new TextField("Adresse Email");
-		username.addStyleName(ChameleonTheme.TEXTFIELD_BIG);
-		username.setWidth("100%");
-		username.setId("amapj.login.email");
-		if (loginFromUrl!=null)
-		{
-			username.setValue(loginFromUrl);
-		}
-		fields.addComponent(username);
-
-		password = new PasswordField("Mot de passe");
-		password.addStyleName(ChameleonTheme.TEXTFIELD_BIG);
-		password.setWidth("100%");
-		password.setId("amapj.login.password");
-		if (passwordFromUrl!=null)
-		{
-			password.setValue(passwordFromUrl);
-		}
-		fields.addComponent(password);
-		
-		if ((loginFromUrl==null) || (loginFromUrl.length()==0))
-		{
-			username.focus();
-		}
-		else
-		{
-			password.focus();
-		}
-
-		signin = new Button("S'identifier");
-		signin.setId("amapj.login.signin");
-		if (sudo!=null)
-		{
-			signin.setCaption("SUDO");
-		}
-		
-		signin.addStyleName(ChameleonTheme.BUTTON_BIG);
-		signin.addStyleName(ChameleonTheme.BUTTON_DEFAULT);
-		fields.addComponent(signin);
-		fields.setComponentAlignment(signin, Alignment.BOTTOM_LEFT);
-		
-		lostPwd = new Button("Mot de passe perdu");
-		lostPwd.addStyleName(ChameleonTheme.BUTTON_BIG);
-		lostPwd.addStyleName(ChameleonTheme.BUTTON_LINK);
-		fields.addComponent(lostPwd);
-		fields.setComponentAlignment(lostPwd, Alignment.BOTTOM_LEFT);
-		
-		
-		
-
-		enter = new ShortcutListener("Connexion", KeyCode.ENTER, null)
-		{
-			@Override
-			public void handleAction(Object sender, Object target)
-			{
-				signin.click();
-			}
-		};
-
-		signin.addClickListener(new ClickListener()
-		{
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				handleSignIn();
-			}
-		});
-
-		signin.addShortcutListener(enter);
-		
-		
-		lostPwd.addClickListener(new ClickListener()
-		{
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				handleLostPwd();
-			}
-		});
-
-		
-
-		loginLayout.addComponent(fields,5,2,6,5);
-		//loginLayout.setComponentAlignment(loginPanel, Alignment.MIDDLE_CENTER);
+		// Zone de saisie login/password sur la gauche	
+		MyLoginForm myLoginForm = new MyLoginForm(loginFromUrl,passwordFromUrl,sudo);
+		myLoginForm.setWidth("100%");
+		loginLayout.addComponent(myLoginForm,5,2,6,5);
 		
 		Label l1 = new Label("Application fonctionnant avec AmapJ - ");
 		Link link = new Link("Plus d'infos", new ExternalResource("http://amapj.fr"));
@@ -215,42 +113,12 @@ public class LoginPart
 		// Si les deux champs ont été remplis on tente une validation automatique
 		if ((passwordFromUrl!=null) && (loginFromUrl!=null))
 		{
-			signin.click();
+			myLoginForm.login(loginFromUrl, passwordFromUrl);
 		}
 		
 	}
 
-	/**
-	 * Appui sur "Connexion"
-	 */
-	private void handleSignIn()
-	{
-		String msg = passwordManager.checkUser(username.getValue(), password.getValue(),sudo); 
-		if ( msg == null)
-		{
-			// Si le mot de passe est correct : on passe à la vue principale
-			signin.removeShortcutListener(enter);
-			ui.buildMainView();
-		} 
-		else
-		{
-			
-			// Sinon on affiche le probleme
-			if (fields.getComponentCount() > 4)
-			{
-				// Remove the previous error message
-				fields.removeComponent(fields.getComponent(4));
-			}
-			// Add new error message
-			Label error = new Label(msg, ContentMode.HTML);
-			error.addStyleName(ChameleonTheme.LABEL_ERROR);
-			error.addStyleName(ChameleonTheme.LABEL_BIG);
-			error.setSizeUndefined();
-			fields.addComponent(error);
-			username.focus();
-		}
-	}
-
+	
 
 	/**
 	 * Gestion de l'appui sur mot de passe perdu
@@ -259,4 +127,127 @@ public class LoginPart
 	{
 		FormPopup.open(new PopupSaisieEmail());
 	}
+	
+	
+	/**
+	 * Zone de saisie du password 
+	 *
+	 */
+    public class MyLoginForm extends LoginForm 
+    {
+    	String loginFromUrl;
+    	String passwordFromUrl;
+    	String sudo;
+    	
+    	VerticalLayout layout;
+    	TextField userNameField;
+    	
+		public MyLoginForm(String loginFromUrl, String passwordFromUrl,	String sudo) 
+		{
+			this.loginFromUrl = loginFromUrl;
+			this.passwordFromUrl = passwordFromUrl;
+			this.sudo = sudo;
+		}
+
+		@Override
+        protected Component createContent(TextField userNameField, PasswordField passwordField, Button loginButton) 
+        {
+            layout = new VerticalLayout();
+            layout.setSpacing(true);
+            layout.setMargin(true);
+            
+            this.userNameField = userNameField;
+            userNameField.setCaption("Adresse Email");
+            userNameField.setStyleName(ChameleonTheme.TEXTFIELD_BIG);
+            userNameField.setWidth("100%");
+            userNameField.setId("amapj.login.email");
+    		if (loginFromUrl!=null)
+    		{
+    			userNameField.setValue(loginFromUrl);
+    		}
+    		layout.addComponent(userNameField);
+
+    		passwordField.setCaption("Mot de passe");
+    		passwordField.setStyleName(ChameleonTheme.TEXTFIELD_BIG);
+    		passwordField.setWidth("100%");
+    		passwordField.setId("amapj.login.password");
+    		if (passwordFromUrl!=null)
+    		{
+    			passwordField.setValue(passwordFromUrl);
+    		}
+    		layout.addComponent(passwordField);
+    		
+    		if ((loginFromUrl==null) || (loginFromUrl.length()==0))
+    		{
+    			userNameField.focus();
+    		}
+    		else
+    		{
+    			passwordField.focus();
+    		}
+
+    		loginButton.setCaption("S'identifier");
+    		loginButton.setId("amapj.login.signin");
+    		if (sudo!=null)
+    		{
+    			loginButton.setCaption("SUDO");
+    		}
+    		
+    		loginButton.addStyleName(ChameleonTheme.BUTTON_BIG);
+    		loginButton.addStyleName(ChameleonTheme.BUTTON_DEFAULT);
+    		layout.addComponent(loginButton);
+    		layout.setComponentAlignment(loginButton, Alignment.BOTTOM_LEFT);
+    		
+    		
+    		Button lostPwd = new Button("Mot de passe perdu");
+    		lostPwd.addStyleName(ChameleonTheme.BUTTON_BIG);
+    		lostPwd.addStyleName(ChameleonTheme.BUTTON_LINK);
+    		layout.addComponent(lostPwd);
+    		layout.setComponentAlignment(lostPwd, Alignment.BOTTOM_LEFT);
+    		
+    		
+    		
+    		lostPwd.addClickListener(new ClickListener()
+    		{
+    			@Override
+    			public void buttonClick(ClickEvent event)
+    			{
+    				handleLostPwd();
+    			}
+    		});
+            return layout;
+        }
+
+ 
+        @Override
+        protected void login(String userName, String password) 
+        {
+        	String msg = passwordManager.checkUser(userName, password,sudo); 
+    		
+    		if ( msg == null)
+    		{
+    			// Si le mot de passe est correct : on passe à la vue principale
+    			ui.buildMainView();
+    		} 
+    		else
+    		{
+    			
+    			// Sinon on affiche le probleme
+    			if (layout.getComponentCount() > 4)
+    			{
+    				// Remove the previous error message
+    				layout.removeComponent(layout.getComponent(4));
+    			}
+    			// Add new error message
+    			Label error = new Label(msg, ContentMode.HTML);
+    			error.addStyleName(ChameleonTheme.LABEL_ERROR);
+    			error.addStyleName(ChameleonTheme.LABEL_BIG);
+    			error.setSizeUndefined();
+    			layout.addComponent(error);
+    			userNameField.focus();
+    		}
+        }
+    }
+	
+	
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -384,7 +384,7 @@ public class PasswordManager
 		
 		SessionManager.setSessionParameters(null);
 		new LogViewService().endAccess(p.logId,p.getNbError());
-		AmapJLogManager.endLog(true);
+		AmapJLogManager.endLog(true,p.logFileName);
 		
 		
 	}

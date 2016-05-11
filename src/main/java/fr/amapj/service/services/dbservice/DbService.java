@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -85,7 +85,7 @@ public class DbService
 	 * Ceci est fait dans une transaction en lecture  
 	 */
 	@DbRead
-	public int count(Class clazz,String property,String value)
+	public int count(Class clazz,String property,String value,Long id)
 	{
 		EntityManager em = TransactionHelper.getEm();
 		
@@ -95,7 +95,7 @@ public class DbService
 		Root root = cq.from(clazz);
 
 		// On ajoute la condition where
-		cq.where(cb.equal(root.get(property), value));
+		cq.where(cb.and(cb.equal(root.get(property), value),cb.notEqual(root.get("id"), id)));
 		
 		return em.createQuery(cq).getResultList().size();
 	}

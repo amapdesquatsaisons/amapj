@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -49,6 +49,7 @@ public class EditionSpecifique implements Identifiable
 
 	@NotNull
 	@Size(min = 1, max = 100)
+	@Column(length = 100)
 	private String nom;
 	
 	@NotNull

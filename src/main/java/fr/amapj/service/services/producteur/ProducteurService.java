@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -249,7 +249,26 @@ public class ProducteurService
 			throw new UnableToSuppressException("Cet producteur posséde "+r+" produits. Vous devez d'abord les supprimer.");
 		}
 		
+		// Il faut d'abord supprimer les referents et les utilisateurs producteurs 
+		Query q = em.createQuery("select c from ProducteurReferent c WHERE c.producteur=:p");
+		q.setParameter("p", p);
+		List<ProducteurReferent> prs =  q.getResultList();
+		for (ProducteurReferent pr : prs)
+		{
+			em.remove(pr);
+		}
 		
+		
+		q = em.createQuery("select c from ProducteurUtilisateur c WHERE c.producteur=:p");
+		q.setParameter("p", p);
+		List<ProducteurUtilisateur> pus =  q.getResultList();
+		for (ProducteurUtilisateur pu : pus)
+		{
+			em.remove(pu);
+		}
+		
+		
+		// Puis on supprime le producteur
 		em.remove(p);
 	}
 

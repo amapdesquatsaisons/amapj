@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -22,6 +22,8 @@
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 
@@ -111,6 +113,25 @@ public class CollectionUtils
 		}
 		
 		return str.toString();
+	}
+	
+	/**
+	 * Convertit une liste d'objet en une String 
+	 * Exemple : ls = [ "Bob" , "Marc" , "Paul" ]
+	 * 
+	 *  asString(ls,",") =>  "Bob,Marc,Paul"
+	 * 
+	 */
+	public static <T> String asString(List<T> ls,String sep)
+	{
+		ToString<T> f = new CollectionUtils.ToString<T>() 
+		{
+			public String toString(T t)
+			{
+				return t.toString();
+			}
+		};
+		return asString(ls, sep,f);
 	}
 	
 	

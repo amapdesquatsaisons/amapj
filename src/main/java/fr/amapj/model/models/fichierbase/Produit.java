@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -20,6 +20,7 @@
  */
  package fr.amapj.model.models.fichierbase;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -42,11 +43,13 @@ public class Produit  implements Identifiable
 	private Long id;
 
 	@NotNull
-	@Size(min = 1, max = 100)
+	@Size(min = 1, max = 255)
+	@Column(length = 255)
 	private String nom;
 	
 	@NotNull
 	@Size(min = 1, max = 500)
+	@Column(length = 500)
 	private String conditionnement;
 	
 

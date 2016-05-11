@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -176,15 +176,8 @@ public class GestionContratListPart extends VerticalLayout implements ComponentC
 		title2.addStyleName("h1");	
 		
 		newButton = new Button("Créer");
-		newButton.addClickListener(new Button.ClickListener()
-		{
-
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				handleAjouter();
-			}
-		});
+		newButton.addClickListener(event -> handleAjouter() );
+			
 		
 		newButtonFrom = new Button("Créer à partir de ...");
 		newButtonFrom.addClickListener(new Button.ClickListener()

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -33,13 +33,19 @@ public class UniqueInDatabaseValidator implements IValidator
 	private Class clazz;
 
     private String property;
+    
+    // Id de la fiche en cours
+    // Dans le cas de la modification d'une fiche, il est nécessaire de valider comme correcte la valeur qui est dans la fiche
+    // même si elle est bien sûr dans la base
+    private Long id;
 
  
-	public UniqueInDatabaseValidator(Class clazz,String property)
+	public UniqueInDatabaseValidator(Class clazz,String property,Long id)
 	{
 		super();
 		this.clazz = clazz;
 		this.property = property;
+		this.id = id;
 	}
 
 
@@ -53,8 +59,9 @@ public class UniqueInDatabaseValidator implements IValidator
 		{
 			val="";
 		}
+	
 		
-		int nb = new DbService().count(clazz, property, val);
+		int nb = new DbService().count(clazz, property, val,id);
 		if (nb>0)
 		{
 			a.addMessage("Le champ \""+a.title+"\" contient une valeur déjà utilisée. Merci de choisir une autre valeur.");

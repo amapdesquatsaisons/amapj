@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -22,6 +22,7 @@
 
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -29,6 +30,7 @@ import javax.persistence.Id;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import fr.amapj.model.engine.Identifiable;
 
@@ -46,6 +48,8 @@ public class AppInstance  implements Identifiable
 	private Long id;
 
 	@NotNull
+	@Size(min = 0, max = 255)
+	@Column(length = 255) 
 	private String nomInstance;
 	
 	@NotNull
@@ -53,12 +57,18 @@ public class AppInstance  implements Identifiable
 	private Date dateCreation;
 	
 	@NotNull
+	@Size(min = 0, max = 255)
+	@Column(length = 255)
 	private String dbms;
 	
 	// Utilisé uniquement pour les base de données externe
+	@Size(min = 0, max = 255)
+	@Column(length = 255)
 	private String dbUserName;
 	
 	// Utilisé uniquement pour les base de données externe
+	@Size(min = 0, max = 255)
+	@Column(length = 255)
 	private String dbPassword;
 	
 

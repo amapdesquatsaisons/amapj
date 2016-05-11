@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -49,27 +49,32 @@ public class Parametres implements Identifiable
 	 * Nom de l'AMAP
 	 */
 	@Size(min = 0, max = 100)
+	@Column(length = 100)
 	private String nomAmap;
 	
 	/**
 	 * Ville de l'AMAP
 	 */
 	@Size(min = 0, max = 200)
+	@Column(length = 200)
 	private String villeAmap;
 	
 	/**
 	 * Envoi de mail
 	 */
 	@Size(min = 0, max = 255)
+	@Column(length = 255)
 	private String sendingMailUsername;
 	
 	@Size(min = 0, max = 255)
+	@Column(length = 255)
 	private String sendingMailPassword;
 	
 	// Nombre maximum de mail qu'il est possible d'envoyer par jour 
 	private int sendingMailNbMax;
 	
 	@Size(min = 0, max = 255)
+	@Column(length = 255)
 	private String mailCopyTo;
 	
 	/**
@@ -83,6 +88,7 @@ public class Parametres implements Identifiable
 	 * Url de l'application visible dans les mails
 	 */
 	@Size(min = 0, max = 255)
+	@Column(length = 255)
 	private String url;
 	
 
@@ -90,6 +96,7 @@ public class Parametres implements Identifiable
 	 * Destinataire de la sauvegarde
 	 */
 	@Size(min = 0, max = 255)
+	@Column(length = 255)
 	private String backupReceiver;
 
 	

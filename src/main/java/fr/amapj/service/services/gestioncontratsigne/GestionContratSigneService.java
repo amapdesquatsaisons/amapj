@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -396,6 +396,41 @@ public class GestionContratSigneService
 		}
 	}
 	
+	
+	
+	// PARTIE REQUETAGE POUR AVOIR LA LISTE DES MAILS DES UTILISATEURS QUI ONT UN CONTRAT 
+	/**
+	 * 
+	 */
+	@DbRead
+	public List<String> getAllMails(Long idModeleContrat)
+	{
+		EntityManager em = TransactionHelper.getEm();
+		
+		ModeleContrat mc = em.find(ModeleContrat.class, idModeleContrat);
+		
+		Query q = em.createQuery("select c.utilisateur.email from Contrat c WHERE c.modeleContrat=:mc ORDER BY c.utilisateur.nom, c.utilisateur.prenom");
+		q.setParameter("mc",mc);
+		List<String> mails = q.getResultList();
+		return mails;
+	}
+	
+	/**
+	 * 
+	 */
+	@DbRead
+	public List<Utilisateur> getAllUtilisateur(Long idModeleContrat)
+	{
+		EntityManager em = TransactionHelper.getEm();
+		
+		ModeleContrat mc = em.find(ModeleContrat.class, idModeleContrat);
+		
+		Query q = em.createQuery("select c.utilisateur from Contrat c WHERE c.modeleContrat=:mc ORDER BY c.utilisateur.nom, c.utilisateur.prenom");
+		q.setParameter("mc",mc);
+		List<Utilisateur> mails = q.getResultList();
+		return mails;
+	}
+		
 	
 	
 	

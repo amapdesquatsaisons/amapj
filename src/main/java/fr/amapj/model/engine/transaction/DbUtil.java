@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -166,8 +166,15 @@ public class DbUtil
 		mp.put("javax.persistence.jdbc.url",url);
 		mp.put(PersistenceUnitProperties.JDBC_USER, user);
 		mp.put(PersistenceUnitProperties.JDBC_PASSWORD, password);
-		mp.put("eclipselink.logging.level" ,"FINE" );
+		
+		mp.put("eclipselink.logging.level" ,"INFO" );
+		mp.put("eclipselink.logging.level.sql" ,"FINE" );
+		
+		
 		mp.put(PersistenceUnitProperties.DDL_GENERATION, PersistenceUnitProperties.NONE);
+		mp.put(PersistenceUnitProperties.LOGGING_LOGGER, "fr.amapj.model.engine.db.EclipseLinkLogger");
+		
+		
 		
 		DecimalFormat df = new DecimalFormat("00");
 		int puNumber = entityManagerFactorys.size();

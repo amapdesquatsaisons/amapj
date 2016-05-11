@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -30,6 +30,8 @@ import fr.amapj.model.models.contrat.modele.GestionPaiement;
 import fr.amapj.service.services.gestioncontrat.GestionContratService;
 import fr.amapj.service.services.gestioncontrat.ModeleContratDTO;
 import fr.amapj.view.engine.popup.formpopup.WizardFormPopup;
+import fr.amapj.view.engine.popup.formpopup.validator.IValidator;
+import fr.amapj.view.engine.popup.formpopup.validator.StringLengthValidator;
 
 /**
  * Permet de modifier les infos de paiements
@@ -92,11 +94,13 @@ public class ModifPaiementContratEditorPart extends WizardFormPopup
 
 	private void addFieldPaiement()
 	{
+		IValidator len_0_255 = new StringLengthValidator(0, 255);
+		
 		setStepTitle("les informations sur le paiement");
 		
 		if (modeleContrat.gestionPaiement==GestionPaiement.GESTION_STANDARD)
 		{	
-			addTextField("Ordre du chèque", "libCheque");
+			addTextField("Ordre du chèque", "libCheque",len_0_255);
 			
 			if (modeleContrat.frequence==FrequenceLivraison.UNE_SEULE_LIVRAISON)
 			{

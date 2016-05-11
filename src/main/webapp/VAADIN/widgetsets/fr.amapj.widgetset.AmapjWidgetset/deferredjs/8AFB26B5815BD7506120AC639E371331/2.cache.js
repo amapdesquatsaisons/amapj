@@ -1,0 +1,1 @@
+$wnd.fr_amapj_widgetset_AmapjWidgetset.runAsyncCallback2('Afb(1551,1,AVd);_.Qd=function $cc(){_$b((!U$b&&(U$b=new e_b),U$b),this.a.d)};EOd(ul)(2);\n//# sourceURL=fr.amapj.widgetset.AmapjWidgetset-2.js\n')

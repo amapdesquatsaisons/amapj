@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -323,7 +323,7 @@ public class PermanenceService
 		
 		
 		// Remplacement des zones de textes
-		String link = param.getUrl()+"?username="+email;
+		String link = "<a href=\""+param.getUrl()+"\">"+param.getUrl()+"</a>";
 		htmlContent = htmlContent.replaceAll("#LINK#", link);
 		
 		String datePermanences = getDatePermanence(em,utilisateur);

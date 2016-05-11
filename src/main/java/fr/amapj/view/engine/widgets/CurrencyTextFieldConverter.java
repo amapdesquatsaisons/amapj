@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -138,6 +138,9 @@ public class CurrencyTextFieldConverter implements Converter
 	{		
 		// Suppression des espaces
 		str = str.trim();
+		
+		// Remplacement des virgules par des .
+		str = str.replace(',', '.');
 		
 		if (str.length()==0)
 		{

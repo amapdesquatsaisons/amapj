@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -24,21 +24,19 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;import org.apache.logging.log4j.Logger;
-
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import fr.amapj.common.AmapjRuntimeException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import fr.amapj.common.DateUtils;
-import fr.amapj.model.engine.transaction.Call;
 import fr.amapj.model.engine.transaction.DbRead;
 import fr.amapj.model.engine.transaction.DbWrite;
 import fr.amapj.model.engine.transaction.TransactionHelper;
-import fr.amapj.model.engine.transaction.NewTransaction;
 import fr.amapj.model.models.contrat.modele.EtatModeleContrat;
 import fr.amapj.model.models.contrat.modele.ModeleContrat;
 import fr.amapj.model.models.contrat.modele.ModeleContratDate;
@@ -49,8 +47,6 @@ import fr.amapj.model.models.contrat.reel.Contrat;
 import fr.amapj.model.models.contrat.reel.ContratCell;
 import fr.amapj.model.models.contrat.reel.EtatPaiement;
 import fr.amapj.model.models.contrat.reel.Paiement;
-import fr.amapj.model.models.cotisation.PeriodeCotisation;
-import fr.amapj.model.models.cotisation.PeriodeCotisationUtilisateur;
 import fr.amapj.model.models.fichierbase.Utilisateur;
 import fr.amapj.model.models.remise.RemiseProducteur;
 import fr.amapj.service.services.gestioncontrat.GestionContratService;
@@ -191,10 +187,15 @@ public class MesContratsService
 
 	/**
 	 * Un contrat est historique si la date de la dernière livraison 
-	 * est passée de plus de 5 jours
+	 * est passée de plus de 5 jours et si il n'est plus possible de s'inscrire
 	 */
 	public boolean isHistorique(Contrat contrat,EntityManager em)
 	{
+		if (DateUtils.isInscriptionPossible(contrat.getModeleContrat().getDateFinInscription()))
+		{
+			return false;
+		}
+		
 		Query q = em.createQuery("select count(cc) from ContratCell cc " +
 				"WHERE cc.contrat=:c and cc.modeleContratDate.dateLiv>=:d");
 

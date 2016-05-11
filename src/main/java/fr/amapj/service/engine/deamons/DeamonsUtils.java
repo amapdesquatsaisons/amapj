@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -79,7 +79,7 @@ public class DeamonsUtils
 				
 				DbUtil.setDbForDeamonThread(null);
 				new LogViewService().endAccess(dto.id,deamonsContext.nbError);
-				AmapJLogManager.endLog(true);
+				AmapJLogManager.endLog(true,dto.logFileName);
 			}
 		}
 	}

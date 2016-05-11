@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -20,6 +20,7 @@
  */
  package fr.amapj.view.views.common.contrattelecharger;
 
+import fr.amapj.model.models.contrat.modele.GestionPaiement;
 import fr.amapj.service.services.editionspe.EditionSpeService;
 import fr.amapj.service.services.excelgenerator.EGBilanCompletCheque;
 import fr.amapj.service.services.excelgenerator.EGCollecteCheque;
@@ -27,6 +28,9 @@ import fr.amapj.service.services.excelgenerator.EGContratUtilisateur;
 import fr.amapj.service.services.excelgenerator.EGFeuilleLivraison;
 import fr.amapj.service.services.excelgenerator.EGLiasseContratUtilisateur;
 import fr.amapj.service.services.excelgenerator.EGSyntheseContrat;
+import fr.amapj.service.services.excelgenerator.EGUtilisateurContrat;
+import fr.amapj.service.services.gestioncontrat.GestionContratService;
+import fr.amapj.service.services.gestioncontrat.ModeleContratDTO;
 import fr.amapj.service.services.pdfgenerator.PGEngagement;
 import fr.amapj.service.services.producteur.ProducteurService;
 import fr.amapj.view.engine.excelgenerator.TelechargerPopup;
@@ -52,9 +56,17 @@ public class TelechargerContrat
 		}
 		
 		popup.addGenerator(new EGFeuilleLivraison(idModeleContrat));
-		popup.addGenerator(new EGCollecteCheque(idModeleContrat));
-		popup.addGenerator(new EGBilanCompletCheque(idModeleContrat));
+		
+		// Ces documents sont utilisables uniquement si le modele de contrat gere les paiements 
+		if (isWithPaiement(idModeleContrat))
+		{
+			popup.addGenerator(new EGCollecteCheque(idModeleContrat));
+			popup.addGenerator(new EGBilanCompletCheque(idModeleContrat));
+		}
+		
+		
 		popup.addGenerator(new EGLiasseContratUtilisateur(idModeleContrat));
+		popup.addGenerator(new EGUtilisateurContrat(idModeleContrat));
 		popup.addGenerator(new EGSyntheseContrat(idModeleContrat));
 		
 		if (new EditionSpeService().needEngagement(idModeleContrat))
@@ -63,6 +75,12 @@ public class TelechargerContrat
 		}
 				
 		CorePopup.open(popup,listener);
+	}
+
+	private static boolean isWithPaiement(Long idModeleContrat) 
+	{
+		ModeleContratDTO dto = new GestionContratService().loadModeleContrat(idModeleContrat);
+		return dto.gestionPaiement==GestionPaiement.GESTION_STANDARD;
 	}
 	
 	

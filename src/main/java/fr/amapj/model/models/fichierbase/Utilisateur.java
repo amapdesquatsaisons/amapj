@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -22,6 +22,7 @@
 
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -53,25 +54,31 @@ public class Utilisateur  implements Identifiable
 
 	@NotNull
 	@Size(min = 1, max = 100)
+	@Column(length = 100)
 	private String prenom;
 	
 	@NotNull
 	@Size(min = 1, max = 100)
+	@Column(length = 100)
 	private String nom;
 	
 	@Size(min = 0, max = 150)
+	@Column(length = 150)
 	// Contient l'adresse e mail
 	private String email;
 	
 	@Size(min = 0, max = 150)
+	@Column(length = 150)
 	// Contient le password encrypté
 	private String password;
 	
 	@Size(min = 0, max = 150)
+	@Column(length = 150)
 	// Contient le salt permettant d'encrypter le password 
 	private String salt;
 	
 	@Size(min = 0, max = 150)
+	@Column(length = 150)
 	// Contient le slat calculé à la demande du reset du password 
 	private String resetPasswordSalt;
 	

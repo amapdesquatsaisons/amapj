@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -22,9 +22,12 @@
 
 import com.vaadin.data.util.BeanItem;
 
+import fr.amapj.model.models.contrat.modele.ModeleContrat;
 import fr.amapj.service.services.gestioncontrat.GestionContratService;
 import fr.amapj.service.services.gestioncontrat.ModeleContratDTO;
 import fr.amapj.view.engine.popup.formpopup.FormPopup;
+import fr.amapj.view.engine.popup.formpopup.validator.IValidator;
+import fr.amapj.view.engine.popup.formpopup.validator.UniqueInDatabaseValidator;
 
 /**
  * Permet de modifier l'entete du contrat, c'est à dire son nom
@@ -52,8 +55,10 @@ public class ModifEnteteContratEditorPart extends FormPopup
 	
 	protected void addFields()
 	{
+		IValidator uniq = new UniqueInDatabaseValidator(ModeleContrat.class,"nom",modeleContrat.id);
+		
 		// Champ 1
-		addTextField("Nom du contrat", "nom");
+		addTextField("Nom du contrat", "nom",uniq);
 		
 		// Champ 2
 		addTextField("Description du contrat", "description");

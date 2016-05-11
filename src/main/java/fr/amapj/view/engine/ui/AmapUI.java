@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -35,11 +35,13 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.UI;
 
+import fr.amapj.common.DebugUtil;
 import fr.amapj.model.engine.transaction.DataBaseInfo;
 import fr.amapj.model.engine.transaction.DbUtil;
 import fr.amapj.service.services.appinstance.AppState;
 import fr.amapj.service.services.authentification.PasswordManager;
 import fr.amapj.service.services.session.SessionManager;
+import fr.amapj.service.services.session.SessionParameters;
 import fr.amapj.service.services.session.SessionManager.BroadcastListener;
 import fr.amapj.view.engine.menu.MenuPart;
 import fr.amapj.view.engine.popup.errorpopup.ErrorPopup;
@@ -234,7 +236,7 @@ public class AmapUI extends UI implements BroadcastListener
 		{
 			return null;
 		}
-		return "fr.amap.view.samples.test" + nb + ".Test" + nb;
+		return "fr.amapj.view.samples.test" + nb + ".Test" + nb;
 	}
 
 	private void invokeTestClass(String testClass, VaadinRequest request)
@@ -250,5 +252,21 @@ public class AmapUI extends UI implements BroadcastListener
 		}
 
 	}	
+	
+	@Override
+	protected void refresh(VaadinRequest request) 
+	{
+		// Récupération du nom de la base 
+		String dbName = getDbName(request);
+		
+		// On vérifie que celui ci est bien celui de l'utilisateur qui est connecté 
+		if ( (getData()!=null) && (SessionManager.getDb()!=null) && (SessionManager.getDb().getDbName().equals(dbName)==false) )
+		{
+			// Si ce n'est pas le cas, on déconnecte l'utilisateur
+			getPage().reload();
+			close();
+			return ;
+		}
+	}
 
 }

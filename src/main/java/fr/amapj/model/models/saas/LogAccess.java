@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -22,6 +22,7 @@
 
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -31,6 +32,7 @@ import javax.persistence.Id;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import fr.amapj.model.engine.Identifiable;
 import fr.amapj.model.engine.Mdm;
@@ -47,12 +49,20 @@ public class LogAccess  implements Identifiable
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
+	@Size(min = 0, max = 255)
+	@Column(length = 255)
 	private String ip;
 	
+	@Size(min = 0, max = 255)
+	@Column(length = 255)
 	private String browser;
 	
+	@Size(min = 0, max = 255)
+	@Column(length = 255)
 	private String nom;
 	
+	@Size(min = 0, max = 255)
+	@Column(length = 255)
 	private String prenom;
 	
 	private Long idUtilisateur;
@@ -68,9 +78,13 @@ public class LogAccess  implements Identifiable
 	private int activityTime;
 	
 	// Nom de la base de données associée
+	@Size(min = 0, max = 255)
+	@Column(length = 255)
 	private String dbName;
 	
 	// Nom du fichier de log associé
+	@Size(min = 0, max = 255)
+	@Column(length = 255)
 	private String logFileName;
 	
 	// Type du log : user ou deamon

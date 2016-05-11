@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -112,12 +112,15 @@ public class AmapJLogManager
 	 * Si definitive est égal à true, alors le fichier est fermé et il ne sera plus possible de logguer dans ce contexte
 	 * 
 	 * Si definitive est égal à false, alors le fichier est laissé ouvert
+	 * 
+	 * fileNameToClose contient le nom du fichier a fermer, on ne le prend pas avec ThreadContext.get(LOG4J_ID) car on peut obtenir null
+	 * dans certains cas (logout par time out par exemple) 
 	 */
-	public static void endLog(boolean definitive)
+	public static void endLog(boolean definitive,String fileNameToClose)
 	{
 		if (definitive==true)
 		{
-			stopLogger();
+			stopLogger(fileNameToClose);
 		}
 		
 		ThreadContext.put(LOG4J_ID,null);
@@ -128,9 +131,13 @@ public class AmapJLogManager
 	 * 
 	 * @param l
 	 */
-	private static void stopLogger() 
+	private static void stopLogger(String fileNameToClose) 
 	{
-		String key = ThreadContext.get(LOG4J_ID);
+		if (fileNameToClose==null)
+		{
+			logger.error("FUITE-FICHIER : impossible de fermer le fichier null");
+			return;
+		}
 		
 		org.apache.logging.log4j.core.Logger coreLogger = (org.apache.logging.log4j.core.Logger) logger; 
 		org.apache.logging.log4j.core.LoggerContext context = (org.apache.logging.log4j.core.LoggerContext)coreLogger.getContext(); 
@@ -141,7 +148,7 @@ public class AmapJLogManager
 		{
 			Method method = appender.getClass().getDeclaredMethod("getControl",String.class,LogEvent.class);
 			method.setAccessible(true);
-			AppenderControl appenderControl = (AppenderControl) method.invoke(appender,key,null);
+			AppenderControl appenderControl = (AppenderControl) method.invoke(appender,fileNameToClose,null);
 			appenderControl.getAppender().stop();
 		} 
 		catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)

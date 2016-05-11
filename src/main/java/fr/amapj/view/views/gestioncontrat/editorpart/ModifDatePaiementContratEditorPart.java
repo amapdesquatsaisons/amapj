@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -20,6 +20,9 @@
  */
  package fr.amapj.view.views.gestioncontrat.editorpart;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.PopupDateField;
@@ -32,6 +35,7 @@ import fr.amapj.service.services.gestioncontrat.DateModeleContratDTO;
 import fr.amapj.service.services.gestioncontrat.DatePaiementModeleContratDTO;
 import fr.amapj.service.services.gestioncontrat.GestionContratService;
 import fr.amapj.service.services.gestioncontrat.ModeleContratDTO;
+import fr.amapj.service.services.producteur.ProdUtilisateurDTO;
 import fr.amapj.view.engine.collectioneditor.CollectionEditor;
 import fr.amapj.view.engine.collectioneditor.FieldType;
 import fr.amapj.view.engine.popup.formpopup.OnSaveException;
@@ -114,8 +118,33 @@ public class ModifDatePaiementContratEditorPart extends WizardFormPopup
 	@Override
 	protected void performSauvegarder() throws OnSaveException
 	{
+		if (checkFieldDate()==false)
+		{
+			List<String> ls = new ArrayList<String>();
+			ls.add("Il y a des erreurs dans la saisie des dates");
+			ls.add("Vous ne devez pas avoir de lignes vides");
+			throw new OnSaveException(ls);
+		}
+		
+		
 		new GestionContratService().updateDatePaiement(modeleContrat);
 	}
+	
+	
+	
+	private boolean checkFieldDate()
+	{
+		List<DatePaiementModeleContratDTO> us = modeleContrat.datePaiements;
+		for (DatePaiementModeleContratDTO lig : us)
+		{
+			if (lig.datePaiement==null)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+	
 
 	@Override
 	protected Class getEnumClass()

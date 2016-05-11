@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -91,7 +91,7 @@ public class CreationUtilisateurEditorPart extends WizardFormPopup
 
 	private void addFieldSaisie()
 	{
-		IValidator uniq = new UniqueInDatabaseValidator(Utilisateur.class,"email");
+		IValidator uniq = new UniqueInDatabaseValidator(Utilisateur.class,"email",utilisateurDTO.id);
 		IValidator notNull = new NotNullValidator();
 		IValidator email = new EmailValidator();
 		

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -54,7 +54,7 @@ public class AmapJServletService extends VaadinServletService
 	public void requestEnd(VaadinRequest request, VaadinResponse response, VaadinSession session)
 	{
 		super.requestEnd(request, response, session);
-		AmapJLogManager.endLog(false);
+		AmapJLogManager.endLog(false,null);
 	}
 
 }

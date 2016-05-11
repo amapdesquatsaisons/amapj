@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -55,7 +55,7 @@ public class AbstractEditionSpeJson implements Identifiable
 		Class clazz = findClazz(p.typEditionSpecifique);
 	
 		
-		AbstractEditionSpeJson etiquetteDTO = new Gson().fromJson(p.content, clazz);
+		AbstractEditionSpeJson etiquetteDTO = (AbstractEditionSpeJson) new Gson().fromJson(p.content, clazz);
 		etiquetteDTO.setId(p.id);
 		etiquetteDTO.setNom(p.nom);
 		etiquetteDTO.setTypEditionSpecifique(p.typEditionSpecifique);
@@ -68,7 +68,7 @@ public class AbstractEditionSpeJson implements Identifiable
 		Class clazz = findClazz(p.getTypEditionSpecifique());
 	
 		
-		AbstractEditionSpeJson etiquetteDTO = new Gson().fromJson(p.getContent(), clazz);
+		AbstractEditionSpeJson etiquetteDTO = (AbstractEditionSpeJson) new Gson().fromJson(p.getContent(), clazz);
 		etiquetteDTO.setId(p.getId());
 		etiquetteDTO.setNom(p.getNom());
 		etiquetteDTO.setTypEditionSpecifique(p.getTypEditionSpecifique());

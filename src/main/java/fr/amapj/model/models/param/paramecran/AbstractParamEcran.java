@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -57,7 +57,7 @@ public class AbstractParamEcran implements Identifiable
 		Class clazz = findClazz(p.menu);
 	
 		
-		AbstractParamEcran etiquetteDTO = new Gson().fromJson(p.content, clazz);
+		AbstractParamEcran etiquetteDTO = (AbstractParamEcran) new Gson().fromJson(p.content, clazz);
 		etiquetteDTO.setId(p.id);
 		etiquetteDTO.setMenu(p.menu);
 		
@@ -69,7 +69,7 @@ public class AbstractParamEcran implements Identifiable
 		Class clazz = findClazz(p.getMenu());
 	
 		
-		AbstractParamEcran etiquetteDTO = new Gson().fromJson(p.getContent(), clazz);
+		AbstractParamEcran etiquetteDTO = (AbstractParamEcran) new Gson().fromJson(p.getContent(), clazz);
 		etiquetteDTO.setId(p.getId());
 		etiquetteDTO.setMenu(p.getMenu());
 		

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -22,6 +22,7 @@
 
 import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.RichTextArea;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 
@@ -95,8 +96,7 @@ public class PopupRappelPermanence extends WizardFormPopup
 		
 	
 		//
-		TextArea f =  addTextAeraField("Texte du mail", "texte");
-		f.setMaxLength(20480);
+		RichTextArea f =  addRichTextAeraField("Texte du mail", "texte");
 		f.setHeight(10, Unit.CM);
 		
 		
@@ -121,13 +121,12 @@ public class PopupRappelPermanence extends WizardFormPopup
 	
 	private String getInitialText()
 	{
-		String lineSep="\r\n";
+		String lineSep="<br/>";
 		
 		ParametresDTO param = new ParametresService().getParametres();
 		
 		StringBuffer buf = new StringBuffer();
 		buf.append("<h2>"+param.nomAmap+"</h2>");
-		buf.append(lineSep);
 		buf.append("Bonjour , ");
 		buf.append(lineSep);
 		buf.append(lineSep);
@@ -149,7 +148,7 @@ public class PopupRappelPermanence extends WizardFormPopup
 		buf.append(lineSep);
 		buf.append("Notez que vous pouvez désormais consulter le planning des permanences sur l'application WEB de l'AMAP");
 		buf.append(lineSep);
-		buf.append("<a href=\"#LINK#\">Cliquez ici pour accéder à l'application</a>");
+		buf.append("#LINK#");
 		buf.append(lineSep);
 		buf.append(lineSep);
 		buf.append("Bonne journée à tous !!");

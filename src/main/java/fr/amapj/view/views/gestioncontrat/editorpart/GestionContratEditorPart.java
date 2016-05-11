@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -20,11 +20,13 @@
  */
  package fr.amapj.view.views.gestioncontrat.editorpart;
 
+import java.util.Date;
 import java.util.List;
 
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.server.UserError;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.PopupDateField;
 import com.vaadin.ui.TextField;
 
@@ -137,7 +139,7 @@ public class GestionContratEditorPart extends WizardFormPopup
 		
 		// Liste des validators
 		IValidator len_1_100 = new StringLengthValidator(1, 100);
-		IValidator uniq = new UniqueInDatabaseValidator(ModeleContrat.class,"nom");
+		IValidator uniq = new UniqueInDatabaseValidator(ModeleContrat.class,"nom",null);
 		IValidator notNull = new NotNullValidator();
 		IValidator prodValidator = new ProducteurAvecProduitValidator();
 		
@@ -226,16 +228,33 @@ public class GestionContratEditorPart extends WizardFormPopup
 
 	private void addFieldPaiement()
 	{
+		if (checkProduits()==false)
+		{
+			setBackOnlyMode();
+			
+			// Titre
+			setErrorTitle("Il y a des erreurs dans la saisie des produits");
+			
+			addLabel("Il y a des produits non renseignés ou des prix non renseignés",ContentMode.TEXT);
+			
+			addLabel("Vous ne devez pas avoir de lignes vides non plus",ContentMode.TEXT);
+			
+			return ;
+		}
+		
+		
+		
 		setStepTitle("les informations sur le paiement");
 		
 		// Liste des validators
 		IValidator notNull = new NotNullValidator();
 		IValidator len_0_2048 = new StringLengthValidator(0, 2048);
+		IValidator len_0_255 = new StringLengthValidator(0, 255);
 
 		
 		if (modeleContrat.gestionPaiement==GestionPaiement.GESTION_STANDARD)
 		{	
-			addTextField("Ordre du chèque", "libCheque");
+			addTextField("Ordre du chèque", "libCheque",len_0_255);
 			
 			if (modeleContrat.frequence==FrequenceLivraison.UNE_SEULE_LIVRAISON)
 			{
@@ -248,10 +267,10 @@ public class GestionContratEditorPart extends WizardFormPopup
 				p.setValue(modeleContrat.dateFinInscription);
 				
 				p = addDateField("Date du premier paiement", "premierCheque",notNull);
-				p.setValue(DateUtils.firstDayInMonth(modeleContrat.dateDebut));
+				p.setValue(proposeDatePremierPaiement());
 				
 				p = addDateField("Date du dernier paiement", "dernierCheque",notNull);
-				p.setValue(DateUtils.firstDayInMonth(modeleContrat.dateFin)); 
+				p.setValue(proposeDateDernierPaiement()); 
 			}
 		}
 		else
@@ -261,6 +280,58 @@ public class GestionContratEditorPart extends WizardFormPopup
 			f.setHeight(5, Unit.CM);
 		}
 	}
+
+	private boolean checkProduits()
+	{
+		List<LigneContratDTO> produits = modeleContrat.produits;
+		for (LigneContratDTO lig : produits)
+		{
+			if (lig.prix==null)
+			{
+				return false;
+			}
+			if (lig.produitId==null)
+			{
+				return false;
+			}
+		}
+		
+		
+		return true;
+	}
+
+	private Date proposeDatePremierPaiement()
+	{
+		if (modeleContrat.dateDebut!=null)
+		{
+			return DateUtils.firstDayInMonth(modeleContrat.dateDebut); 
+		}
+		
+		if (modeleContrat.dateLivs.size()>0)
+		{
+			return DateUtils.firstDayInMonth(modeleContrat.dateLivs.get(0).dateLiv);
+		}
+		
+		return null;
+	}
+	
+	
+	private Date proposeDateDernierPaiement()
+	{
+		if (modeleContrat.dateFin!=null)
+		{
+			return DateUtils.firstDayInMonth(modeleContrat.dateFin); 
+		}
+		
+		if (modeleContrat.dateLivs.size()>0)
+		{
+			return DateUtils.firstDayInMonth(modeleContrat.dateLivs.get(modeleContrat.dateLivs.size()-1).dateLiv);
+		}
+		
+		return null;
+	}
+	
+	
 
 	@Override
 	protected void performSauvegarder()

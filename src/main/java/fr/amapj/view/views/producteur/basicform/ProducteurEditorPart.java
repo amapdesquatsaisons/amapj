@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -20,20 +20,24 @@
  */
  package fr.amapj.view.views.producteur.basicform;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.TextArea;
 
-import fr.amapj.model.models.param.EtatModule;
+import fr.amapj.model.models.fichierbase.Producteur;
 import fr.amapj.service.services.editionspe.EditionSpeService;
-import fr.amapj.service.services.parametres.ParametresDTO;
-import fr.amapj.service.services.parametres.ParametresService;
 import fr.amapj.service.services.producteur.ProdUtilisateurDTO;
 import fr.amapj.service.services.producteur.ProducteurDTO;
 import fr.amapj.service.services.producteur.ProducteurService;
 import fr.amapj.view.engine.collectioneditor.CollectionEditor;
 import fr.amapj.view.engine.collectioneditor.FieldType;
+import fr.amapj.view.engine.popup.formpopup.OnSaveException;
 import fr.amapj.view.engine.popup.formpopup.WizardFormPopup;
+import fr.amapj.view.engine.popup.formpopup.validator.IValidator;
+import fr.amapj.view.engine.popup.formpopup.validator.UniqueInDatabaseValidator;
 import fr.amapj.view.views.searcher.SearcherList;
 
 /**
@@ -109,7 +113,8 @@ public class ProducteurEditorPart extends WizardFormPopup
 		setStepTitle("les informations générales du producteur");
 		
 		// Champ 1
-		addTextField("Nom", "nom");
+		IValidator uniq = new UniqueInDatabaseValidator(Producteur.class,"nom",producteurDTO.id);
+		addTextField("Nom", "nom",uniq);
 		
 		TextArea f =  addTextAeraField("Description", "description");
 		f.setMaxLength(20480);
@@ -160,6 +165,21 @@ public class ProducteurEditorPart extends WizardFormPopup
 	
 	private void addFieldReferents()
 	{
+		if (checkFieldUtilisateur()==false)
+		{
+			setBackOnlyMode();
+			
+			// Titre
+			setErrorTitle("Il y a des erreurs dans la saisie des noms des producteurs");
+			
+			addLabel("Vous ne devez pas avoir de lignes vides",ContentMode.TEXT);
+			
+			addLabel("Vous devez bien choisir dans la liste des noms proposés",ContentMode.TEXT);
+			
+			return ;
+		}
+		
+		
 		// Titre
 		setStepTitle("les noms des référents");
 		
@@ -171,12 +191,52 @@ public class ProducteurEditorPart extends WizardFormPopup
 		form.addComponent(f1);
 	
 	}
+	
+	
+	private boolean checkFieldUtilisateur()
+	{
+		List<ProdUtilisateurDTO> us = producteurDTO.utilisateurs;
+		for (ProdUtilisateurDTO lig : us)
+		{
+			if (lig.idUtilisateur==null)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	
+	private boolean checkFieldReferents()
+	{
+		List<ProdUtilisateurDTO> us = producteurDTO.referents;
+		for (ProdUtilisateurDTO lig : us)
+		{
+			if (lig.idUtilisateur==null)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	
+	
 
 	
 
 	@Override
-	protected void performSauvegarder()
+	protected void performSauvegarder() throws OnSaveException
 	{
+		if (checkFieldReferents()==false)
+		{
+			List<String> ls = new ArrayList<String>();
+			ls.add("Il y a des erreurs dans la saisie des noms des référents");
+			ls.add("Vous ne devez pas avoir de lignes vides");
+			ls.add("Vous devez bien choisir dans la liste des noms proposés");
+			throw new OnSaveException(ls);
+		}
+		
 		new ProducteurService().update(producteurDTO, create);
 	}
 

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -23,8 +23,7 @@
 import fr.amapj.view.engine.popup.swicthpopup.SwitchPopup;
 
 /**
- * Permet de choisir ce que l'on veut modifier
- * dans le contrat : l'entete, les dates ou les produits
+ * Permet de choisir son action 
  */
 @SuppressWarnings("serial")
 public class ChoixActionContratSigne extends SwitchPopup
@@ -49,6 +48,7 @@ public class ChoixActionContratSigne extends SwitchPopup
 	{
 		line1 = "Veuillez indiquer ce que vous souhaitez faire :";
 
+		addLine("Envoyer un e mail à tous les adhérents de ce contrat", new PopupCopyAllMailForContrat(mcId));
 		addLine("Mettre à zéro les quantités commandées sur une ou plusieurs dates de livraison", new PopupAnnulationDateLivraison(mcId));
 
 	}

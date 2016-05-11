@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -23,7 +23,9 @@
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -221,6 +223,39 @@ public class MaintenanceView extends Panel implements View
 		addEmptyLine(layout);
 		
 		return layout;
+	}
+	
+	
+	
+	
+	
+	/**
+	 * Chaque appel a cette fonction provoque une fuite memoire d'environ 80 Mo
+	 */
+	private  void performLeakMemory()
+	{
+		
+		int n = 1000000;
+		MyObject[] obs = new MyObject[n];
+		for (int i = 0; i < n; i++)
+		{
+			obs[i] = new MyObject();
+			obs[i].a = i;
+			obs[i].b = 2*i;
+			obs[i].w = "toto"+i;
+			
+		}
+		
+		ls.add(obs);
+	}
+	
+	static List<MyObject[]> ls = new ArrayList<MaintenanceView.MyObject[]>();
+	
+	static class MyObject
+	{
+		int a;
+		long b;
+		String w;
 	}
 	
 	

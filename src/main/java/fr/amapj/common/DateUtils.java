@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -27,6 +27,28 @@ import java.util.Date;
 
 public class DateUtils
 {
+	
+	
+	/**
+	 * Permet de savoir s'il est toujours possible de s'inscrire, par rapport à une date limite 
+	 * @param dateFinInscription
+	 * @return
+	 */
+	static public boolean isInscriptionPossible(Date dateFinInscription)
+	{
+		Date d = DateUtils.suppressTime(new Date());
+		
+		if (dateFinInscription.before(d))
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+		
+	}
+	
 
 	static public Date suppressTime(Date d)
 	{

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2014 AmapJ Team
+ *  Copyright 2013-2015 AmapJ Team
  * 
  *  This file is part of AmapJ.
  *  
@@ -22,6 +22,7 @@
 
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -51,6 +52,7 @@ public class PeriodeCotisation implements Identifiable
 
 	@NotNull
 	@Size(min = 1, max = 100)
+	@Column(length = 100)
 	private String nom;
 	
 	@NotNull
@@ -79,11 +81,13 @@ public class PeriodeCotisation implements Identifiable
 	// Paiement
 	
 	@Size(min = 0, max = 2048)
+	@Column(length = 2048)
 	// Texte qui sera affiché pour le paiement
 	private String textPaiement;
 	
 	// Libellé du chéque 
 	@Size(min = 0, max = 100)
+	@Column(length = 100)
 	private String libCheque;
 	
 	// Date de remise des chéques
