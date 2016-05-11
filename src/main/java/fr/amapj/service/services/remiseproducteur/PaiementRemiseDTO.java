@@ -20,6 +20,9 @@
  */
  package fr.amapj.service.services.remiseproducteur;
 
+import javax.persistence.Column;
+import javax.validation.constraints.Size;
+
 import fr.amapj.model.models.contrat.reel.EtatPaiement;
 
 
@@ -40,6 +43,11 @@ public class PaiementRemiseDTO
 	public String prenomUtilisateur;
 	
 	public EtatPaiement etatPaiement;
+	
+	public String commentaire1;
+
+	public String commentaire2;
+	
 	
 
 	public int getMontant()

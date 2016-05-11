@@ -76,6 +76,8 @@ public enum MenuList
 	
 	PRODUCTEUR("Gestion des producteurs") ,
 	
+	TABLEAU_DE_BORD("Tableau de bord"),
+	
 	BILAN_COTISATION("Bilan des cotisations") ,
 	
 	RECEPTION_COTISATION("Réception des cotisations") ,
@@ -85,6 +87,8 @@ public enum MenuList
 	LISTE_TRESORIER("Liste des trésoriers"),
 	
 	ETIQUETTE("Editions spécifiques"),
+	
+	
 	
 	
 	// Partie admnistrateur
@@ -97,7 +101,7 @@ public enum MenuList
 	
 	ENVOI_MAIL("Envoyer un mail"),
 	
-	// Partie Saas
+	// 
 
 	LISTE_APP_INSTANCE("Liste des instances"),
 	
@@ -105,7 +109,13 @@ public enum MenuList
 	
 	VISU_LOG("Visualisation des logs"),
 	
-	STAT_ACCES("Statistiques des accès")
+	STAT_ACCES("Statistiques des accès"),
+	
+	
+	// Partie non visible, mais paramétrable
+	
+	OUT_SAISIE_PAIEMENT("Saisie des paiements par l'amapien")
+	
 	
 	;
 

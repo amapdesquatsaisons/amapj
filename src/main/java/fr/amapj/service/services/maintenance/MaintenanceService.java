@@ -20,21 +20,20 @@
  */
  package fr.amapj.service.services.maintenance;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import fr.amapj.common.DateUtils;
 import fr.amapj.model.engine.transaction.DbWrite;
 import fr.amapj.model.engine.transaction.TransactionHelper;
 import fr.amapj.model.models.contrat.modele.ModeleContrat;
-import fr.amapj.model.models.contrat.modele.ModeleContratDate;
-import fr.amapj.model.models.contrat.modele.ModeleContratDatePaiement;
 import fr.amapj.model.models.contrat.reel.Contrat;
+import fr.amapj.model.models.contrat.reel.Paiement;
+import fr.amapj.model.models.remise.RemiseProducteur;
 import fr.amapj.service.services.gestioncontrat.GestionContratService;
 import fr.amapj.service.services.mescontrats.MesContratsService;
+import fr.amapj.service.services.remiseproducteur.RemiseProducteurService;
 
 /**
  * Permet la gestion des contrats
@@ -61,20 +60,59 @@ public class MaintenanceService
 	public void deleteModeleContratAndContrats(Long modeleContratId)
 	{
 		EntityManager em = TransactionHelper.getEm();
-		
 		ModeleContrat mc = em.find(ModeleContrat.class, modeleContratId);
-		List<Contrat> cs = getAllContrats(em, mc);
 		
+		// On supprime d'abord toutes les remises
+		List<RemiseProducteur> remises = getAllRemises(em,mc);
+		for (RemiseProducteur remiseProducteur : remises)
+		{
+			new RemiseProducteurService().deleteRemise(remiseProducteur.getId());
+		}
+		
+		// On supprime ensuite tous les paiements
+		List<Paiement> paiements = getAllPaiements(em,mc);
+		for (Paiement paiement : paiements)
+		{
+			em.remove(paiement);
+		}
+		
+		
+		// On supprime ensuite tous les contrats
+		List<Contrat> cs = getAllContrats(em, mc);
 		for (Contrat contrat : cs)
 		{
 			new MesContratsService().deleteContrat(contrat.getId());
 		}
 		
+		// On supprime ensuite le modele de contrat
 		new GestionContratService().deleteContrat(modeleContratId);
 		
 	}
 
 	
+	
+
+
+
+	private List<RemiseProducteur> getAllRemises(EntityManager em, ModeleContrat mc)
+	{
+		Query q = em.createQuery("select r from RemiseProducteur r  WHERE r.datePaiement.modeleContrat=:mc ORDER BY r.datePaiement.datePaiement desc");
+		q.setParameter("mc", mc);
+		
+		List<RemiseProducteur> rps = q.getResultList();
+		return rps;
+	}
+
+	
+	private List<Paiement> getAllPaiements(EntityManager em, ModeleContrat mc)
+	{
+		Query q = em.createQuery("select p from Paiement p  WHERE p.contrat.modeleContrat=:mc");
+		q.setParameter("mc", mc);
+		List<Paiement> rps = q.getResultList();
+		return rps;
+	}
+
+
 	/**
 	 * 
 	 */

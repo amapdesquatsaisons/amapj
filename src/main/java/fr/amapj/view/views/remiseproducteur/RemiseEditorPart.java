@@ -111,7 +111,16 @@ public class RemiseEditorPart extends WizardFormPopup
 		for (PaiementRemiseDTO paiement : remiseDTO.paiements)
 		{
 			String montant = new CurrencyTextFieldConverter().convertToString(paiement.montant)+" €";
-			text = text+paiement.nomUtilisateur+" "+paiement.prenomUtilisateur+" - Montant = "+montant+"<br/>";
+			text = text+paiement.nomUtilisateur+" "+paiement.prenomUtilisateur+" - Montant = "+montant;
+			if (paiement.commentaire1!=null)
+			{
+				text = text+" - "+paiement.commentaire1;
+			}
+			if (paiement.commentaire2!=null)
+			{
+				text = text+" - "+paiement.commentaire2;
+			}
+			text=text+"<br/>";
 		}
 		
 		addLabel(text, ContentMode.HTML);

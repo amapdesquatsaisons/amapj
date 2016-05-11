@@ -23,6 +23,7 @@
 import com.google.gson.Gson;
 
 import fr.amapj.common.AmapjRuntimeException;
+import fr.amapj.common.DebugUtil;
 import fr.amapj.model.engine.Identifiable;
 import fr.amapj.model.models.acces.RoleList;
 import fr.amapj.service.services.parametres.ParamEcranDTO;
@@ -83,6 +84,12 @@ public class AbstractParamEcran implements Identifiable
 		{
 		case LISTE_ADHERENTS:
 			return PEListeAdherent.class;
+			
+		case RECEPTION_CHEQUES:
+			return PEReceptionCheque.class;
+			
+		case OUT_SAISIE_PAIEMENT:
+			return PESaisiePaiement.class;
 			
 		
 		default:

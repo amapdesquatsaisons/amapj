@@ -24,9 +24,14 @@ import java.text.SimpleDateFormat;
 
 import com.vaadin.ui.Notification;
 
+import fr.amapj.common.AmapjRuntimeException;
+import fr.amapj.model.models.param.ChoixOuiNon;
+import fr.amapj.model.models.param.paramecran.PEReceptionCheque;
+import fr.amapj.model.models.param.paramecran.PESaisiePaiement;
 import fr.amapj.service.services.mescontrats.DatePaiementDTO;
 import fr.amapj.service.services.mescontrats.InfoPaiementDTO;
 import fr.amapj.service.services.mescontrats.MesContratsService;
+import fr.amapj.service.services.parametres.ParametresService;
 import fr.amapj.view.engine.grid.GridHeaderLine;
 import fr.amapj.view.engine.grid.currencyvector.PopupCurrencyVector;
 import fr.amapj.view.engine.popup.formpopup.OnSaveException;
@@ -47,6 +52,8 @@ public class PopupSaisiePaiement extends PopupCurrencyVector
 	
 	private SaisieContratData data;
 	
+	private PESaisiePaiement peConf;
+	
 	/**
 	 * 
 	 */
@@ -55,6 +62,7 @@ public class PopupSaisiePaiement extends PopupCurrencyVector
 		super();
 		this.data = data;
 		this.paiementDTO = data.contratDTO.paiement;
+		this.peConf = new ParametresService().getPESaisiePaiement();
 		
 		
 		//
@@ -80,11 +88,7 @@ public class PopupSaisiePaiement extends PopupCurrencyVector
 		for (int i = 0; i < param.nbLig; i++)
 		{
 			param.montant[i] = paiementDTO.datePaiements.get(i).montant;
-			param.excluded[i] = paiementDTO.datePaiements.get(i).excluded;
-			if (param.excluded[i])
-			{
-				param.nbExcluded++;
-			}
+			param.excluded[i] = false;
 		}
 		
 		param.largeurCol = 200;
@@ -141,10 +145,31 @@ public class PopupSaisiePaiement extends PopupCurrencyVector
 			return ;
 		}
 
-		// Sinon on fait un calcul complet
+		// Sinon on fait un calcul complet, en fonction du paramétrage 
+		switch (peConf.modeCalculPaiement) 
+		{
+		case STANDARD:
+			performPropositionStandard(peConf.montantChequeMiniCalculProposition);
+			break;
+			
+		case TOUS_EGAUX:
+			performPropositionTousEgaux();
+			break;
+			
+		default:
+			throw new AmapjRuntimeException();
+		}
+
+	}
+
+
+
+	private void performPropositionStandard(int montantMini) 
+	{
+		//
 		for (int i = 0; i < param.nbLig; i++)
 		{
-			if (param.excluded[i]==false)
+			if (shouldBeZero(i)==false)
 			{
 				// Calcul du montant restant à affecter
 				int montantRestant = param.montantCible;
@@ -153,30 +178,71 @@ public class PopupSaisiePaiement extends PopupCurrencyVector
 					montantRestant = montantRestant-param.montant[j];
 				}
 				
-				// Calcul du nombre de paiements disponibles
-				int nbPaiement=0;
-				for (int j = i; j < param.nbLig; j++)
+				
+				// Ce montant à affecter  est inférieur au montant mini, on met tout sur cette ligne et on arrete
+				if (montantRestant<montantMini)
 				{
-					if (param.excluded[j]==false)
-					{
-						nbPaiement++;
-					}
+					param.montant[i] = montantRestant;
+					break;
 				}
 				
+				// Calcul du nombre de paiements disponibles
+				int nbPaiement=param.nbLig-i;
+				
 				// Calcul du montant
-				param.montant[i] = round(montantRestant,nbPaiement);
+				int mnt = round(montantRestant,nbPaiement);
+				param.montant[i] = (mnt<montantMini) ? montantMini : mnt; 
 			}
 		}
+	}
+
+	/**
+	 * Détermine si ce mois doit être à 0
+	 * 
+	 * Ceci est utile pour repartir equitablement les paiements
+	 * 
+	 * Exemple : l'utilisateur doit 40 euro sur 4 mois , avec un montant mini de 20 euro
+	 * 
+	 * Dans ce cas, le programme doit proposer 20 0 20 0 et non pas 20 20 0 0 
+	 * 
+	 * @param i
+	 * @return
+	 */
+	private boolean shouldBeZero(int i)
+	{
+		// ne s'applique pas pour la dernière ligne ou la premiere ligne 
+		if (  (i==(param.nbLig-1)) || (i==0) )
+		{
+			return false;
+		}
 		
+		// Calcul du montant moyen par mois 
+		int montantMoyen = param.montantCible/param.nbLig;
+		
+		// Calcul du montant qui doit être payé à cette date 
+		int montantDu = montantMoyen*(i+1);
+		
+		
+		// Calcul du montant déja affecté 
+		int montantPaye = 0;
+		for (int j = 0; j < i; j++)
+		{
+			montantPaye = montantPaye+param.montant[j];
+		}
+		
+		if (montantPaye>=montantDu)
+		{
+			return true;
+		}
+		else
+		{
+			return false;	
+		}
 	}
 
 
 
 	/**
-	 * 
-	 * @param montantRestant
-	 * @param nbPaiement
-	 * @return
 	 */
 	private int round(int montantRestant, int nbPaiement)
 	{
@@ -187,6 +253,30 @@ public class PopupSaisiePaiement extends PopupCurrencyVector
 		}
 		return (montantRestant/nbPaiement/100)*100;
 	}
+	
+	
+	private void performPropositionTousEgaux() 
+	{
+		int montantStandard = param.montantCible/param.nbLig;
+		
+		int montantAffecte = 0;
+		
+		//
+		for (int i = 0; i < param.nbLig-1; i++)
+		{
+			param.montant[i] = montantStandard;
+			montantAffecte = montantAffecte+montantStandard;
+			
+		}
+		
+		// Pour la derniere ligne (pour corriger les erreurs sur les quarts de centimes)
+		param.montant[param.nbLig-1] = param.montantCible-montantAffecte;
+	}
+	
+	
+	
+	
+	
 
 
 

@@ -34,6 +34,8 @@ import fr.amapj.model.models.acces.RoleList;
 import fr.amapj.model.models.param.Parametres;
 import fr.amapj.model.models.param.paramecran.AbstractParamEcran;
 import fr.amapj.model.models.param.paramecran.PEListeAdherent;
+import fr.amapj.model.models.param.paramecran.PEReceptionCheque;
+import fr.amapj.model.models.param.paramecran.PESaisiePaiement;
 import fr.amapj.model.models.param.paramecran.ParamEcran;
 import fr.amapj.service.services.parametres.paramecran.PEListeAdherentDTO;
 import fr.amapj.service.services.session.SessionManager;
@@ -181,7 +183,7 @@ public class ParametresService
 
 	
 
-	// PARTIE MISE A JOUR DES ETIQUETTES
+	// PARTIE MISE A JOUR 
 	@DbWrite
 	public void update(final ParamEcranDTO dto, final boolean create)
 	{
@@ -265,6 +267,52 @@ public class ParametresService
 		
 		return ret;
 	}
+	
+	
+	/**
+	 * Permet de charger le parametrage de l'écran "Reception des cheques"
+	 * dans le but de l'utiliser fonctionnellement
+	 */
+	public PEReceptionCheque getPEReceptionCheque()
+	{
+		ParamEcranDTO p = getParamEcran(MenuList.RECEPTION_CHEQUES);
+
+		PEReceptionCheque pe;
+		if (p!=null)
+		{
+			pe = (PEReceptionCheque) AbstractParamEcran.load(p);
+		}
+		else
+		{
+			 pe = new PEReceptionCheque();	
+		}
+		return pe;
+	}
+	
+	
+	
+	
+	/**
+	 * Permet de charger le parametrage de l'écran "Saisie des paiements par l'amapien"
+	 * dans le but de l'utiliser fonctionnellement
+	 */
+	public PESaisiePaiement getPESaisiePaiement()
+	{
+		ParamEcranDTO p = getParamEcran(MenuList.OUT_SAISIE_PAIEMENT);
+
+		PESaisiePaiement pe;
+		if (p!=null)
+		{
+			pe = (PESaisiePaiement) AbstractParamEcran.load(p);
+		}
+		else
+		{
+			 pe = new PESaisiePaiement();	
+		}
+		return pe;
+	}
+	
+	
 	
 	
 }

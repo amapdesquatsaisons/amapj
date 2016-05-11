@@ -274,6 +274,8 @@ public class MesPaiementsService
 			dto.datePaiement = paiement.getModeleContratDatePaiement().getDatePaiement();
 			dto.montant = paiement.getMontant();
 			dto.etatPaiement = paiement.getEtat();
+			dto.commentaire1 = paiement.getCommentaire1();
+			dto.commentaire2 = paiement.getCommentaire2();
 			
 			res.add(dto);
 		}
@@ -296,6 +298,8 @@ public class MesPaiementsService
 		{
 			Paiement p = em.find(Paiement.class, dto.idPaiement);
 			p.setEtat(dto.etatPaiement);
+			p.setCommentaire1(dto.commentaire1);
+			p.setCommentaire2(dto.commentaire2);
 						
 		}	
 	}

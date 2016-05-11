@@ -88,8 +88,8 @@ public class EGPlanningMensuel extends AbstractExcelGenerator
 		List<Utilisateur> utilisateurs = getUtilisateur(em,libInfo,planningJson);
 		
 		
-		// Les colonnes en + sont le nom, prenom et telephone et commentaire
-		int nbCol =  entete.prodCols.size()+4;
+		// Les colonnes en + sont le nom, prenom et telephone1 et telephone 2 et commentaire
+		int nbCol =  entete.prodCols.size()+5;
 		et.addSheet("Planning "+libInfo.lib2+" "+libInfo.lib1, nbCol, 25);
 		et.setModePaysage();
 		
@@ -106,7 +106,9 @@ public class EGPlanningMensuel extends AbstractExcelGenerator
 			index = index + dateCol.nbColProduit;
 		}
 		
-		et.setCell(index, "Téléphone portable ", et.grasCentreBordure);
+		et.setCell(index, "Téléphone 1 ", et.grasCentreBordure);
+		index++;
+		et.setCell(index, "Téléphone 2 ", et.grasCentreBordure);
 		index++;
 		et.setCell(index, "Commentaire ", et.grasCentreBordure);
 		
@@ -155,6 +157,12 @@ public class EGPlanningMensuel extends AbstractExcelGenerator
 		et.setCell(index, "", et.grasCentreBordure);
 		et.mergeCellsUp(index, 3);
 		et.setColumnWidthInMm(index, planningJson.getLgColnumTel1());
+		
+		index++;
+		et.setCell(index, "", et.grasCentreBordure);
+		et.mergeCellsUp(index, 3);
+		et.setColumnWidthInMm(index, planningJson.getLgColnumTel2());
+		
 		
 		index++;
 		et.setCell(index, "", et.grasCentreBordure);
@@ -214,8 +222,12 @@ public class EGPlanningMensuel extends AbstractExcelGenerator
 			index++;
 		}
 		
-		// Numéro de telephone
+		// Numéro de telephone 1
 		et.setCell(index, utilisateur.getNumTel1(), et.switchGray(et.nonGrasCentreBordure,numLigne));
+		
+		// Numéro de telephone 2
+		index++;
+		et.setCell(index, utilisateur.getNumTel2(), et.switchGray(et.nonGrasCentreBordure,numLigne));
 		
 		// Commentaire
 		index++;

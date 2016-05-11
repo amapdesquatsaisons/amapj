@@ -20,6 +20,7 @@
  */
  package fr.amapj.model.models.contrat.reel;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -28,6 +29,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import fr.amapj.model.engine.Identifiable;
 import fr.amapj.model.engine.Mdm;
@@ -65,6 +67,15 @@ public class Paiement  implements Identifiable
 	
 	@ManyToOne
 	private RemiseProducteur remise;
+	
+
+	@Size(min = 0, max = 255)
+	@Column(length = 255)
+	private String commentaire1;
+
+	@Size(min = 0, max = 255)
+	@Column(length = 255)
+	private String commentaire2;
 	
 	
 	public enum P implements Mdm
@@ -150,5 +161,25 @@ public class Paiement  implements Identifiable
 	{
 		this.remise = remise;
 	}
-	
+
+
+	public String getCommentaire1()
+	{
+		return commentaire1;
+	}
+
+	public void setCommentaire1(String commentaire1)
+	{
+		this.commentaire1 = commentaire1;
+	}
+
+	public String getCommentaire2()
+	{
+		return commentaire2;
+	}
+
+	public void setCommentaire2(String commentaire2)
+	{
+		this.commentaire2 = commentaire2;
+	}
 }

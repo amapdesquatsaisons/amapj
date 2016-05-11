@@ -319,7 +319,6 @@ public class MesContratsService
 			DatePaiementDTO lig = new DatePaiementDTO();
 			lig.datePaiement = date.getDatePaiement();
 			lig.idModeleContratDatePaiement = date.getId();
-			lig.excluded = false; // TODO
 			lig.montant = 0;
 			lig.etatPaiement = EtatPaiement.A_FOURNIR;
 			lig.idPaiement = null;

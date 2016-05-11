@@ -116,7 +116,9 @@ public class PlanningMensuelEditorPart extends WizardFormPopup
 		
 		addIntegerField("Largeur (en mm) de la colonne Présence", "lgColPresence");
 		
-		addIntegerField("Largeur (en mm) de la colonne Tel", "lgColnumTel1");
+		addIntegerField("Largeur (en mm) de la colonne Tel1", "lgColnumTel1");
+		
+		addIntegerField("Largeur (en mm) de la colonne Tel2", "lgColnumTel2");
 		
 		addIntegerField("Largeur (en mm) de la colonne Commentaire", "lgColCommentaire");
 		

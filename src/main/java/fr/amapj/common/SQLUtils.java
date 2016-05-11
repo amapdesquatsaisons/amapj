@@ -18,39 +18,42 @@
  * 
  * 
  */
- package fr.amapj.service.services.mescontrats;
+ package fr.amapj.common;
+
+import java.math.BigDecimal;
 
 
-import java.util.Date;
 
-import fr.amapj.model.models.contrat.reel.EtatPaiement;
-
-/**
- * Informations sur les paiements de ce contrat
- *
- */
-public class DatePaiementDTO
+public class SQLUtils
 {
-	// Jamais null
-	public Long idModeleContratDatePaiement;
+	
+	/**
+	 * Permet de gérer le retour de la méthode 
+	 * Query.getSingleResult()
+	 * 
+	 */
+	public static int toInt(Object o)
+	{
+		if (o==null)
+		{
+			return 0;
+		}
+		if (o instanceof BigDecimal)
+		{
+			return ( (BigDecimal) o).intValue();	
+		}
+		
+		if (o instanceof Long)
+		{
+			return ( (Long) o).intValue();	
+		}
 
-	// Peut etre null pour une creation
-	public Long idPaiement;
-
-	// 
-	public Date datePaiement;
-	
-	// Contient les montants
-	public int montant;
-	
-	// Contient l'état du paiement
-	public EtatPaiement etatPaiement;
-	
-	
-	public String commentaire1;
-	
-	
-	public String commentaire2;
-	
-	
+		if (o instanceof Integer)
+		{
+			return ( (Integer) o).intValue();	
+		}
+		
+		throw new AmapjRuntimeException("Type inconnu:"+o.getClass());
+		
+	}
 }

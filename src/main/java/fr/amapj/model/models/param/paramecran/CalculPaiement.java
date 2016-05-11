@@ -18,39 +18,14 @@
  * 
  * 
  */
- package fr.amapj.service.services.mescontrats;
+ package fr.amapj.model.models.param.paramecran;
 
-
-import java.util.Date;
-
-import fr.amapj.model.models.contrat.reel.EtatPaiement;
-
-/**
- * Informations sur les paiements de ce contrat
- *
- */
-public class DatePaiementDTO
+public enum CalculPaiement
 {
-	// Jamais null
-	public Long idModeleContratDatePaiement;
-
-	// Peut etre null pour une creation
-	public Long idPaiement;
-
 	// 
-	public Date datePaiement;
+	STANDARD ,
 	
-	// Contient les montants
-	public int montant;
-	
-	// Contient l'état du paiement
-	public EtatPaiement etatPaiement;
-	
-	
-	public String commentaire1;
-	
-	
-	public String commentaire2;
-	
-	
+	// 
+	TOUS_EGAUX ;
+
 }

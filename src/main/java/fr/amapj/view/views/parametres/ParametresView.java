@@ -39,6 +39,8 @@ import fr.amapj.view.engine.popup.PopupListener;
 import fr.amapj.view.engine.popup.corepopup.CorePopup;
 import fr.amapj.view.engine.popup.formpopup.FormPopup;
 import fr.amapj.view.views.parametres.paramecran.PEListeAdherentEditorPart;
+import fr.amapj.view.views.parametres.paramecran.PEReceptionChequeEditorPart;
+import fr.amapj.view.views.parametres.paramecran.PESaisiePaiementEditorPart;
 
 
 /**
@@ -114,16 +116,12 @@ public class ParametresView extends VerticalLayout implements View, PopupListene
 		
 		final PopupListener listener = this;
 		
-		addButton(layout, "Ecran \"Liste des adhérents\"",new Button.ClickListener()
-		{
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				CorePopup.open(new PEListeAdherentEditorPart(),listener);
-			}
-		});
+		addButton(layout, "Ecran \"Liste des adhérents\"",e -> 	CorePopup.open(new PEListeAdherentEditorPart(),listener));
+			
+		addButton(layout, "Ecran \"Réception des chèques\"",e -> CorePopup.open(new PEReceptionChequeEditorPart(),listener));
 		
-		
+		addButton(layout, "Ecran \"Saisie des paiements par l'amapien\"",e -> CorePopup.open(new PESaisiePaiementEditorPart(),listener));
+	
 		
 		refresh();
 		

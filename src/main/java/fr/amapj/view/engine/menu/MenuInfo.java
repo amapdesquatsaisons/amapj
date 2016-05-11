@@ -58,6 +58,7 @@ import fr.amapj.view.views.remiseproducteur.RemiseProducteurListPart;
 import fr.amapj.view.views.saisiepermanence.SaisiePermanenceListPart;
 import fr.amapj.view.views.sendmail.SendMailView;
 import fr.amapj.view.views.suiviacces.SuiviAccesView;
+import fr.amapj.view.views.tableaudebord.TableauDeBordView;
 import fr.amapj.view.views.utilisateur.UtilisateurListPart;
 
 /**
@@ -115,6 +116,7 @@ public class MenuInfo
 		// Partie tésorier
 		menus.add(new MenuDescription(MenuList.UTILISATEUR, UtilisateurListPart.class, RoleList.TRESORIER ).setCategorie("TRESORIER"));
 		menus.add(new MenuDescription(MenuList.PRODUCTEUR, ProducteurBasicForm.class, RoleList.TRESORIER));
+		menus.add(new MenuDescription(MenuList.TABLEAU_DE_BORD, TableauDeBordView.class, RoleList.TRESORIER));
 		menus.add(new MenuDescription(MenuList.BILAN_COTISATION, BilanCotisationView.class, RoleList.TRESORIER , ModuleList.GESTION_COTISATION));
 		menus.add(new MenuDescription(MenuList.RECEPTION_COTISATION, ReceptionCotisationView.class, RoleList.TRESORIER , ModuleList.GESTION_COTISATION));
 		menus.add(new MenuDescription(MenuList.IMPORT_DONNEES, ImportDonneesView.class, RoleList.TRESORIER));

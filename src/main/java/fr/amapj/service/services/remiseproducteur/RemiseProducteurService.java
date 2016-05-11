@@ -164,6 +164,8 @@ public class RemiseProducteurService
 			dto.nomUtilisateur = paiement.getContrat().getUtilisateur().getNom();
 			dto.prenomUtilisateur = paiement.getContrat().getUtilisateur().getPrenom();
 			dto.etatPaiement = paiement.getEtat();
+			dto.commentaire1 = paiement.getCommentaire1();
+			dto.commentaire2 = paiement.getCommentaire2();
 
 			info.paiements.add(dto);
 		}
@@ -326,6 +328,9 @@ public class RemiseProducteurService
 			dto.montant = paiement.getMontant();
 			dto.nomUtilisateur = paiement.getContrat().getUtilisateur().getNom();
 			dto.prenomUtilisateur = paiement.getContrat().getUtilisateur().getPrenom();
+			dto.commentaire1 = paiement.getCommentaire1();
+			dto.commentaire2 = paiement.getCommentaire2();
+			
 			res.paiements.add(dto);
 
 			if (paiement.getEtat() != EtatPaiement.PRODUCTEUR)

@@ -21,17 +21,17 @@
  package fr.amapj.service.services.excelgenerator;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 
 import javax.persistence.EntityManager;
 
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
 import fr.amapj.model.models.contrat.modele.ModeleContrat;
+import fr.amapj.model.models.param.ChoixOuiNon;
+import fr.amapj.model.models.param.paramecran.PEReceptionCheque;
 import fr.amapj.model.models.remise.RemiseProducteur;
 import fr.amapj.service.engine.generator.excel.AbstractExcelGenerator;
 import fr.amapj.service.engine.generator.excel.ExcelFormat;
 import fr.amapj.service.engine.generator.excel.ExcelGeneratorTool;
+import fr.amapj.service.services.parametres.ParametresService;
 import fr.amapj.service.services.remiseproducteur.PaiementRemiseDTO;
 import fr.amapj.service.services.remiseproducteur.RemiseDTO;
 import fr.amapj.service.services.remiseproducteur.RemiseProducteurService;
@@ -60,8 +60,10 @@ public class EGRemise extends AbstractExcelGenerator
 		ModeleContrat mc = remise.getDatePaiement().getModeleContrat();
 		RemiseDTO dto = new RemiseProducteurService().loadRemise(remiseId);
 		
-		// Calcul du nombre de colonnes :  Nom + prénom + 1 montant du chéque
-		et.addSheet(dto.moisRemise, 3, 20);
+		PEReceptionCheque peConf = new ParametresService().getPEReceptionCheque();
+		
+		// Calcul du nombre de colonnes :  Nom + prénom + 1 montant du chéque + commentaire 1 + commentaire 2
+		et.addSheet(dto.moisRemise, 5, 20);
 				
 		et.addRow("Remise de chèques du mois de "+dto.moisRemise,et.grasGaucheNonWrappe);
 		et.addRow("",et.grasGaucheNonWrappe);
@@ -80,12 +82,32 @@ public class EGRemise extends AbstractExcelGenerator
 		et.setCell(0,"Nom",et.grasCentreBordure);
 		et.setCell(1,"Prénom",et.grasCentreBordure);
 		et.setCell(2,"Montant chèques",et.grasCentreBordure);
+		et.setCell(3,"",et.grasCentreBordure);
+		if (peConf.saisieCommentaire1==ChoixOuiNon.OUI)
+		{
+			et.setCell(3,peConf.libSaisieCommentaire1,et.grasCentreBordure);
+		}
+		else
+		{
+			et.setColumnWidth(3, 0);
+		}
+		et.setCell(4,"",et.grasCentreBordure);
+		if (peConf.saisieCommentaire2==ChoixOuiNon.OUI)
+		{
+			et.setCell(4,peConf.libSaisieCommentaire2,et.grasCentreBordure);
+		}
+		else
+		{
+			et.setColumnWidth(4, 0);
+		}
+		
+		
 		
 		
 		// Une ligne pour chaque chèque 
 		for (PaiementRemiseDTO paiementRemiseDTO : dto.paiements)
 		{
-			addRow(paiementRemiseDTO,et);
+			addRow(paiementRemiseDTO,et,peConf);
 		}
 		
 		// Une ligne vide
@@ -96,12 +118,25 @@ public class EGRemise extends AbstractExcelGenerator
 
 	}
 
-	private void addRow(PaiementRemiseDTO paiementRemiseDTO, ExcelGeneratorTool et)
+	private void addRow(PaiementRemiseDTO paiementRemiseDTO, ExcelGeneratorTool et, PEReceptionCheque peConf)
 	{
 		et.addRow();
 		et.setCell(0,paiementRemiseDTO.nomUtilisateur,et.grasGaucheNonWrappeBordure);
 		et.setCell(1,paiementRemiseDTO.prenomUtilisateur,et.nonGrasGaucheBordure);
 		et.setCellPrix(2,paiementRemiseDTO.montant,et.prixCentreBordure);
+		
+		et.setCell(3,"",et.grasCentreBordure);
+		if (peConf.saisieCommentaire1==ChoixOuiNon.OUI)
+		{
+			et.setCell(3,paiementRemiseDTO.commentaire1,et.nonGrasGaucheBordure);
+		}
+		
+		et.setCell(4,"",et.grasCentreBordure);
+		if (peConf.saisieCommentaire2==ChoixOuiNon.OUI)
+		{
+			et.setCell(4,paiementRemiseDTO.commentaire2,et.nonGrasGaucheBordure);
+		}
+		
 	}
 
 

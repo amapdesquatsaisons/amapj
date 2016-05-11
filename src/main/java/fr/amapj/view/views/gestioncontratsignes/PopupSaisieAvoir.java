@@ -28,8 +28,11 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
+import fr.amapj.model.models.param.ChoixOuiNon;
+import fr.amapj.model.models.param.paramecran.PEReceptionCheque;
 import fr.amapj.service.services.gestioncontratsigne.ContratSigneDTO;
 import fr.amapj.service.services.mescontrats.MesContratsService;
+import fr.amapj.service.services.parametres.ParametresService;
 import fr.amapj.view.engine.popup.okcancelpopup.OKCancelPopup;
 import fr.amapj.view.engine.tools.BaseUiTools;
 
@@ -58,10 +61,13 @@ public class PopupSaisieAvoir extends OKCancelPopup
 	@Override
 	protected void createContent(VerticalLayout contentLayout)
 	{
+		PEReceptionCheque peConf = new ParametresService().getPEReceptionCheque();
+		boolean allowNegativeNumber = peConf.saisieAvoirNegatif == ChoixOuiNon.OUI;
+		 
 		FormLayout f = new FormLayout();
 		
 		
-		textField = BaseUiTools.createCurrencyField("Montant de l'avoir",false);
+		textField = BaseUiTools.createCurrencyField("Montant de l'avoir",allowNegativeNumber);
 		
 		textField.setConvertedValue(new Integer(contratSigneDTO.mntAvoirInitial));
 		

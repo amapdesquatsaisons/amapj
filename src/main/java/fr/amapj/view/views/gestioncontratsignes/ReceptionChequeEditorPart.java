@@ -21,21 +21,29 @@
  package fr.amapj.view.views.gestioncontratsignes;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.vaadin.data.Item;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Table;
+import com.vaadin.ui.Table.ColumnHeaderMode;
+import com.vaadin.ui.TextField;
+import com.vaadin.ui.VerticalLayout;
 
 import fr.amapj.model.models.contrat.reel.EtatPaiement;
+import fr.amapj.model.models.param.ChoixOuiNon;
+import fr.amapj.model.models.param.paramecran.PEReceptionCheque;
 import fr.amapj.service.services.gestioncontratsigne.ContratSigneDTO;
 import fr.amapj.service.services.mescontrats.DatePaiementDTO;
 import fr.amapj.service.services.mespaiements.MesPaiementsService;
-import fr.amapj.view.engine.grid.GridHeaderLine;
-import fr.amapj.view.engine.grid.booleangrid.PopupBooleanGrid;
+import fr.amapj.service.services.parametres.ParametresService;
+import fr.amapj.view.engine.popup.okcancelpopup.OKCancelPopup;
+import fr.amapj.view.engine.tools.TableBuilder;
 import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
 
 /**
@@ -43,14 +51,18 @@ import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
  *  
  */
 @SuppressWarnings("serial")
-public class ReceptionChequeEditorPart extends PopupBooleanGrid
+public class ReceptionChequeEditorPart extends OKCancelPopup
 {
 	
-	SimpleDateFormat df = new SimpleDateFormat("MMMMM yyyy");
+	private SimpleDateFormat df = new SimpleDateFormat("MMMMM yyyy");
 	
 	private ContratSigneDTO c;
 	
 	private List<DatePaiementDTO> paiements;
+	
+	private Table t;
+	
+	private PEReceptionCheque peConf;
 		
 	
 	/**
@@ -62,54 +74,107 @@ public class ReceptionChequeEditorPart extends PopupBooleanGrid
 		this.c = c;
 	}
 	
-	
-	
-	public void loadParam()
+	@Override
+	protected void createContent(VerticalLayout contentLayout)
 	{
+		
+	
 		//
 		paiements = new MesPaiementsService().getPaiementAReceptionner(c.idContrat);
-		
+		peConf = new ParametresService().getPEReceptionCheque();
 		//
 		popupTitle = "Réception chèques";
 		popupWidth ="60%";
 		
+		// Premiere ligne de texte
+		String msg = "<h2> Réception des chèques de "+c.prenomUtilisateur+" "+c.nomUtilisateur+"</h2>";
+		Label lab = new Label(msg,ContentMode.HTML);
+		contentLayout.addComponent(lab);
 		
-		//
-		param.messageSpecifique = "<h2> Réception des chèques de "+c.prenomUtilisateur+" "+c.nomUtilisateur+"</h2>";
+		// Construction de l'entete de la table
+		TableBuilder builder = new TableBuilder();
 		
-		param.nbCol = 1;
-		param.nbLig = paiements.size();
-		param.box = new boolean[param.nbLig][param.nbCol];
-	
-		for (int i = 0; i < param.nbLig; i++)
+		builder.startHeader("tete", 70);
+		builder.addHeaderBox("Date", 213);
+		builder.addHeaderBox("Montant €", 163);
+		builder.addHeaderBox("Cocher la case si le chèque a été donné", 163);
+		if (peConf.saisieCommentaire1==ChoixOuiNon.OUI)
 		{
-			param.box[i][0] = (paiements.get(i).etatPaiement==EtatPaiement.AMAP);
+			builder.addHeaderBox(peConf.libSaisieCommentaire1, 213);
+		}
+		if (peConf.saisieCommentaire2==ChoixOuiNon.OUI)
+		{
+			builder.addHeaderBox(peConf.libSaisieCommentaire2, 213);
+		}
+		contentLayout.addComponent(builder.getHeader());
+		
+		
+		
+		// Construction du contenu de la table
+		t = new Table();
+		
+		int nbCol = 3;
+		t.addContainerProperty("date", Label.class, null);
+		t.addContainerProperty("montant", Label.class, null);
+		t.addContainerProperty("box", CheckBox.class, null);
+		if (peConf.saisieCommentaire1==ChoixOuiNon.OUI)
+		{
+			t.addContainerProperty("c1", TextField.class, null);
+			nbCol++;
+		}
+		if (peConf.saisieCommentaire2==ChoixOuiNon.OUI)
+		{
+			t.addContainerProperty("c2", TextField.class, null);
+			nbCol++;
 		}
 		
-		param.largeurCol = 200;
-		param.espaceInterCol = 3;
-		
-		
-		
-		
-		// Construction du header 1
-		GridHeaderLine line1  =new GridHeaderLine();
-		line1.height = 70;
-		line1.styleName = "tete";
-		line1.cells.add("Date");
-		line1.cells.add("Montant €");
-		line1.cells.add("Cocher la case si le chèque a été donné");
-		
-		param.headerLines.add(line1);
-		
-		// Partie gauche de chaque ligne
-		param.leftPartLine2 = new ArrayList<>();
-		for (DatePaiementDTO datePaiement : paiements)
+		for (int i=0;i<paiements.size();i++)
 		{
-			param.leftPartLine.add(df.format(datePaiement.datePaiement));
-			param.leftPartLine2.add(new CurrencyTextFieldConverter().convertToString(datePaiement.montant));
-		}	
+			DatePaiementDTO p = paiements.get(i);
+			
+			Object[] cells = new Object[nbCol];
+			
+			int index=0;
+			
+			Label l = builder.createLabel(df.format(p.datePaiement),200);
+			cells[index] = l;
+			index++;
+			
+			
+			l =  builder.createLabel(new CurrencyTextFieldConverter().convertToString(p.montant),150);
+			cells[index] = l;
+			index++;
+			
+			CheckBox cb =  builder.createCheckBox(p.etatPaiement==EtatPaiement.AMAP, 150);
+			cells[index] = cb;
+			index++;
+			
+			if (peConf.saisieCommentaire1==ChoixOuiNon.OUI)
+			{
+				TextField tf =  builder.createTextField(p.commentaire1,200);
+				cells[index] = tf;
+				index++;
+			}
+			
+			if (peConf.saisieCommentaire2==ChoixOuiNon.OUI)
+			{
+				TextField tf =  builder.createTextField(p.commentaire2,200);
+				cells[index] = tf;
+				index++;
+			}
+			
+			t.addItem(cells, i);
+		}
 		
+
+		t.addStyleName("big");
+		t.setColumnHeaderMode(ColumnHeaderMode.HIDDEN);
+		t.setSelectable(true);
+		t.setSortEnabled(false);
+		t.setPageLength(15);
+		
+		contentLayout.addComponent(t);
+	
 	}
 	
 	@Override
@@ -132,11 +197,11 @@ public class ReceptionChequeEditorPart extends PopupBooleanGrid
 	
 	protected void handleToutSelectionner()
 	{
-		for (int i = 0; i < param.nbLig; i++)
+		for (int i = 0; i <paiements.size(); i++)
 		{
-			Item item = table.getItem(new Integer(i));
+			Item item = t.getItem(i);
 			
-			CheckBox tf = (CheckBox) item.getItemProperty(new Integer(0)).getValue();
+			CheckBox tf = (CheckBox) item.getItemProperty("box").getValue();
 			tf.setValue(Boolean.TRUE);
 		}
 		
@@ -144,23 +209,47 @@ public class ReceptionChequeEditorPart extends PopupBooleanGrid
 
 
 
-	public void performSauvegarder()
+	public boolean performSauvegarder()
 	{
-		
-		for (int i = 0; i < param.nbLig; i++)
+		for (int i = 0; i < paiements.size(); i++)
 		{
-			if (param.box[i][0] == true)
+			DatePaiementDTO paiement = paiements.get(i);
+			Item item = t.getItem(i);
+			
+			// case à cocher
+			CheckBox cb = (CheckBox) item.getItemProperty("box").getValue();
+			if (cb.getValue().booleanValue()==true)
 			{
-				paiements.get(i).etatPaiement=EtatPaiement.AMAP;
+				paiement.etatPaiement=EtatPaiement.AMAP;
 			}
 			else
 			{
-				paiements.get(i).etatPaiement=EtatPaiement.A_FOURNIR;
+				paiement.etatPaiement=EtatPaiement.A_FOURNIR;
+			}
+			
+			// Commentaire 1
+			if (peConf.saisieCommentaire1==ChoixOuiNon.OUI)
+			{
+				TextField tf = (TextField) item.getItemProperty("c1").getValue();
+				paiement.commentaire1 = tf.getValue();
+			}	
+			
+			// Commentaire 2
+			if (peConf.saisieCommentaire2==ChoixOuiNon.OUI)
+			{
+				TextField tf = (TextField) item.getItemProperty("c2").getValue();
+				paiement.commentaire2 = tf.getValue();
 			}
 		}
 		
-		
+	
 		new MesPaiementsService().receptionCheque(paiements);
+		
+		return true;
 	}
+
+
+
+	
 	
 }

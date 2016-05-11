@@ -405,7 +405,17 @@ public class RemiseProducteurListPart extends VerticalLayout implements Componen
 		
 		for (PaiementRemiseDTO paiement : remiseDTO.paiements)
 		{
-			buf.append(paiement.nomUtilisateur+" "+paiement.prenomUtilisateur+" - "+new CurrencyTextFieldConverter().convertToString(paiement.montant)+" € <br/>");
+			String txt = paiement.nomUtilisateur+" "+paiement.prenomUtilisateur+" - "+new CurrencyTextFieldConverter().convertToString(paiement.montant)+" € ";
+			if (paiement.commentaire1!=null)
+			{
+				txt = txt+" - "+paiement.commentaire1;
+			}
+			if (paiement.commentaire2!=null)
+			{
+				txt = txt+" - "+paiement.commentaire2;
+			}
+			txt = txt+"<br/>";
+			buf.append(txt);
 		}
 		
 		

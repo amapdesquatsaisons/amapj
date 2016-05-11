@@ -45,8 +45,12 @@ public class PlanningMensuelJson extends AbstractEditionSpeJson
 	// Largeur en mm pour la colonne Presence
 	private int lgColPresence;
 
-	// Largeur en mm pour la colonne Telephone
+	// Largeur en mm pour la colonne Telephone 1
 	private int lgColnumTel1;
+	
+	// Largeur en mm pour la colonne Telephone 2
+	private int lgColnumTel2;
+
 	
 	// Largeur en mm pour la colonne Commentaire
 	private int lgColCommentaire;
@@ -185,5 +189,20 @@ public class PlanningMensuelJson extends AbstractEditionSpeJson
 	{
 		this.hauteurLigne = hauteurLigne;
 	}
+
+
+	public int getLgColnumTel2()
+	{
+		return lgColnumTel2;
+	}
+
+
+	public void setLgColnumTel2(int lgColnumTel2)
+	{
+		this.lgColnumTel2 = lgColnumTel2;
+	}
+	
+	
+	
 	
 }

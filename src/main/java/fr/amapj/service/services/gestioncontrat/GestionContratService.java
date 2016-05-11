@@ -39,6 +39,7 @@ import org.apache.poi.ss.usermodel.DateUtil;
 import fr.amapj.common.BigDecimalUtils;
 import fr.amapj.common.DateUtils;
 import fr.amapj.common.LongUtils;
+import fr.amapj.common.SQLUtils;
 import fr.amapj.model.engine.transaction.DbRead;
 import fr.amapj.model.engine.transaction.DbWrite;
 import fr.amapj.model.engine.transaction.TransactionHelper;
@@ -1042,7 +1043,7 @@ public class GestionContratService
 				"from ContratCell c " +
 				"WHERE c.contrat.modeleContrat=:mc");
 		q.setParameter("mc", mc);
-		return BigDecimalUtils.toInt(q.getSingleResult());
+		return SQLUtils.toInt(q.getSingleResult());
 	}
 	
 	
@@ -1053,7 +1054,7 @@ public class GestionContratService
 				"from Contrat c " +
 				"WHERE c.modeleContrat=:mc");
 		q.setParameter("mc", mc);
-		return LongUtils.toInt(q.getSingleResult());
+		return SQLUtils.toInt(q.getSingleResult());
 	}
 	
 	
