@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -31,6 +31,7 @@ import fr.amapj.service.services.parametres.ParametresDTO;
 import fr.amapj.service.services.parametres.ParametresService;
 import fr.amapj.service.services.utilisateur.UtilisateurDTO;
 import fr.amapj.service.services.utilisateur.UtilisateurService;
+import fr.amapj.view.engine.popup.corepopup.CorePopup.ColorStyle;
 import fr.amapj.view.engine.popup.formpopup.WizardFormPopup;
 import fr.amapj.view.engine.popup.formpopup.validator.EmailValidator;
 import fr.amapj.view.engine.popup.formpopup.validator.IValidator;
@@ -62,8 +63,7 @@ public class CreationUtilisateurEditorPart extends WizardFormPopup
 	 */
 	public CreationUtilisateurEditorPart()
 	{
-		popupWidth = "80%";
-		popupHeight = "60%";
+		setWidth(80);
 		popupTitle = "Création d'un utilisateur";
 
 		utilisateurDTO = new UtilisateurDTO();
@@ -178,7 +178,7 @@ public class CreationUtilisateurEditorPart extends WizardFormPopup
 		String clearPassword = new UtilisateurService().createNewUser(utilisateurDTO,true);
 		if (clearPassword!=null)
 		{
-			MessagePopup popup = new MessagePopup("Mot de passe", "Le mot de passe est "+clearPassword);
+			MessagePopup popup = new MessagePopup("Mot de passe", ColorStyle.GREEN , "Le mot de passe est "+clearPassword);
 			MessagePopup.open(popup);
 		}
 	}

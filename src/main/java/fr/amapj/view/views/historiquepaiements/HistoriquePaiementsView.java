@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -43,6 +43,7 @@ import com.vaadin.ui.themes.ChameleonTheme;
 import fr.amapj.service.services.mespaiements.MesPaiementsService;
 import fr.amapj.service.services.mespaiements.PaiementHistoriqueDTO;
 import fr.amapj.service.services.session.SessionManager;
+import fr.amapj.view.engine.template.BackOfficeView;
 import fr.amapj.view.engine.tools.DateAsMonthToStringConverter;
 import fr.amapj.view.engine.tools.DateToStringConverter;
 import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
@@ -54,7 +55,7 @@ import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
  *  
  *
  */
-public class HistoriquePaiementsView extends VerticalLayout implements View
+public class HistoriquePaiementsView extends BackOfficeView
 {
 
 	private Table beanTable;
@@ -69,7 +70,7 @@ public class HistoriquePaiementsView extends VerticalLayout implements View
 	 * 
 	 */
 	@Override
-	public void enter(ViewChangeEvent event)
+	public void enterIn(ViewChangeEvent event)
 	{
 		listPartContainer = new BeanItemContainer<>(PaiementHistoriqueDTO.class);
 		List<PaiementHistoriqueDTO> ps = new MesPaiementsService().getMesPaiements(SessionManager.getUserId()).paiementHistorique;
@@ -80,8 +81,7 @@ public class HistoriquePaiementsView extends VerticalLayout implements View
 		listPartContainer.sort(new String[] { "datePrevu" , "nomContrat" }, new boolean[] { false, true });
 			
 		// Bind it to a component
-		beanTable = new Table("", listPartContainer);
-		beanTable.setStyleName("big strong");
+		beanTable = createTable(listPartContainer);
 		
 		// Gestion de la liste des colonnes visibles
 		beanTable.setVisibleColumns("nomProducteur", "nomContrat" , "datePrevu" , "dateReelle" , "montant");
@@ -121,7 +121,7 @@ public class HistoriquePaiementsView extends VerticalLayout implements View
 		
 		Label title = new Label("Liste des paiements passés");
 		title.setSizeUndefined();
-		title.addStyleName("h1");
+		title.addStyleName("stdlistpart-text-title");
 		
 		
 
@@ -145,14 +145,12 @@ public class HistoriquePaiementsView extends VerticalLayout implements View
 		toolbar.setExpandRatio(searchField, 1);
 		toolbar.setComponentAlignment(searchField, Alignment.TOP_RIGHT);
 
-		setMargin(true);
-		setSpacing(true);
 		
 		addComponent(title);
 		addComponent(toolbar);
 		addComponent(beanTable);
 		setExpandRatio(beanTable, 1);
-		setSizeFull();
+
 		
 	}
 	

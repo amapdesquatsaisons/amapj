@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -20,15 +20,18 @@
  */
  package fr.amapj.view.engine.menu;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.ViewChangeListener;
-import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
-import com.vaadin.server.ThemeResource;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Page;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -36,18 +39,18 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.HorizontalSplitPanel;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
+import com.vaadin.ui.MenuBar;
+import com.vaadin.ui.MenuBar.MenuItem;
+import com.vaadin.ui.themes.ValoTheme;
 
 import fr.amapj.service.services.authentification.PasswordManager;
 import fr.amapj.service.services.parametres.ParametresService;
 import fr.amapj.service.services.session.SessionManager;
 import fr.amapj.service.services.session.SessionParameters;
 import fr.amapj.view.engine.ui.AmapUI;
+import fr.amapj.view.engine.ui.ValoMenuLayout;
 
 
 /**
@@ -58,22 +61,35 @@ public class MenuPart
 {
 	private static final Logger logger = LogManager.getLogger();
 	
-	CssLayout content = new CssLayout();
 	
-	AmapUI ui;
 	
-	private  Navigator nav;
+	// Correspondance entre les boutons et les vues
+	private Map<String, Button> viewNameToMenuButton;
 	
 	
 	public MenuPart()
 	{
 	}
 	
-	public void buildMainView(final AmapUI ui,GridLayout loginLayout,CssLayout root)
+	public void buildMainView(final AmapUI ui,ValoMenuLayout root)
 	{
-		this.ui = ui;
+		root.prepareForMainPage();
 		
-		nav = new Navigator(ui, content);
+		viewNameToMenuButton = new HashMap<String, Button>();
+		
+		CssLayout menu = new CssLayout();
+		CssLayout menuItemsLayout = new CssLayout(); 
+		
+		if (ui.getPage().getWebBrowser().isIE() && ui.getPage().getWebBrowser().getBrowserMajorVersion() == 9)
+		{
+			menu.setWidth("320px");
+		}
+		
+		// Chargement de tous les menus accesibles par l'utilisateur
+		// et création du "navigator"
+		List<MenuDescription> allMenus = MenuInfo.getInstance().getMenu();
+		
+		Navigator nav = new Navigator(ui, root.getContentContainer());
 		nav.addViewChangeListener(new ViewChangeListener()
 		{
 			
@@ -87,13 +103,11 @@ public class MenuPart
 			@Override
 			public void afterViewChange(ViewChangeEvent event)
 			{
-				// Nothing to do
+				menu.removeStyleName("valo-menu-visible");
 			}
 		});
 
-		// Chargement de tous les menus accesibles par l'utilisateur
-		// et création du "navigator"
-		List<MenuDescription> allMenus = MenuInfo.getInstance().getMenu();
+	
 		
 		if (allMenus.size()>0)
 		{
@@ -106,109 +120,157 @@ public class MenuPart
 			nav.addView("/"+mD.getMenuName().name().toLowerCase(), mD.getViewClass());
 		}
 
-		// Suppression de la page de login
-		root.removeComponent(loginLayout);
-
-		// Création de la page complete (partie de gauche avec le menu et de droite avec la page aplicative)
-		HorizontalSplitPanel page = createPage(allMenus);
-		root.addComponent(page);
+		// Création du menu 
+		root.addMenu(buildMenu(menu,menuItemsLayout,allMenus,nav,ui));
 		
 	}
 
-	private HorizontalSplitPanel createPage(List<MenuDescription> allMenus)
-	{
-		HorizontalSplitPanel layout = new HorizontalSplitPanel();
-		layout.setSizeFull();
-		
-		// Partie de gauche contenant le menu
-		layout.addComponent(createLeftPart(allMenus));
-		
-		// Partie de droite avec le contenu
-		layout.addComponent(content);
-		content.setSizeFull();
-		
-		layout.setSplitPosition(15);
-		
-		return layout;
-	}
+
 	
-	
-	private Component createLeftPart(List<MenuDescription> allMenus)
+	private CssLayout buildMenu(CssLayout menu,CssLayout menuItemsLayout,List<MenuDescription> allMenus, Navigator navigator, AmapUI ui)
 	{
-		VerticalLayout layout = new VerticalLayout();
 		
-		layout.addStyleName(ChameleonTheme.COMPOUND_LAYOUT_SIDEBAR_MENU);
-		layout.setSizeFull();
-		
-		String nomAmap = new ParametresService().getParametres().nomAmap;
-		String message  = "<h2>"+nomAmap+"</h2>";
-		
-		// Partie haute du menu
-		layout.addComponent(new Label(message, ContentMode.HTML));
-		layout.addComponent(new Label(""));
-		layout.addComponent(new Label(""));
-		
-		
-		
-		// Partie mediane du menu
-		SidebarMenu sidebarMenu = new SidebarMenu(allMenus,nav);
-		CssLayout lay = sidebarMenu.constructMenu(); 
-		lay.setSizeUndefined();
-		
-		
-		Panel p = new Panel();
-		p.setSizeFull();
-		p.setContent(lay);
-		p.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
-		
-		layout.addComponent(p);
-		layout.setExpandRatio(p, 5);
-		
-		// Partie basse du menu
-		CssLayout toolbar = createBottomMenu();
-		layout.addComponent(toolbar);
-		layout.setExpandRatio(toolbar, 1);
-		layout.setComponentAlignment(toolbar, Alignment.BOTTOM_CENTER);
-		
-		
-		return layout;
-	}
 
-	private CssLayout createBottomMenu()
-	{
-		CssLayout toolbar = new CssLayout();
-        toolbar.setWidth("100%");
-        toolbar.setStyleName("toolbar");
-        
-				
-		
-		Button exit = new Button();
-		exit.setIcon(new ThemeResource("img/power.png"));
-		exit.setDescription("Se déconnecter");
-		exit.setStyleName("icon-only");
+		final HorizontalLayout top = new HorizontalLayout();
+		top.setWidth("100%");
+		top.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
+		top.addStyleName("valo-menu-title");
+		menu.addComponent(top);
 
-				
-		
-		toolbar.addComponent(exit);
-		exit.addClickListener(new ClickListener()
+		final Button showMenu = new Button("Menu", new ClickListener()
 		{
 			@Override
-			public void buttonClick(ClickEvent event)
+			public void buttonClick(final ClickEvent event)
+			{
+				if (menu.getStyleName().contains("valo-menu-visible"))
+				{
+					menu.removeStyleName("valo-menu-visible");
+				} 
+				else
+				{
+					menu.addStyleName("valo-menu-visible");
+				}
+			}
+		});
+		showMenu.addStyleName(ValoTheme.BUTTON_PRIMARY);
+		showMenu.addStyleName(ValoTheme.BUTTON_SMALL);
+		showMenu.addStyleName("valo-menu-toggle");
+		showMenu.setIcon(FontAwesome.LIST);
+		menu.addComponent(showMenu);
+		
+		String nomAmap = new ParametresService().getParametres().nomAmap;
+		Label title = new Label("<h2>"+nomAmap+"</h2>", ContentMode.HTML);
+		title.setSizeUndefined();
+		top.addComponent(title);
+		top.setExpandRatio(title, 1);
+
+		final MenuBar settings = new MenuBar();
+		settings.addStyleName("user-menu");
+		
+
+		SessionParameters p = SessionManager.getSessionParameters();
+		MenuItem settingsItem = settings.addItem(p.userPrenom+" "+p.userNom, null, null);
+		settingsItem.addItem("Se déconnecter", new  MenuBar.Command()
+		{
+			@Override
+			public void menuSelected(MenuItem selectedItem)
 			{
 				new PasswordManager().disconnect();
-				ui.buildLoginView(true,null,null,null);
+				ui.buildLoginView(null,null,null);	
 			}
 		});
 		
-		SessionParameters p = SessionManager.getSessionParameters();
-			
-		Button name = new Button(p.userPrenom+" "+p.userNom);
-		name.addStyleName(ChameleonTheme.BUTTON_BORDERLESS);
-		toolbar.addComponent(name);
-			
+		menu.addComponent(settings);
+		
 
-		return toolbar;
+		menuItemsLayout.setPrimaryStyleName("valo-menuitems");
+		menu.addComponent(menuItemsLayout);
+		
+		boolean first = true;
+		String firstEntry=null;
+		Button firstButton=null;
+
+		
+		for (MenuDescription menuDescription : allMenus)
+		{
+			final String view = menuDescription.getMenuName().name().toLowerCase();
+			final String titleView = menuDescription.getMenuName().getTitle();
+			
+			
+			if (menuDescription.getCategorie()!=null)
+			{
+				Label l = new Label(menuDescription.getCategorie(), ContentMode.HTML);
+				l.setPrimaryStyleName("valo-menu-subtitle");
+				l.addStyleName("h4");
+				l.setSizeUndefined();
+				menuItemsLayout.addComponent(l);
+			}
+			
+			final Button b = new Button(titleView, new ClickListener()
+			{
+				@Override
+				public void buttonClick(final ClickEvent event)
+				{
+					setSelected(event.getButton(),menuItemsLayout);
+					navigator.navigateTo("/" +view);
+				}
+			});
+			
+			b.setId("amapj.menu."+view);
+			b.setHtmlContentAllowed(true);
+			b.setPrimaryStyleName("valo-menu-item");
+			b.setIcon(menuDescription.getMenuName().getFont());
+			menuItemsLayout.addComponent(b);
+			
+			viewNameToMenuButton.put("/"+view, b);
+			
+			if (first)
+			{
+				first = false;
+				firstButton = b;
+				firstEntry = view;
+			}
+		}
+		
+		
+		
+		// Gestion de l'url
+		String f = Page.getCurrent().getUriFragment();
+		if (f != null && f.startsWith("!"))
+		{
+			f = f.substring(1);
+		}
+		if (f == null || f.equals("") || f.equals("/"))
+		{
+			navigator.navigateTo("/"+firstEntry);
+			setSelected(firstButton,menuItemsLayout);
+		} 
+		else
+		{
+			navigator.navigateTo(f);
+			setSelected(viewNameToMenuButton.get(f),menuItemsLayout);
+		}
+		
+
+		return menu;
 	}
-	
 
+	/**
+	 * 
+	 * @param viewName du style /xxxx
+	 */
+	private void setSelected(Button b,CssLayout menuItemsLayout)
+	{
+		for (final Iterator<Component> it = menuItemsLayout.iterator(); it.hasNext();)
+		{
+			it.next().removeStyleName("selected");
+		}
+		
+		
+		// b peut etre null dans le cas du error view provider 
+		if (b!=null)
+		{
+			b.addStyleName("selected");
+		}
+	}
 }

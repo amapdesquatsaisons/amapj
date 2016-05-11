@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -27,12 +27,19 @@ import java.util.Locale;
 
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.converter.Converter;
+import com.vaadin.server.Page;
 import com.vaadin.shared.ui.datefield.Resolution;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Layout;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.PopupDateField;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
 
 import fr.amapj.view.engine.popup.messagepopup.MessagePopup;
 import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
@@ -41,6 +48,108 @@ import fr.amapj.view.engine.widgets.QteTextFieldConverter;
 
 public class BaseUiTools
 {
+	
+	static public Label addStdLabel(Layout layout,String content,String styleName)
+	{
+		Label tf = new Label(content);
+		tf.addStyleName(styleName);
+		layout.addComponent(tf);
+		return tf;
+	}
+	
+	
+	static public Label addHtmlLabel(Layout layout,String content,String styleName)
+	{
+		Label tf = new Label(content,ContentMode.HTML);
+		tf.addStyleName(styleName);
+		layout.addComponent(tf);
+		return tf;
+	}
+	
+	
+	/**
+	 * Crée un Panel avec un VerticalLayout à l'intérieur 
+	 * 
+	 * @param layout
+	 * @param styleName
+	 * @return
+	 */
+	static public VerticalLayout addPanel(Layout layout,String styleName)
+	{
+		Panel p0 = new Panel();
+		p0.setWidth("100%");
+		p0.addStyleName(styleName);
+		
+		VerticalLayout vl1 = new VerticalLayout();
+		vl1.setMargin(true);
+		p0.setContent(vl1);
+		layout.addComponent(p0);
+		
+		return vl1;
+	}
+	
+	/**
+	 * Permet de créer un bandeau, c'est à dire avec un texte avec un fond, et ceci sur toute la longueur 
+	 * 
+	 */
+	static public Label addBandeau(Layout layout,String content,String styleName)
+	{
+		Label l = new Label(content);
+		l.setWidth("100%");
+		
+		Panel p1 = new Panel();
+		p1.setContent(l);
+		p1.addStyleName("bandeau-"+styleName);
+		
+		layout.addComponent(p1);
+		
+		return l;
+	}
+	
+	
+	static public Label addEmptyLine(Layout layout)
+	{
+		Label l = new Label("<br/>",ContentMode.HTML);
+		layout.addComponent(l);
+		return l;
+	}
+	
+	
+	
+	
+	
+	
+	/**
+	 * On distingue deux modes d'affichage dans le logiciel : un mode compact pour les smartphone,
+	 * et un mode classique dans les autres cas
+	 */
+	static public boolean isCompactMode()
+	{
+		Page page = UI.getCurrent().getPage();
+		int width = page.getBrowserWindowWidth();
+		int height = page.getBrowserWindowHeight();
+		
+		if ((height<700) || (width<700))
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	
+	public static boolean isWidthBelow(int width)
+	{
+		Page page = UI.getCurrent().getPage();
+		int currentWidth = page.getBrowserWindowWidth();
+		return currentWidth<width;
+	}
+	
+	
+	
+	
+	
+	
+	
 
 	static public PopupDateField createDateField(FieldGroup binder, String propertyId, String title)
 	{
@@ -131,7 +240,6 @@ public class BaseUiTools
 	{
 		CheckBox checkbox = new CheckBox();
 		checkbox.addStyleName("align-center");
-		checkbox.addStyleName("big");
 		checkbox.setImmediate(true);
 
 		return checkbox;
@@ -162,5 +270,8 @@ public class BaseUiTools
 		t.addItem(line, null);
 		return t;
 	}
+
+
+	
 
 }

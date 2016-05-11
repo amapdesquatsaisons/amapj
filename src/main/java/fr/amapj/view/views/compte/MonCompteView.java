@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -22,20 +22,20 @@
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
 
-import fr.amapj.model.models.fichierbase.Utilisateur;
+import fr.amapj.service.services.authentification.PasswordManager;
 import fr.amapj.service.services.moncompte.MonCompteService;
 import fr.amapj.service.services.utilisateur.UtilisateurDTO;
 import fr.amapj.view.engine.popup.PopupListener;
 import fr.amapj.view.engine.popup.formpopup.FormPopup;
+import fr.amapj.view.engine.template.FrontOfficeView;
+import fr.amapj.view.engine.tools.InLineFormHelper;
+import fr.amapj.view.engine.ui.ValoMenuLayout;
 
 
 /**
@@ -46,8 +46,17 @@ import fr.amapj.view.engine.popup.formpopup.FormPopup;
  *  
  *
  */
-public class MonCompteView extends VerticalLayout implements View, PopupListener
+public class MonCompteView extends FrontOfficeView implements PopupListener
 {
+	
+	
+	
+	static private String TEXTFIELD_COMPTEINPUT = "compteinput";
+	
+	static private String PANEL_COMPTEFORM = "compteform";
+	
+	
+	
 
 	UtilisateurDTO u;
 	
@@ -62,147 +71,109 @@ public class MonCompteView extends VerticalLayout implements View, PopupListener
 	TextField codePostal;
 	TextField ville;	
 	
+	FormLayout form1;
+	FormLayout form2;
+	FormLayout form3;
+	
+
+	public String getMainStyleName()
+	{
+		return "moncompte";
+	}
+	
 
 	/**
 	 * 
 	 */
 	@Override
-	public void enter(ViewChangeEvent event)
+	public void enter()
 	{
-
-		GridLayout layout = new GridLayout(3, 8);
-		layout.setWidth("80%");
-		layout.setColumnExpandRatio(0, 0);
+		Panel p0 = new Panel();
+		p0.setWidth("100%");
+		p0.addStyleName(PANEL_COMPTEFORM);
+		
+		VerticalLayout vl1 = new VerticalLayout();
+		vl1.setMargin(true);
+		p0.setContent(vl1);
+		addComponent(p0);
+		
+		// Bloc nom et prenom - Le nom et le prenom ne sont pas modifiables
+		form1 = new FormLayout();
+        form1.setMargin(false);
+        form1.addStyleName("light");
+        vl1.addComponent(form1);
+        
+        
+        Label section = new Label("Nom et prénom");
+        section.addStyleName("h2");
+        section.addStyleName("colored");
+        form1.addComponent(section);
+		
+		nom = addTextField("Votre nom ",form1);
+		prenom = addTextField("Votre prénom ",form1);
 		
 		
-		// Une ligne vide
-		addLabel(layout," ");
-		addLabel(layout," ");
-		addLabel(layout," ");
+		// Bloc Adresse mail  
+		InLineFormHelper formHelper = new InLineFormHelper("Votre mail", "Modifier votre adresse mail", this,  e->handleSaveMail());
+	    mail = addTextField("Votre mail",formHelper.getForm());
+		formHelper.addIn(vl1);
 		
-		// le nom 
-		addLabel(layout,"Votre nom: ");
-		nom = addTextField(layout);
-		addLabel(layout," ");
 		
-		// le prenom 
-		addLabel(layout,"Votre prénom: ");
-		prenom = addTextField(layout);
-		addLabel(layout," ");
+		// Bloc mot de passe
+		formHelper = new InLineFormHelper("Votre mot de passe", "Modifier votre mot de passe", this,  e->handleSavePassword());
+	    pwd = addTextField("Votre mot de passe",formHelper.getForm());
+		formHelper.addIn(vl1);
 		
-		// le mail 
-		addLabel(layout,"Votre mail: ");
-		mail = addTextField(layout);
-		addButton(layout, "Changer votre adresse e-mail",new Button.ClickListener()
-		{
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				handleChangerEmail();
-			}
-		});
-		
-		// le mot de passe
-		addLabel(layout,"Votre mot de passe: ");
-		pwd = addTextField(layout);
-		addButton(layout, "Changer votre mot de passe",new Button.ClickListener()
-		{
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				handleChangerPassword();
-			}
-		});
 		
 		// les coordonnées
-		numTel1 = addLine(layout,"Numéro de tel 1:");
-		numTel2 = addLine(layout,"Numéro de tel 2:");
-		adresse = addLine(layout,"Adresse:");
-		codePostal = addLine(layout,"Code Postal:");
-
-		addLabel(layout,"Ville");
-		ville = addTextField(layout);
-		addButton(layout, "Changer vos coordonnées",new Button.ClickListener()
-		{
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				handleChangerCoordonnees();
-			}
-		});
-		
-		
+		formHelper = new InLineFormHelper("Vos coordonnées", "Modifier vos coordonnées", this,  e->handleSaveChangerCoordonnees());
+		numTel1 = addTextField("Numéro de tel 1",formHelper.getForm());
+		numTel2 = addTextField("Numéro de tel 2",formHelper.getForm());
+		adresse = addTextField("Adresse",formHelper.getForm());
+		codePostal = addTextField("Code Postal",formHelper.getForm());
+		ville = addTextField("Ville",formHelper.getForm());
+		formHelper.addIn(vl1);
+	
 		
 		refresh();
 		
-		layout.setMargin(true);
-		layout.setSpacing(true);
-		layout.setSizeFull();
-		addComponent(layout);
-		
-		
-		
 	}
 
 
-
-	private TextField addLine(GridLayout layout, String label)
+	private void handleSaveMail()
 	{
-		addLabel(layout,label);
-		TextField tf = addTextField(layout);
-		addLabel(layout," ");
-		return tf;
+		String newValue = mail.getValue();
+		new MonCompteService().setNewEmail(u.getId(),newValue);
 	}
 
 
-
-	protected void handleChangerPassword()
+	private void handleSavePassword()
 	{
-		FormPopup.open(new PopupSaisiePassword(u));
+		String newValue = pwd.getValue();
+		new PasswordManager().setUserPassword(u.id,newValue);
 	}
 	
-	private void handleChangerCoordonnees()
+	
+	
+	
+	
+	
+	private void handleSaveChangerCoordonnees()
 	{
-		FormPopup.open(new PopupSaisieCoordonnees(u),this);
+		u.setNumTel1(numTel1.getValue());
+		u.setNumTel2(numTel2.getValue());
+		u.setLibAdr1(adresse.getValue());
+		u.setCodePostal(codePostal.getValue());
+		u.setVille(ville.getValue());
 		
+		new MonCompteService().updateCoordoonees(u);
 	}
+	
+	
 	
 
-	protected void handleChangerEmail()
-	{
-		FormPopup.open(new PopupSaisieEmail(u),this);
-		
-	}
 	
-	private Label addLabel(GridLayout layout, String str)
-	{
-		Label tf = new Label(str);
-		tf.addStyleName(ChameleonTheme.LABEL_BIG);
-		layout.addComponent(tf);
-		return tf;
-		
-	}
 
-	private TextField addTextField(GridLayout layout)
-	{
-		TextField tf = new TextField();
-		tf.setWidth("100%");
-		tf.setNullRepresentation("");
-		tf.addStyleName(ChameleonTheme.TEXTFIELD_BIG);
-		tf.setEnabled(false);
-		layout.addComponent(tf);
-		return tf;
-		
-	}
-	
-	private void addButton(GridLayout layout, String str,ClickListener listener)
-	{
-		Button b = new Button(str);
-		b.addStyleName(ChameleonTheme.BUTTON_BIG);
-		b.addClickListener(listener);
-		layout.addComponent(b);
-		
-	}
 
 	@Override
 	public void onPopupClose()
@@ -214,18 +185,39 @@ public class MonCompteView extends VerticalLayout implements View, PopupListener
 	{
 		u = new MonCompteService().getUtilisateurInfo();
 		
-		nom.setValue(u.getNom());
-		prenom.setValue(u.getPrenom());
-		mail.setValue(u.getEmail());
-		pwd.setValue("***********");
-		numTel1.setValue(u.getNumTel1());
-		numTel2.setValue(u.getNumTel2());
-		adresse.setValue(u.getLibAdr1());
-		codePostal.setValue(u.getCodePostal());
-		ville.setValue(u.getVille());			
+		setValue(nom,u.getNom());
+		setValue(prenom,u.getPrenom());
+		setValue(mail,u.getEmail());
+		setValue(pwd,"***********");
+		setValue(numTel1,u.getNumTel1());
+		setValue(numTel2,u.getNumTel2());
+		setValue(adresse,u.getLibAdr1());
+		setValue(codePostal,u.getCodePostal());
+		setValue(ville,u.getVille());		
 	}
 	
 	
+	// TOOLS
 
+
+	private void setValue(TextField tf, String val)
+	{
+		tf.setReadOnly(false);
+		tf.setValue(val);
+		tf.setReadOnly(true);
+	}
+	
+	
+	private TextField addTextField(String lib,FormLayout form)
+	{
+		TextField name = new TextField(lib);
+		name.addStyleName(TEXTFIELD_COMPTEINPUT);
+		name.setWidth("100%");
+		name.setNullRepresentation("");
+		name.setReadOnly(true);
+		form.addComponent(name);
+
+		return name;
+	}
 
 }

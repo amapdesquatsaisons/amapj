@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -51,6 +51,7 @@ import fr.amapj.view.engine.popup.corepopup.CorePopup;
 import fr.amapj.view.engine.popup.suppressionpopup.PopupSuppressionListener;
 import fr.amapj.view.engine.popup.suppressionpopup.SuppressionPopup;
 import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
+import fr.amapj.view.engine.template.BackOfficeView;
 import fr.amapj.view.engine.tools.TableTools;
 import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
 
@@ -59,7 +60,7 @@ import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
  * Affichage de la liste des périodes de cotisation 
  *
  */
-public class BilanCotisationView extends VerticalLayout implements ComponentContainer , View ,  PopupSuppressionListener
+public class BilanCotisationView extends BackOfficeView implements ComponentContainer , View ,  PopupSuppressionListener
 {
 
 	private TextField searchField;
@@ -82,21 +83,14 @@ public class BilanCotisationView extends VerticalLayout implements ComponentCont
 	
 	
 	@Override
-	public void enter(ViewChangeEvent event)
+	public void enterIn(ViewChangeEvent event)
 	{
-		setSizeFull();
-		buildMainArea();
-	}
-	
-
-	private void buildMainArea()
-	{
+		
 		// Lecture dans la base de données
 		mcInfos = new BeanItemContainer<PeriodeCotisationDTO>(PeriodeCotisationDTO.class);
 			
 		// Bind it to a component
-		cdesTable = new Table("", mcInfos);
-		cdesTable.setStyleName("big strong");
+		cdesTable = createTable(mcInfos);
 		
 		
 		// Titre des colonnes
@@ -148,11 +142,12 @@ public class BilanCotisationView extends VerticalLayout implements ComponentCont
 		});
 
 		HorizontalLayout toolbar = new HorizontalLayout();
+		toolbar.addStyleName("stdlistpart-hlayout-button");
 		
 		
 		Label title2 = new Label("Liste des périodes de cotisation");
 		title2.setSizeUndefined();
-		title2.addStyleName("h1");	
+		title2.addStyleName("stdlistpart-text-title");	
 		
 		newButton = new Button("Créer une période");
 		newButton.addClickListener(new Button.ClickListener()
@@ -236,9 +231,7 @@ public class BilanCotisationView extends VerticalLayout implements ComponentCont
 		addComponent(toolbar);
 		addComponent(cdesTable);
 		setExpandRatio(cdesTable, 1);
-		setSizeFull();
-		setMargin(true);
-		setSpacing(true);
+		
 		
 		refreshTable();
 
@@ -277,7 +270,7 @@ public class BilanCotisationView extends VerticalLayout implements ComponentCont
 	private void handleTelecharger()
 	{
 		PeriodeCotisationDTO dto = (PeriodeCotisationDTO) cdesTable.getValue();
-		TelechargerPopup popup = new TelechargerPopup();
+		TelechargerPopup popup = new TelechargerPopup("Bilan des cotisations");
 		popup.addGenerator(new EGBilanAdhesion(dto.id));
 		CorePopup.open(popup,this);
 	}

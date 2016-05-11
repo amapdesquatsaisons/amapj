@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -62,8 +62,8 @@ public class SaisieContrat
 			@Override
 			public void onPopupClose()
 			{
-				// Si l'opérateur a appuyé sur cancel on arrete
-				if (data.cancel==true)
+				// Si l'opérateur a appuyé sur cancel , ou si il a fait echap, ou il a cliqué sur la croix, on arrete
+				if (data.shouldContinue==false)
 				{
 					listener.onPopupClose();
 				}
@@ -152,7 +152,7 @@ public class SaisieContrat
 		
 		// Variables échangés entre les différents popup de la saisie
 		public int montantCible;
-		public boolean cancel = false;
+		public boolean shouldContinue = false; // Par défaut, on ne continue pas , sauf si l'utilisateur a bien appuyé sur Continuer 
 		
 		
 		public SaisieContratData(ContratDTO contratDTO, Long userId, String messageSpecifique,ModeSaisie modeSaisie)

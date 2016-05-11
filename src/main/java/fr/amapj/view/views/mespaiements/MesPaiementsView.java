@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -23,13 +23,10 @@
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-import com.vaadin.navigator.View;
-import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
 
 import fr.amapj.model.models.contrat.reel.EtatPaiement;
 import fr.amapj.service.services.mespaiements.DetailPaiementAFournirDTO;
@@ -39,54 +36,72 @@ import fr.amapj.service.services.mespaiements.MesPaiementsService;
 import fr.amapj.service.services.mespaiements.PaiementAFournirDTO;
 import fr.amapj.service.services.mespaiements.PaiementFourniDTO;
 import fr.amapj.service.services.session.SessionManager;
+import fr.amapj.view.engine.template.FrontOfficeView;
 import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
 
 
 /**
  * Page permettant à l'utilisateur de visualiser tous ses paiements
  * 
- *  
- *
  */
-public class MesPaiementsView extends Panel implements View
+public class MesPaiementsView extends FrontOfficeView
 {
-	VerticalLayout layout = null;
+	
+	
+	
+	static private String LABEL_TEXTEFOND = "textefond";
+	
+	static private String LABEL_CONTRAT = "contrat";
+	static private String LABEL_CHEQUEAFOURNIR = "chequeafournir";
+	
+	static private String LABEL_MOIS = "mois";
+	static private String LABEL_CHEQUE = "cheque";	
+	
+	static private String PANEL_CONTRAT = "contrat";
+	static private String PANEL_CHEQUEAFOURNIR = "chequeafournir";
+	
+	static private String PANEL_AVENIR = "avenir";
+	static private String PANEL_MOIS = "mois";
+	
 	
 	SimpleDateFormat df = new SimpleDateFormat("EEEEE dd MMMMM yyyy");
 
-	/**
-	 * 
-	 */
-	@Override
-	public void enter(ViewChangeEvent event)
+	
+	
+	public String getMainStyleName()
 	{
-		setSizeFull();
-		refresh();
+		return "paiement";
 	}
-
 	
 	/**
 	 * Ajoute un label sur toute la largeur à la ligne indiquée
 	 */
-	private Label addLabel(VerticalLayout layout, String str)
+	private Label addLabel(String str)
 	{
 		Label tf = new Label(str);
-		tf.addStyleName(ChameleonTheme.LABEL_H1);
-		layout.addComponent(tf);
+		tf.addStyleName(LABEL_TEXTEFOND);
+		addComponent(tf);
 		return tf;
 		
 	}
 
 
-	private void refresh()
+	@Override
+	public void enter()
 	{
 		MesPaiementsDTO mesPaiementsDTO = new MesPaiementsService().getMesPaiements(SessionManager.getUserId());
 		
-		
-		layout = new VerticalLayout();
-		
 		// Le titre
-		addLabel(layout,"Les chèques que je dois donner à l'AMAP");
+		addLabel("Les chèques que je dois donner à l'AMAP");
+		
+		Panel p0 = new Panel();
+		p0.setWidth("100%");
+		p0.addStyleName(PANEL_CHEQUEAFOURNIR);
+		
+		VerticalLayout vl1 = new VerticalLayout();
+		vl1.setMargin(true);
+		p0.setContent(vl1);
+		addComponent(p0);
 	
 		
 		// la liste des chéques à donner
@@ -95,53 +110,75 @@ public class MesPaiementsView extends Panel implements View
 		if (paiementAFournirs.size()==0)
 		{
 			String str = "Vous êtes à jour de vos paiements, vous n'avez pas de chèques à fournir à l'AMAP <br/>";
-			layout.addComponent(new Label(str, ContentMode.HTML));
+			Label l = new Label(str, ContentMode.HTML);
+			l.addStyleName(LABEL_CHEQUEAFOURNIR);
+			vl1.addComponent(l);
 		}
 		
 		for (PaiementAFournirDTO paiementAFournir : paiementAFournirs)
 		{
 			String str = formatContrat(paiementAFournir);
-			layout.addComponent(new Label(str, ContentMode.HTML));
+			Label l = new Label(str, ContentMode.HTML);
+			l.addStyleName(LABEL_CONTRAT);
+			
+			Panel p1 = new Panel();
+			p1.setContent(l);
+			p1.addStyleName(PANEL_CONTRAT);
+			vl1.addComponent(p1);
 		
 			
 			for (DetailPaiementAFournirDTO detail : paiementAFournir.paiements)
 			{
-				str = detail.formatPaiement(); 
-				layout.addComponent(new Label(str, ContentMode.HTML));
+				str = detail.formatPaiement();
+				Label ld = new Label(str, ContentMode.HTML);
+				ld.addStyleName(LABEL_CHEQUEAFOURNIR);
+				vl1.addComponent(ld);
 			
 			}
 			
 			// Une ligne vide
-			layout.addComponent(new Label("<br/>", ContentMode.HTML));
+			vl1.addComponent(new Label("<br/>", ContentMode.HTML));
 		}
 		
 		
 		// Le titre
-		addLabel(layout,"Le planning de mes paiements à venir mois par mois");
+		addLabel("Le planning de mes paiements à venir mois par mois");
+		
+		
+		Panel p = new Panel();
+		p.setWidth("100%");
+		p.addStyleName(PANEL_AVENIR);
+		
+		VerticalLayout vl = new VerticalLayout();
+		vl.setMargin(true);
+		p.setContent(vl);
+		addComponent(p);
 	
 		
 		// la liste des chéques qui seront bientot encaissés		
 		for (PaiementFourniDTO paiementFourni : mesPaiementsDTO.paiementFourni)
 		{
 			String str = formatMois(paiementFourni);
-			layout.addComponent(new Label(str, ContentMode.HTML));
+			Label l = new Label(str, ContentMode.HTML);
+			l.addStyleName(LABEL_MOIS);
+			
+			Panel p1 = new Panel();
+			p1.setContent(l);
+			p1.addStyleName(PANEL_MOIS);
+			vl.addComponent(p1);
 		
 			
 			for (DetailPaiementFourniDTO detail : paiementFourni.paiements)
 			{
-				str = formatPaiement(detail); 
-				layout.addComponent(new Label(str, ContentMode.HTML));
+				str = formatPaiement(detail);
+				Label cheque = new Label(str, ContentMode.HTML);
+				cheque.addStyleName(LABEL_CHEQUE);
+				vl.addComponent(cheque);
 			}
 			
 			// Une ligne vide
-			layout.addComponent(new Label("<br/>", ContentMode.HTML));
+			vl.addComponent(new Label("<br/>", ContentMode.HTML));
 		}
-		
-		layout.setMargin(true);
-		layout.setSpacing(true);
-		
-		setContent(layout);
-		addStyleName(ChameleonTheme.PANEL_BORDERLESS);
 	}
 	
 	
@@ -152,12 +189,9 @@ public class MesPaiementsView extends Panel implements View
 	private String formatContrat(PaiementAFournirDTO paiementAFournir)
 	{
 		// Ligne 0
-		String str = "<h4>"+
-					"Nom du contrat : "+paiementAFournir.nomContrat+
-					" - Date limite de remise des chèques: "+df.format(paiementAFournir.dateRemise)+
-					"<br/>"+
-					" Ordre des chèques : "+paiementAFournir.libCheque+
-					"</h4>";
+		String str = "Nom du contrat : "+paiementAFournir.nomContrat+"<br/>"+
+					" Date limite de remise des chèques: "+df.format(paiementAFournir.dateRemise)+"<br/>"+
+					" Ordre des chèques : "+paiementAFournir.libCheque;
 						
 		return str;
 	}
@@ -169,7 +203,7 @@ public class MesPaiementsView extends Panel implements View
 	private String formatMois(PaiementFourniDTO paiementFourni)
 	{
 		String montant = new CurrencyTextFieldConverter().convertToString(paiementFourni.totalMois)+" €";
-		String str = "<h4>"+paiementFourni.moisPaiement+" - Total du mois : "+montant+"</h4>";
+		String str = paiementFourni.moisPaiement+" - Total du mois : "+montant;
 		return str;
 	}
 

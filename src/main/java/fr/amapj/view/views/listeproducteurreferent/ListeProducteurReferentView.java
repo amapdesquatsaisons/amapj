@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -22,18 +22,16 @@
 
 import java.util.List;
 
-import com.vaadin.navigator.View;
-import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
 
 import fr.amapj.service.services.listeproducteurreferent.DetailProducteurDTO;
 import fr.amapj.service.services.listeproducteurreferent.ListeProducteurReferentService;
 import fr.amapj.service.services.producteur.ProdUtilisateurDTO;
 import fr.amapj.service.services.utilisateur.util.UtilisateurUtil;
+import fr.amapj.view.engine.template.FrontOfficeView;
 
 
 /**
@@ -42,69 +40,70 @@ import fr.amapj.service.services.utilisateur.util.UtilisateurUtil;
  *  
  *
  */
-public class ListeProducteurReferentView extends Panel implements View
+public class ListeProducteurReferentView extends FrontOfficeView
 {
-	VerticalLayout layout = null;
+	
+	
+	
+	static private String LABEL_TITRE = "titre";
+	static private String LABEL_LIGNE = "ligne";
+		
+	static private String PANEL_PRODUCTEUR = "producteur";
+
+	
+	public String getMainStyleName()
+	{
+		return "producteurreferent";
+	}
 
 	/**
 	 * 
 	 */
 	@Override
-	public void enter(ViewChangeEvent event)
+	public void enter()
 	{
-		setSizeFull();
-		refresh();
-	}
-
-	
-	/**
-	 * Ajoute un label sur toute la largeur à la ligne indiquée
-	 */
-	private Label addLabel(VerticalLayout layout, String str)
-	{
-		Label tf = new Label(str);
-		tf.addStyleName(ChameleonTheme.LABEL_H1);
-		layout.addComponent(tf);
-		return tf;
 		
-	}
-
-
-	private void refresh()
-	{
 		List<DetailProducteurDTO> dtos = new ListeProducteurReferentService().getAllProducteurs();
 		
-		
-		layout = new VerticalLayout();
 		
 		
 		for (DetailProducteurDTO detailProducteurDTO : dtos)
 		{
-			// Le titre
-			addLabel(layout,"Producteur : "+detailProducteurDTO.nom);
+			Panel p0 = new Panel();
+			p0.setWidth("100%");
+			p0.addStyleName(PANEL_PRODUCTEUR);
 			
-			String str = detailProducteurDTO.description;
+			VerticalLayout vl1 = new VerticalLayout();
+			vl1.setMargin(true);
+			p0.setContent(vl1);
+			addComponent(p0);
+			
+			// Le titre		
+			String str = "Producteur : "+detailProducteurDTO.nom;
+			Label l = new Label(str, ContentMode.HTML);
+			l.addStyleName(LABEL_TITRE);
+			vl1.addComponent(l);
+			
+			
+			
+			str = detailProducteurDTO.description;
 			if (str!=null)
 			{
-				Label tf =new Label(str, ContentMode.HTML);
-				tf.addStyleName(ChameleonTheme.LABEL_H4);
-				layout.addComponent(tf);
+				l =new Label(str, ContentMode.HTML);
+				l.addStyleName(LABEL_LIGNE);
+				vl1.addComponent(l);
 			}
 			
 			str = formatUtilisateur(detailProducteurDTO.utilisateurs);
-			layout.addComponent(new Label(str, ContentMode.HTML));
+			l =new Label(str, ContentMode.HTML);
+			l.addStyleName(LABEL_LIGNE);
+			vl1.addComponent(l);
 			
 			str = formatReferent(detailProducteurDTO.referents);
-			layout.addComponent(new Label(str, ContentMode.HTML));
+			l =new Label(str, ContentMode.HTML);
+			l.addStyleName(LABEL_LIGNE);
+			vl1.addComponent(l);
 		}
-		
-		// 
-		
-		layout.setMargin(true);
-		layout.setSpacing(true);
-		
-		setContent(layout);
-		addStyleName(ChameleonTheme.PANEL_BORDERLESS);
 	}
 	
 	

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -25,11 +25,10 @@ import java.text.SimpleDateFormat;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.themes.ChameleonTheme;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.VerticalLayout;
 
 import fr.amapj.service.services.gestioncotisation.GestionCotisationService;
 import fr.amapj.service.services.gestioncotisation.PeriodeCotisationDTO;
@@ -38,13 +37,13 @@ import fr.amapj.service.services.mescontrats.MesContratsDTO;
 import fr.amapj.view.engine.popup.suppressionpopup.PopupSuppressionListener;
 import fr.amapj.view.engine.popup.suppressionpopup.SuppressionPopup;
 import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
+import fr.amapj.view.engine.tools.BaseUiTools;
+import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
 
 
 /**
- * Page permettant à l'utilisateur de gérer ses contrats
+ * Page permettant à l'utilisateur de gérer son adhesion 
  * 
- *  
- *
  */
 public class MesContratsViewAdhesionPart implements PopupSuppressionListener
 {
@@ -61,33 +60,10 @@ public class MesContratsViewAdhesionPart implements PopupSuppressionListener
 	}
 
 	
-	/**
-	 * Ajoute un label sur toute la largeur à la ligne indiquée
-	 */
-	private Label addLabel(GridLayout layout, String str,int row1)
-	{
-		Label tf = new Label(str);
-		tf.addStyleName(ChameleonTheme.LABEL_H1);
-		layout.addComponent(tf, 0, row1, 3, row1);
-		return tf;
-		
-	}
-	
-
-
 	private Button addButtonAdhesionAdherer(String str)
 	{
 		Button b = new Button(str);
-		b.addStyleName(ChameleonTheme.BUTTON_BIG);
-		b.addClickListener(new ClickListener()
-		{
-			
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				handleAdhesionAdherer();
-			}
-		});
+		b.addClickListener(e -> handleAdhesionAdherer());
 		return b;
 	}
 	
@@ -102,16 +78,7 @@ public class MesContratsViewAdhesionPart implements PopupSuppressionListener
 	private Button addButtonAdhesionVoir(String str)
 	{
 		Button b = new Button(str);
-		b.addStyleName(ChameleonTheme.BUTTON_BIG);
-		b.addClickListener(new ClickListener()
-		{
-			
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				handleAdhesionVoir();
-			}
-		});
+		b.addClickListener(e -> handleAdhesionVoir());
 		return b;
 	}
 	
@@ -125,16 +92,7 @@ public class MesContratsViewAdhesionPart implements PopupSuppressionListener
 	private Button addButtonAdhesionSupprimer(String str)
 	{
 		Button b = new Button(str);
-		b.addStyleName(ChameleonTheme.BUTTON_BIG);
-		b.addClickListener(new ClickListener()
-		{
-			
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				handleAdhesionSupprimer();
-			}
-		});
+		b.addClickListener(e ->	handleAdhesionSupprimer());
 		return b;
 	}
 	
@@ -155,7 +113,7 @@ public class MesContratsViewAdhesionPart implements PopupSuppressionListener
 
 
 
-	public int addAhesionInfo(GridLayout layout,int index)
+	public void addAhesionInfo(VerticalLayout layout)
 	{
 		MesContratsDTO mesContratsDTO = view.mesContratsDTO;
 		
@@ -164,41 +122,71 @@ public class MesContratsViewAdhesionPart implements PopupSuppressionListener
 		// Information sur le renouvellement de l'adhésion
 		if (mesContratsDTO.adhesionDTO.displayAdhesionTop())
 		{
-			// Le titre
-			addLabel(layout,"Renouvellement de votre adhésion à l'AMAP",index);
-			index++;
+			
+			Label lab = new Label("Renouvellement de votre adhésion à l'AMAP");
+			lab.addStyleName(MesContratsView.LABEL_RUBRIQUE);
+			layout.addComponent(lab);
+			
+			Panel p = new Panel();
+			p.addStyleName(MesContratsView.PANEL_UNCONTRAT);
+			
+			HorizontalLayout hl = new HorizontalLayout();
+			hl.setMargin(true);
+			hl.setSpacing(true);
+			hl.setWidth("100%");
+			
+			VerticalLayout vl = new VerticalLayout();
+			Label lab1 = new Label("Adhésion pour "+mesContratsDTO.adhesionDTO.periodeCotisationDTO.nom);
+			lab1.addStyleName(MesContratsView.LABEL_TITRECONTRAT);
+			vl.addComponent(lab1);
+						
 			
 			String str = formatLibelleAdhesion(mesContratsDTO.adhesionDTO);
+			BaseUiTools.addHtmlLabel(vl, str, "libelle-contrat");
 			
-			layout.addComponent(new Label(str, ContentMode.HTML),0,index);
+			
+			hl.addComponent(vl);
+			hl.setExpandRatio(vl, 1);
+			
+			VerticalLayout vl2 = new VerticalLayout();
+			vl2.setWidth("115px");
+			vl2.setSpacing(true);	
+
+			hl.addComponent(vl2);
+			hl.setComponentAlignment(vl2, Alignment.MIDDLE_CENTER);
+
 			
 			if (mesContratsDTO.adhesionDTO.isCotisant())	
 			{
-				Button v = addButtonAdhesionVoir("Voir");
-				layout.addComponent(v,1,index);
-				layout.setComponentAlignment(v, Alignment.MIDDLE_CENTER);
-				
 				Button b = addButtonAdhesionAdherer("Modifier");
-				layout.addComponent(b,2,index);
-				layout.setComponentAlignment(b, Alignment.MIDDLE_CENTER);
-				
+				b.setWidth("100%");
+				vl2.addComponent(b);	
+			
 				b = addButtonAdhesionSupprimer("Supprimer");
-				layout.addComponent(b,3,index);
-				layout.setComponentAlignment(b, Alignment.MIDDLE_CENTER);
+				b.setWidth("100%");
+				vl2.addComponent(b);
+				
+				Button v = addButtonAdhesionVoir("Voir");
+				v.setWidth("100%");
+				v.addStyleName(MesContratsView.BUTTON_PRINCIPAL);
+				vl2.addComponent(v);
 				
 			}
 			else
 			{
 				Button b = addButtonAdhesionAdherer("Adhérer");
-				layout.addComponent(b,1,index);
-				layout.setComponentAlignment(b, Alignment.MIDDLE_CENTER);
+				b.addStyleName(MesContratsView.BUTTON_PRINCIPAL);
+				b.setWidth("100%");
+				vl2.addComponent(b);
 			}
 			
-			index++;
+			p.setContent(hl);
+			layout.addComponent(p);
+			
 			
 		}
 		
-		return index;
+		
 		
 	}
 	
@@ -212,7 +200,7 @@ public class MesContratsViewAdhesionPart implements PopupSuppressionListener
 		
 		PeriodeCotisationDTO p = adhesionDTO.periodeCotisationDTO;
 		// Ligne 0
-		String str = "<h4>Adhésion pour "+p.nom+"</h4>";
+		String str = "";
 		
 		// Ligne 1
 		
@@ -220,19 +208,20 @@ public class MesContratsViewAdhesionPart implements PopupSuppressionListener
 		//  
 		if (adhesionDTO.isCotisant())
 		{
-			str = str+"Vous avez renouvelé votre adhésion à l'AMAP.<br/>Vous pouvez modifier votre choix  jusqu'au "+df.format(p.dateFinInscription)+ " minuit.";
+			str = str+"Vous avez renouvelé votre adhésion à l'AMAP. Montant : "
+					 +new CurrencyTextFieldConverter().convertToString(adhesionDTO.periodeCotisationUtilisateurDTO.montantAdhesion)+" €"
+					 + "<br/>Vous pouvez modifier votre choix  jusqu'au "+df.format(p.dateFinInscription)+ " minuit.";
 		}
 		else
 		{
 			str = str +"Il est temps d'adhérer pour la nouvelle saison !<br/>";
 			
-			str = str+"Cette adhésion couvre la période du "+df2.format(p.dateDebut)+" au "+df2.format(p.dateFin);
+			str = str+"<b>Cette adhésion couvre la période du "+df2.format(p.dateDebut)+" au "+df2.format(p.dateFin)+"</b>";
 			
 			str=str+"<br/>";
 			str = str+"Vous avez jusqu'au  "+df.format(p.dateFinInscription)+ " minuit pour adhérer à l'AMAP.";
 		}
 		
-		str=str+"<br/>";
 		str=str+"<br/>";
 		
 		return str;

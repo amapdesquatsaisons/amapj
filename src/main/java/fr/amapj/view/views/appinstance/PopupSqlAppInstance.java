@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -25,6 +25,7 @@ import java.util.List;
 
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.vaadin.data.util.BeanItem;
+import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.TextArea;
 
@@ -33,6 +34,7 @@ import fr.amapj.service.services.appinstance.AppInstanceService;
 import fr.amapj.service.services.appinstance.SqlRequestDTO;
 import fr.amapj.service.services.appinstance.SqlRequestDTO.DataBaseResponseDTO;
 import fr.amapj.service.services.appinstance.SqlRequestDTO.ResponseDTO;
+import fr.amapj.service.services.appinstance.SqlRequestDTO.SqlType;
 import fr.amapj.view.engine.popup.formpopup.OnSaveException;
 import fr.amapj.view.engine.popup.formpopup.WizardFormPopup;
 
@@ -62,8 +64,7 @@ public class PopupSqlAppInstance extends WizardFormPopup
 	{
 		
 		popupTitle = "Executer des requetes SQL";
-		popupWidth = "90%";
-		popupHeight = "80%";
+		setWidth(90);
 		saveButtonTitle = "OK";
 		this.appInstanceDTOs = appInstanceDTOs;
 		
@@ -106,9 +107,13 @@ public class PopupSqlAppInstance extends WizardFormPopup
 		
 		// Titre
 		setStepTitle("informations");
+
+		// Champ 1 : le type de requetes
+		addComboEnumField("Type des requetes", "sqlType");
+
 		
-		// Champ 1
 		
+		// Champ 2
 		String str = "Cet outil permet d'executer X requetes SQL sur les bases sélectionnées<br/><br/>";
 		
 		str = str +"Le nombre de bases est : "+appInstanceDTOs.size()+" bases<br/><br/>";
@@ -118,7 +123,6 @@ public class PopupSqlAppInstance extends WizardFormPopup
 		{
 			str = str+ appInstanceDTO.nomInstance+"<br/>";
 		}
-					
 		
 		addLabel(str, ContentMode.HTML);
 		
@@ -196,7 +200,7 @@ public class PopupSqlAppInstance extends WizardFormPopup
 		String str = "";
 		if (selected.success)
 		{	
-			str = str+"SUCCESS <br/><br/>";
+			str = str+"SUCCESS <br/><br/>";		
 		}
 		else
 		{
@@ -231,6 +235,27 @@ public class PopupSqlAppInstance extends WizardFormPopup
 		{	
 			str = str+"Requete "+responseDTO.index+" : "+responseDTO.sqlRequest+"<br/>";
 			str = str + SafeHtmlUtils.htmlEscape(responseDTO.sqlResponse)+"<br/><br/>";
+			if (selected.sqlType==SqlType.REQUETE_SQL_STANDARD)
+			{
+				str = str+"<table>";
+				List<List<String>> lines = responseDTO.sqlResultSet;
+				for (List<String> ls : lines)
+				{
+					str = str+" <tr>";
+					for (String string : ls)
+					{
+						if (string!=null)
+						{
+							string = SafeHtmlUtils.htmlEscape(string);
+						}
+						str = str +  "<td>"+string+"</td>";
+					}
+					str = str+" </tr>";
+				}
+				str = str+" </table>";
+				str = str+"<br/><br/>";
+			}
+			
 		}
 		return str;
 	}

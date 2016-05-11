@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -33,7 +33,6 @@ import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
-import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
@@ -45,7 +44,6 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.Align;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
 
 import fr.amapj.service.services.excelgenerator.EGRemise;
 import fr.amapj.service.services.remiseproducteur.PaiementRemiseDTO;
@@ -53,10 +51,12 @@ import fr.amapj.service.services.remiseproducteur.RemiseDTO;
 import fr.amapj.service.services.remiseproducteur.RemiseProducteurService;
 import fr.amapj.view.engine.excelgenerator.TelechargerPopup;
 import fr.amapj.view.engine.popup.corepopup.CorePopup;
+import fr.amapj.view.engine.popup.corepopup.CorePopup.ColorStyle;
 import fr.amapj.view.engine.popup.messagepopup.MessagePopup;
 import fr.amapj.view.engine.popup.suppressionpopup.PopupSuppressionListener;
 import fr.amapj.view.engine.popup.suppressionpopup.SuppressionPopup;
 import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
+import fr.amapj.view.engine.template.BackOfficeView;
 import fr.amapj.view.engine.tools.DateTimeToStringConverter;
 import fr.amapj.view.engine.tools.DateToStringConverter;
 import fr.amapj.view.engine.tools.TableTools;
@@ -68,7 +68,7 @@ import fr.amapj.view.views.common.contratselector.IContratSelectorPart;
 /**
  * Gestion des remises 
  */
-public class RemiseProducteurListPart extends VerticalLayout implements ComponentContainer , View ,  PopupSuppressionListener , IContratSelectorPart
+public class RemiseProducteurListPart extends BackOfficeView implements ComponentContainer ,   PopupSuppressionListener , IContratSelectorPart
 {
 	
 	private TextField searchField;
@@ -92,20 +92,13 @@ public class RemiseProducteurListPart extends VerticalLayout implements Componen
 	
 	
 	@Override
-	public void enter(ViewChangeEvent event)
+	public void enterIn(ViewChangeEvent event)
 	{
-		setSizeFull();
-		buildMainArea();
-	}
-	
-
-	private void buildMainArea()
-	{
-		// 
+		 
 		mcInfos = new BeanItemContainer<RemiseDTO>(RemiseDTO.class);
 			
 		// Bind it to a component
-		cdesTable = new Table("", mcInfos);
+		cdesTable = createTable(mcInfos);
 		
 		// Titre des colonnes
 		cdesTable.setVisibleColumns(new Object[] { "moisRemise", "dateCreation" , "dateReelleRemise" , "mnt" });
@@ -160,14 +153,16 @@ public class RemiseProducteurListPart extends VerticalLayout implements Componen
 		
 		Label title2 = new Label(str);
 		title2.setSizeUndefined();
-		title2.addStyleName("h1");
+		title2.addStyleName("stdlistpart-text-title");
 		
 		// Partie choix du contrat
 		contratSelectorPart = new ContratSelectorPart(this);
 		HorizontalLayout toolbar1 = contratSelectorPart.getChoixContratComponent();
+		toolbar1.addStyleName("stdlistpart-hlayout-contratselector");
 		
 		// Partie bouton
 		HorizontalLayout toolbar2 = new HorizontalLayout();
+		toolbar2.addStyleName("stdlistpart-hlayout-button");
 		
 		
 		newButton = new Button("Faire une remise");
@@ -252,10 +247,6 @@ public class RemiseProducteurListPart extends VerticalLayout implements Componen
 		addComponent(toolbar2);
 		addComponent(cdesTable);
 		setExpandRatio(cdesTable, 1);
-		setSizeFull();
-		
-		setMargin(true);
-		setSpacing(true);
 		
 		contratSelectorPart.fillAutomaticValues();
 
@@ -265,7 +256,7 @@ public class RemiseProducteurListPart extends VerticalLayout implements Componen
 	private void handleTelecharger()
 	{
 		RemiseDTO remiseDTO = (RemiseDTO) cdesTable.getValue();
-		TelechargerPopup popup = new TelechargerPopup();
+		TelechargerPopup popup = new TelechargerPopup("Remise à un producteur");
 		popup.addGenerator(new EGRemise(remiseDTO.id));
 		CorePopup.open(popup,this);
 	}
@@ -276,7 +267,7 @@ public class RemiseProducteurListPart extends VerticalLayout implements Componen
 	{
 		RemiseDTO remiseDTO = (RemiseDTO) cdesTable.getValue();
 		String str = formatRemise(remiseDTO.id);
-		MessagePopup.open(new MessagePopup("Visualisation d'une remise", ContentMode.HTML, str));	
+		MessagePopup.open(new MessagePopup("Visualisation d'une remise", ContentMode.HTML, ColorStyle.GREEN,str));	
 	}
 	
 	
@@ -308,7 +299,7 @@ public class RemiseProducteurListPart extends VerticalLayout implements Componen
 		}
 		else
 		{
-			MessagePopup.open(new MessagePopup("Impossible de faire la remise.", ContentMode.HTML,"Il n'est pas possible de faire la remise à cause de :",remiseDTO.messageRemiseFailed));
+			MessagePopup.open(new MessagePopup("Impossible de faire la remise.", ContentMode.HTML,ColorStyle.RED,"Il n'est pas possible de faire la remise à cause de :",remiseDTO.messageRemiseFailed));
 		}
 	}
 	

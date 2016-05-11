@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -22,8 +22,6 @@
 
 import com.ejt.vaadin.loginform.LoginForm;
 import com.vaadin.server.ExternalResource;
-import com.vaadin.server.Resource;
-import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -31,69 +29,56 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
 
-import fr.amapj.common.DebugUtil;
 import fr.amapj.service.services.authentification.PasswordManager;
 import fr.amapj.service.services.parametres.ParametresService;
 import fr.amapj.view.engine.popup.formpopup.FormPopup;
+import fr.amapj.view.engine.tools.BaseUiTools;
 import fr.amapj.view.engine.ui.AmapUI;
+import fr.amapj.view.engine.ui.ValoMenuLayout;
 
 public class LoginPart
 {
 	private PasswordManager passwordManager = new PasswordManager();
-	
-	public GridLayout loginLayout = new GridLayout(8, 8);
 		
 	private AmapUI ui;
+	
+	private int nbComposant = 6;
 	
 	public LoginPart()
 	{
 		
 	}
 	
-	public void buildLoginView(boolean exit,CssLayout root,AmapUI ui,String loginFromUrl,String passwordFromUrl,String sudo)
+	public void buildLoginView(ValoMenuLayout root,AmapUI ui,String loginFromUrl,String passwordFromUrl,String sudo)
 	{
 		this.ui = ui;
-		if (exit)
-		{
-			root.removeAllComponents();
-		}
+		CssLayout loginAera = root.prepareForLoginPage();
 		
-
-		loginLayout.removeAllComponents();
+		VerticalLayout loginLayout = new VerticalLayout();
 		loginLayout.setSizeFull();
 		
-		root.addComponent(loginLayout);
+	
+		loginAera.setStyleName("login-backgroundimage");
+		loginAera.addComponent(loginLayout);
 		
-		
-		// Bandeau du haut
+		// Recuperation des parametres
 		String nomAmap = new ParametresService().getParametres().nomAmap;
-		String message  = "<h1>"+nomAmap+"</h1>";
-		Panel bandeau = new Panel(message);
-		bandeau.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
-		loginLayout.addComponent(bandeau,0,0,7,0);
+		ui.getPage().setTitle(nomAmap); 
 		
-		
-		// Image sur la partie droite (panier)
-		Resource res = new ThemeResource("img/panier.png");
-		Image image = new Image(null, res);
-		image.setSizeFull();
-		loginLayout.addComponent(image,1,2,3,5);
-		
-		// Zone de saisie login/password sur la gauche	
-		MyLoginForm myLoginForm = new MyLoginForm(loginFromUrl,passwordFromUrl,sudo);
-		myLoginForm.setWidth("100%");
-		loginLayout.addComponent(myLoginForm,5,2,6,5);
+		// Zone de saisie login/password 
+		MyLoginForm myLoginForm = new MyLoginForm(loginFromUrl,passwordFromUrl,sudo,nomAmap);
+		myLoginForm.addStyleName("login-layout");
+		loginLayout.addComponent(myLoginForm);
+		loginLayout.setComponentAlignment(myLoginForm, Alignment.MIDDLE_CENTER);
+		loginLayout.setExpandRatio(myLoginForm, 10);
 		
 		Label l1 = new Label("Application fonctionnant avec AmapJ - ");
 		Link link = new Link("Plus d'infos", new ExternalResource("http://amapj.fr"));
@@ -106,9 +91,9 @@ public class LoginPart
 		hL.setComponentAlignment(link, Alignment.MIDDLE_CENTER);
 		hL.setMargin(true);
 		
-		loginLayout.addComponent(hL,0,7,7,7);
+		loginLayout.addComponent(hL);
 		loginLayout.setComponentAlignment(hL, Alignment.BOTTOM_CENTER);
-		
+		loginLayout.setExpandRatio(hL, 1);
 		
 		// Si les deux champs ont été remplis on tente une validation automatique
 		if ((passwordFromUrl!=null) && (loginFromUrl!=null))
@@ -138,27 +123,45 @@ public class LoginPart
     	String loginFromUrl;
     	String passwordFromUrl;
     	String sudo;
+    	String nomAmap;
     	
     	VerticalLayout layout;
     	TextField userNameField;
     	
-		public MyLoginForm(String loginFromUrl, String passwordFromUrl,	String sudo) 
+    	
+		public MyLoginForm(String loginFromUrl, String passwordFromUrl,	String sudo,String nomAmap) 
 		{
 			this.loginFromUrl = loginFromUrl;
 			this.passwordFromUrl = passwordFromUrl;
 			this.sudo = sudo;
+			this.nomAmap = nomAmap;
 		}
 
 		@Override
         protected Component createContent(TextField userNameField, PasswordField passwordField, Button loginButton) 
         {
+			Panel p = new Panel();
+			p.setWidth("100%");
+			
             layout = new VerticalLayout();
             layout.setSpacing(true);
             layout.setMargin(true);
+            layout.setSizeFull();
             
+            p.setContent(layout);
+            
+           
+            
+            Label section = new Label(nomAmap);
+            section.addStyleName("h2");
+            section.addStyleName("colored");
+            section.setSizeUndefined();
+            layout.addComponent(section);
+            layout.setComponentAlignment(section, Alignment.MIDDLE_CENTER);
+
             this.userNameField = userNameField;
             userNameField.setCaption("Adresse Email");
-            userNameField.setStyleName(ChameleonTheme.TEXTFIELD_BIG);
+            userNameField.setStyleName("name");
             userNameField.setWidth("100%");
             userNameField.setId("amapj.login.email");
     		if (loginFromUrl!=null)
@@ -168,7 +171,7 @@ public class LoginPart
     		layout.addComponent(userNameField);
 
     		passwordField.setCaption("Mot de passe");
-    		passwordField.setStyleName(ChameleonTheme.TEXTFIELD_BIG);
+    		passwordField.setStyleName("password");
     		passwordField.setWidth("100%");
     		passwordField.setId("amapj.login.password");
     		if (passwordFromUrl!=null)
@@ -186,22 +189,29 @@ public class LoginPart
     			passwordField.focus();
     		}
 
+    		BaseUiTools.addEmptyLine(layout);
+    		if (BaseUiTools.isCompactMode()==false)
+    		{
+    			BaseUiTools.addEmptyLine(layout);
+    			nbComposant++;
+    		}
+    		
     		loginButton.setCaption("S'identifier");
     		loginButton.setId("amapj.login.signin");
     		if (sudo!=null)
     		{
     			loginButton.setCaption("SUDO");
     		}
+    		loginButton.addStyleName("primary");
     		
-    		loginButton.addStyleName(ChameleonTheme.BUTTON_BIG);
-    		loginButton.addStyleName(ChameleonTheme.BUTTON_DEFAULT);
+    		
     		layout.addComponent(loginButton);
-    		layout.setComponentAlignment(loginButton, Alignment.BOTTOM_LEFT);
+    		layout.setComponentAlignment(loginButton, Alignment.MIDDLE_CENTER);
     		
     		
-    		Button lostPwd = new Button("Mot de passe perdu");
-    		lostPwd.addStyleName(ChameleonTheme.BUTTON_BIG);
-    		lostPwd.addStyleName(ChameleonTheme.BUTTON_LINK);
+    		Button lostPwd = new Button("Mot de passe perdu ?");
+    		lostPwd.addStyleName("link");
+    		lostPwd.addStyleName("perdu");
     		layout.addComponent(lostPwd);
     		layout.setComponentAlignment(lostPwd, Alignment.BOTTOM_LEFT);
     		
@@ -215,7 +225,7 @@ public class LoginPart
     				handleLostPwd();
     			}
     		});
-            return layout;
+            return p;
         }
 
  
@@ -230,18 +240,15 @@ public class LoginPart
     			ui.buildMainView();
     		} 
     		else
-    		{
-    			
-    			// Sinon on affiche le probleme
-    			if (layout.getComponentCount() > 4)
+    		{	
+    			if (layout.getComponentCount() > nbComposant)
     			{
     				// Remove the previous error message
-    				layout.removeComponent(layout.getComponent(4));
+    				layout.removeComponent(layout.getComponent(nbComposant));
     			}
     			// Add new error message
     			Label error = new Label(msg, ContentMode.HTML);
-    			error.addStyleName(ChameleonTheme.LABEL_ERROR);
-    			error.addStyleName(ChameleonTheme.LABEL_BIG);
+    			error.addStyleName("failure");
     			error.setSizeUndefined();
     			layout.addComponent(error);
     			userNameField.focus();

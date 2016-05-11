@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -42,9 +42,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
 
-import fr.amapj.service.services.excelgenerator.EGListeAdherent;
 import fr.amapj.service.services.excelgenerator.EGPlanningPermanence;
 import fr.amapj.service.services.saisiepermanence.PermanenceDTO;
 import fr.amapj.service.services.saisiepermanence.PermanenceService;
@@ -52,6 +50,7 @@ import fr.amapj.view.engine.excelgenerator.LinkCreator;
 import fr.amapj.view.engine.popup.suppressionpopup.PopupSuppressionListener;
 import fr.amapj.view.engine.popup.suppressionpopup.SuppressionPopup;
 import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
+import fr.amapj.view.engine.template.BackOfficeView;
 import fr.amapj.view.engine.tools.DateToStringConverter;
 import fr.amapj.view.engine.tools.TableTools;
 
@@ -61,7 +60,7 @@ import fr.amapj.view.engine.tools.TableTools;
  *
  */
 @SuppressWarnings("serial")
-public class SaisiePermanenceListPart extends VerticalLayout implements ComponentContainer , View ,  PopupSuppressionListener
+public class SaisiePermanenceListPart extends BackOfficeView implements ComponentContainer , View ,  PopupSuppressionListener
 {
 
 	private TextField searchField;
@@ -86,21 +85,14 @@ public class SaisiePermanenceListPart extends VerticalLayout implements Componen
 	
 	
 	@Override
-	public void enter(ViewChangeEvent event)
+	public void enterIn(ViewChangeEvent event)
 	{
-		setSizeFull();
-		buildMainArea();
-	}
-	
 
-	private void buildMainArea()
-	{
 		// Lecture dans la base de données
 		mcInfos = new BeanItemContainer<PermanenceDTO>(PermanenceDTO.class);
 			
 		// Bind it to a component
-		cdesTable = new Table("", mcInfos);
-		cdesTable.setStyleName("big strong");
+		cdesTable = createTable(mcInfos);
 		
 				
 		// Titre des colonnes
@@ -145,11 +137,12 @@ public class SaisiePermanenceListPart extends VerticalLayout implements Componen
 		});
 
 		HorizontalLayout toolbar = new HorizontalLayout();
+		toolbar.addStyleName("stdlistpart-hlayout-button");
 		
 		
 		Label title2 = new Label("Planning des permanences");
 		title2.setSizeUndefined();
-		title2.addStyleName("h1");	
+		title2.addStyleName("stdlistpart-text-title");	
 		
 		newButton = new Button("Créer une nouvelle permanence");
 		newButton.addClickListener(new Button.ClickListener()

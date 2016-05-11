@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -24,7 +24,6 @@ import com.vaadin.data.util.converter.Converter.ConversionException;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
@@ -32,6 +31,7 @@ import fr.amapj.model.models.param.ChoixOuiNon;
 import fr.amapj.model.models.param.paramecran.PEReceptionCheque;
 import fr.amapj.service.services.gestioncontratsigne.ContratSigneDTO;
 import fr.amapj.service.services.mescontrats.MesContratsService;
+import fr.amapj.view.engine.notification.NotificationHelper;
 import fr.amapj.service.services.parametres.ParametresService;
 import fr.amapj.view.engine.popup.okcancelpopup.OKCancelPopup;
 import fr.amapj.view.engine.tools.BaseUiTools;
@@ -100,7 +100,8 @@ public class PopupSaisieAvoir extends OKCancelPopup
 		}
 		catch (ConversionException e)
 		{
-			Notification.show("Erreur de saisie");
+			
+			NotificationHelper.displayNotification("Erreur de saisie");
 			return false;
 		}
 				

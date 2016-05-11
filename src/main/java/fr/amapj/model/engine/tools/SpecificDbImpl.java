@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -23,12 +23,12 @@
 
 
 /**
- * Utilitaires pour les demons
+ * Utilitaires pour les appeles specifiques dans une base
  * 
  */
-public interface SpecificDbImpl 
+public interface SpecificDbImpl<RESULT> 
 {
 	
-	public Object perform();
+	public RESULT perform() throws Exception;
 		
 }

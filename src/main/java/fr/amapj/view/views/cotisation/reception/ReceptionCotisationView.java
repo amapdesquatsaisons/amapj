@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -53,6 +53,7 @@ import fr.amapj.view.engine.popup.corepopup.CorePopup;
 import fr.amapj.view.engine.popup.suppressionpopup.PopupSuppressionListener;
 import fr.amapj.view.engine.popup.suppressionpopup.SuppressionPopup;
 import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
+import fr.amapj.view.engine.template.BackOfficeView;
 import fr.amapj.view.engine.tools.DateToStringConverter;
 import fr.amapj.view.engine.tools.TableTools;
 import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
@@ -63,7 +64,7 @@ import fr.amapj.view.views.cotisation.PeriodeCotisationSelectorPart;
  * Gestion de la réception des cotisations
  *
  */
-public class ReceptionCotisationView extends VerticalLayout implements ComponentContainer , View ,  PopupSuppressionListener 
+public class ReceptionCotisationView extends BackOfficeView implements ComponentContainer , View ,  PopupSuppressionListener 
 {
 
 	private TextField searchField;
@@ -88,14 +89,7 @@ public class ReceptionCotisationView extends VerticalLayout implements Component
 	
 	
 	@Override
-	public void enter(ViewChangeEvent event)
-	{
-		setSizeFull();
-		buildMainArea();
-	}
-	
-
-	private void buildMainArea()
+	public void enterIn(ViewChangeEvent event)
 	{
 		periodeSelector = new PeriodeCotisationSelectorPart(this);
 		
@@ -103,8 +97,7 @@ public class ReceptionCotisationView extends VerticalLayout implements Component
 		mcInfos = new BeanItemContainer<PeriodeCotisationUtilisateurDTO>(PeriodeCotisationUtilisateurDTO.class);
 			
 		// Bind it to a component
-		cdesTable = new Table("", mcInfos);
-		cdesTable.setStyleName("big strong");
+		cdesTable = createTable(mcInfos);
 		
 		
 		// Titre des colonnes
@@ -160,11 +153,12 @@ public class ReceptionCotisationView extends VerticalLayout implements Component
 		});
 
 		HorizontalLayout toolbar = new HorizontalLayout();
+		toolbar.addStyleName("stdlistpart-hlayout-button");
 		
 		
 		Label title2 = new Label("Réception des cotisations");
 		title2.setSizeUndefined();
-		title2.addStyleName("h1");	
+		title2.addStyleName("stdlistpart-text-title");	
 		
 		newButton = new Button("Ajouter une cotisation");
 		newButton.addClickListener(new Button.ClickListener()
@@ -260,9 +254,7 @@ public class ReceptionCotisationView extends VerticalLayout implements Component
 		addComponent(toolbar);
 		addComponent(cdesTable);
 		setExpandRatio(cdesTable, 1);
-		setSizeFull();
-		setMargin(true);
-		setSpacing(true);
+		
 		
 		refreshTable();
 
@@ -315,7 +307,7 @@ public class ReceptionCotisationView extends VerticalLayout implements Component
 	private void handleTelecharger()
 	{
 		Long idPeriode = periodeSelector.getPeriodeId();
-		TelechargerPopup popup = new TelechargerPopup();
+		TelechargerPopup popup = new TelechargerPopup("Réception des cotisations");
 		popup.addGenerator(new EGBilanAdhesion(idPeriode));
 		CorePopup.open(popup,this);
 	}

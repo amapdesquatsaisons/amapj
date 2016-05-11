@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -149,18 +149,40 @@ public class CollectionUtils
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	/**
+	 * Convertit une liste d'objet en une String , EN CONSERVANT LE SEPARATEUR FINAL
+	 * POUR LE DERNIER ELEMENT
+	 *  
+	 * Exemple : ls = [ "Bob" , "Marc" , "Paul" ]
+	 * 
+	 *  asString(ls,",") =>  "Bob,Marc,Paul,"
+	 *  
+	 *  Si la liste est vide, retourne la chaine vide
+	 * 
+	 */
+	public static <T> String asStringFinalSep(List<T> ls,String sep,ToString<T> f)
+	{
+		if (ls.size()==0)
+		{
+			return "";
+		}
+		
+		StringBuffer str = new StringBuffer();
+		for (int i = 0; i < ls.size(); i++)
+		{
+			T l = ls.get(i);
+			if (l!=null)
+			{
+				str.append(f.toString(l));
+			}
+			else
+			{
+				str.append("null");
+			}
+			str.append(sep);
+		}	
+		return str.toString();
+	}
 	
 	
 	

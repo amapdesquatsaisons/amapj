@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -21,25 +21,20 @@
  package fr.amapj.view.engine.popup.messagepopup;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.ui.VerticalLayout;
 
 import fr.amapj.view.engine.popup.corepopup.CorePopup;
 
 /**
- * Popup permettant d'afficher un message , avec 1 bouton OK
+ * Popup permettant d'afficher un message ou une liste de message, avec 1 bouton OK
  *  
  */
-@SuppressWarnings("serial")
+
 public class MessagePopup extends CorePopup
 {
 	protected Button okButton;
@@ -48,21 +43,27 @@ public class MessagePopup extends CorePopup
 	
 	private ContentMode contentMode = ContentMode.TEXT;
 	
+	private ColorStyle colorStyle = ColorStyle.RED;
 	
+	
+	/**
+	 * Crée un message popup, par défaut avec un style RED 
+	 */
 	public MessagePopup(String title, List<String> strs)
 	{
 		popupTitle = title;
 		messages.addAll(strs);
 	}
 	
-	public MessagePopup(String title, String ... msgs)
+	public MessagePopup(String title, ColorStyle colorStyle,String ... msgs)
 	{
-		this(title,ContentMode.TEXT,msgs);
+		this(title,ContentMode.TEXT,colorStyle,msgs);
 	}
 	
-	public MessagePopup(String title, ContentMode contentMode,String ... msgs)
+	public MessagePopup(String title, ContentMode contentMode,ColorStyle colorStyle,String ... msgs)
 	{
 		this.contentMode = contentMode;
+		this.colorStyle = colorStyle;
 		popupTitle = title;
 		for (int i = 0; i < msgs.length; i++)
 		{
@@ -73,39 +74,17 @@ public class MessagePopup extends CorePopup
 	
 	protected void createButtonBar()
 	{		
-		okButton = addDefaultButton("OK", new Button.ClickListener()
-		{
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				close();
-			}
-		});
-				
-	
+		okButton = addDefaultButton("OK",e->close());
 	}
 	
 
 	protected void createContent(VerticalLayout contentLayout)
 	{
+		setColorStyle(colorStyle);
 		for (String message : messages)
-		{
-			// Construction de la zone de texte
-			HorizontalLayout hlTexte = new HorizontalLayout();
-			hlTexte.setMargin(true);
-			hlTexte.setSpacing(true);
-			hlTexte.setWidth("100%");
-			
-			
-			Label textArea = new Label(message,contentMode);
-			textArea.setStyleName(ChameleonTheme.TEXTFIELD_BIG);
-			textArea.setWidth("80%");
-			
-			hlTexte.addComponent(textArea);
-			hlTexte.setExpandRatio(textArea, 1);
-			hlTexte.setComponentAlignment(textArea, Alignment.MIDDLE_CENTER);
-			
-			contentLayout.addComponent(hlTexte);
+		{	
+			Label la = new Label(message,contentMode);	
+			contentLayout.addComponent(la);
 		}
 	}
 	

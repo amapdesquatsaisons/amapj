@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -47,6 +47,7 @@ import fr.amapj.service.services.producteur.ProducteurService;
 import fr.amapj.view.engine.popup.suppressionpopup.PopupSuppressionListener;
 import fr.amapj.view.engine.popup.suppressionpopup.SuppressionPopup;
 import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
+import fr.amapj.view.engine.template.BackOfficeView;
 import fr.amapj.view.engine.tools.TableTools;
 
 
@@ -54,7 +55,7 @@ import fr.amapj.view.engine.tools.TableTools;
  * Gestion des utilisateurs
  *
  */
-public class ProducteurBasicForm extends VerticalLayout implements ComponentContainer , View ,  PopupSuppressionListener
+public class ProducteurBasicForm extends BackOfficeView implements ComponentContainer ,   PopupSuppressionListener
 {
 
 	private TextField searchField;
@@ -76,21 +77,14 @@ public class ProducteurBasicForm extends VerticalLayout implements ComponentCont
 	
 	
 	@Override
-	public void enter(ViewChangeEvent event)
+	public void enterIn(ViewChangeEvent event)
 	{
-		setSizeFull();
-		buildMainArea();
-	}
-	
-
-	private void buildMainArea()
-	{
+		
 		// Lecture dans la base de données
 		mcInfos = new BeanItemContainer<ProducteurDTO>(ProducteurDTO.class);
 			
 		// Bind it to a component
-		cdesTable = new Table("", mcInfos);
-		cdesTable.setStyleName("big strong");
+		cdesTable = createTable(mcInfos);
 		
 		
 		// Titre des colonnes
@@ -131,11 +125,11 @@ public class ProducteurBasicForm extends VerticalLayout implements ComponentCont
 		});
 
 		HorizontalLayout toolbar = new HorizontalLayout();
-		
+		toolbar.addStyleName("stdlistpart-hlayout-button");
 		
 		Label title2 = new Label("Liste des producteurs");
 		title2.setSizeUndefined();
-		title2.addStyleName("h1");	
+		title2.addStyleName("stdlistpart-text-title");	
 		
 		newButton = new Button("Créer un nouveau producteur");
 		newButton.setId("amapj.view.producteur."+"new_button");
@@ -204,9 +198,7 @@ public class ProducteurBasicForm extends VerticalLayout implements ComponentCont
 		addComponent(toolbar);
 		addComponent(cdesTable);
 		setExpandRatio(cdesTable, 1);
-		setSizeFull();
-		setMargin(true);
-		setSpacing(true);
+		
 		
 		refreshTable();
 

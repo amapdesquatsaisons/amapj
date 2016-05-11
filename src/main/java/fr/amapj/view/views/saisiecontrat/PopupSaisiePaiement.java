@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -66,8 +66,8 @@ public class PopupSaisiePaiement extends PopupCurrencyVector
 		
 		
 		//
-		popupTitle = "Saisie des paiements pour le contrat "+data.contratDTO.nom;
-		popupWidth ="50%";
+		popupTitle = "Vos paiements pour le contrat "+data.contratDTO.nom;
+		setWidth(50);
 		
 		// 
 		param.readOnly = (data.modeSaisie==ModeSaisie.READ_ONLY);
@@ -91,7 +91,7 @@ public class PopupSaisiePaiement extends PopupCurrencyVector
 			param.excluded[i] = false;
 		}
 		
-		param.largeurCol = 200;
+		param.largeurCol = 170;
 		param.espaceInterCol = 3;
 		
 		// Calcul d'une proposition de paiement si necessaire

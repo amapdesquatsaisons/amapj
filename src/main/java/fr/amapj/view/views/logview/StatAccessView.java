@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -25,17 +25,16 @@ import java.util.List;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
-import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.VerticalLayout;
 
 import fr.amapj.service.services.logview.LogViewService;
 import fr.amapj.service.services.logview.StatAccessDTO;
+import fr.amapj.view.engine.template.BackOfficeView;
 import fr.amapj.view.engine.tools.DateToStringConverter;
 
 
@@ -47,7 +46,7 @@ import fr.amapj.view.engine.tools.DateToStringConverter;
  *
  */
 @SuppressWarnings("serial")
-public class StatAccessView extends VerticalLayout implements View
+public class StatAccessView extends BackOfficeView
 {
 
 	private Table beanTable;
@@ -57,13 +56,12 @@ public class StatAccessView extends VerticalLayout implements View
 	 * 
 	 */
 	@Override
-	public void enter(ViewChangeEvent event)
+	public void enterIn(ViewChangeEvent event)
 	{		
 		listPartContainer = new BeanItemContainer<>(StatAccessDTO.class);
 									
 		// Bind it to a component
-		beanTable = new Table("", listPartContainer);
-		beanTable.setStyleName("big strong");
+		beanTable =createTable(listPartContainer);
 		
 		// Gestion de la liste des colonnes visibles
 		beanTable.setVisibleColumns("date" , "nbAcces" , "nbVisiteur" , "tempsTotal" );
@@ -110,20 +108,17 @@ public class StatAccessView extends VerticalLayout implements View
 		
 		Label title = new Label("Statistiques des accès");
 		title.setSizeUndefined();
-		title.addStyleName("h1");
+		title.addStyleName("stdlistpart-text-title");	
 		
 		toolbar.addComponent(resfresh);
 		
 		toolbar.setWidth("100%");
-
-		setMargin(true);
-		setSpacing(true);
-		
+	
 		addComponent(title);
 		addComponent(toolbar);
 		addComponent(beanTable);
 		setExpandRatio(beanTable, 1);
-		setSizeFull();
+	
 		
 		refresh();
 		

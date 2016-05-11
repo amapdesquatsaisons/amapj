@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -43,6 +43,7 @@ import fr.amapj.service.services.mescontrats.DatePaiementDTO;
 import fr.amapj.service.services.mespaiements.MesPaiementsService;
 import fr.amapj.service.services.parametres.ParametresService;
 import fr.amapj.view.engine.popup.okcancelpopup.OKCancelPopup;
+import fr.amapj.view.engine.tools.BaseUiTools;
 import fr.amapj.view.engine.tools.TableBuilder;
 import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
 
@@ -84,12 +85,19 @@ public class ReceptionChequeEditorPart extends OKCancelPopup
 		peConf = new ParametresService().getPEReceptionCheque();
 		//
 		popupTitle = "Réception chèques";
-		popupWidth ="60%";
+		setWidth(60);
 		
 		// Premiere ligne de texte
 		String msg = "<h2> Réception des chèques de "+c.prenomUtilisateur+" "+c.nomUtilisateur+"</h2>";
 		Label lab = new Label(msg,ContentMode.HTML);
 		contentLayout.addComponent(lab);
+		
+		if(paiements.size()==0)
+		{
+			BaseUiTools.addStdLabel(contentLayout, "Il n'y a pas de chèques à réceptionner.", null);
+			return;
+		}
+		
 		
 		// Construction de l'entete de la table
 		TableBuilder builder = new TableBuilder();
@@ -167,7 +175,6 @@ public class ReceptionChequeEditorPart extends OKCancelPopup
 		}
 		
 
-		t.addStyleName("big");
 		t.setColumnHeaderMode(ColumnHeaderMode.HIDDEN);
 		t.setSelectable(true);
 		t.setSortEnabled(false);
@@ -180,16 +187,8 @@ public class ReceptionChequeEditorPart extends OKCancelPopup
 	@Override
 	protected void createButtonBar()
 	{
-		Button toutOK = addButton("J'ai bien reçu tous les chèques", new Button.ClickListener()
-		{
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				handleToutSelectionner();
-			}
-		});
-		popupButtonBarLayout.setComponentAlignment(toutOK, Alignment.TOP_LEFT);
-		
+		Button toutOK = addButton("J'ai bien reçu tous les chèques", e->handleToutSelectionner());
+		setButtonAlignement(toutOK, Alignment.TOP_LEFT);
 		
 		super.createButtonBar();
 	}

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -31,7 +31,6 @@ import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
-import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -41,7 +40,6 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
 
 import fr.amapj.service.services.excelgenerator.EGFeuilleLivraison;
 import fr.amapj.service.services.excelgenerator.EGSyntheseContrat;
@@ -53,6 +51,7 @@ import fr.amapj.service.services.mescontrats.MesContratsService;
 import fr.amapj.view.engine.excelgenerator.TelechargerPopup;
 import fr.amapj.view.engine.popup.PopupListener;
 import fr.amapj.view.engine.popup.corepopup.CorePopup;
+import fr.amapj.view.engine.template.BackOfficeView;
 import fr.amapj.view.engine.tools.DateToStringConverter;
 import fr.amapj.view.engine.tools.TableTools;
 import fr.amapj.view.views.producteur.ProducteurSelectorPart;
@@ -64,7 +63,7 @@ import fr.amapj.view.views.saisiecontrat.SaisieContrat.ModeSaisie;
  * Gestion des modeles de contrats : création, diffusion, ...
  *
  */
-public class ProducteurContratListPart extends VerticalLayout implements ComponentContainer , View , PopupListener
+public class ProducteurContratListPart extends BackOfficeView implements ComponentContainer  , PopupListener
 {
 
 	private TextField searchField;
@@ -86,15 +85,9 @@ public class ProducteurContratListPart extends VerticalLayout implements Compone
 	
 	
 	@Override
-	public void enter(ViewChangeEvent event)
+	public void enterIn(ViewChangeEvent event)
 	{
-		setSizeFull();
-		buildMainArea();
-	}
-	
-
-	private void buildMainArea()
-	{
+		
 		//
 		producteurSelector = new ProducteurSelectorPart(this);
 		
@@ -102,7 +95,7 @@ public class ProducteurContratListPart extends VerticalLayout implements Compone
 		mcInfos = new BeanItemContainer<ModeleContratSummaryDTO>(ModeleContratSummaryDTO.class);
 			
 		// Bind it to a component
-		cdesTable = new Table("", mcInfos);
+		cdesTable = createTable(mcInfos);
 		
 		// Titre des colonnes
 		cdesTable.setVisibleColumns(new String[] { "etat", "nom", "finInscription","dateDebut" , "dateFin" , "nbLivraison" ,"nbProduit"});
@@ -156,9 +149,10 @@ public class ProducteurContratListPart extends VerticalLayout implements Compone
 		
 		Label title2 = new Label("Liste des contrats d'un producteur");
 		title2.setSizeUndefined();
-		title2.addStyleName("h1");	
+		title2.addStyleName("stdlistpart-text-title");	
 		
 		HorizontalLayout toolbar = new HorizontalLayout();
+		toolbar.addStyleName("stdlistpart-hlayout-button");
 		
 		testButton = new Button("Tester");
 		testButton.addClickListener(new Button.ClickListener()
@@ -215,9 +209,6 @@ public class ProducteurContratListPart extends VerticalLayout implements Compone
 		addComponent(toolbar);
 		addComponent(cdesTable);
 		setExpandRatio(cdesTable, 1);
-		setSizeFull();
-		setMargin(true);
-		setSpacing(true);
 		
 		refreshTable();
 
@@ -227,7 +218,7 @@ public class ProducteurContratListPart extends VerticalLayout implements Compone
 	{
 		ModeleContratSummaryDTO mcDto = (ModeleContratSummaryDTO) cdesTable.getValue();
 		
-		TelechargerPopup popup = new TelechargerPopup();
+		TelechargerPopup popup = new TelechargerPopup("Producteur");
 		popup.addGenerator(new EGFeuilleLivraison(mcDto.id));
 		popup.addGenerator(new EGPaiementProducteur(mcDto.id));
 		popup.addGenerator(new EGSyntheseContrat(mcDto.id));
@@ -244,7 +235,7 @@ public class ProducteurContratListPart extends VerticalLayout implements Compone
 		}
 		ModeleContratSummaryDTO mcDto = (ModeleContratSummaryDTO) cdesTable.getValue();
 		ContratDTO contratDTO = new MesContratsService().loadContrat(mcDto.id,null);
-		SaisieContrat.saisieContrat(contratDTO,null,"<h1>Mode Test</h1>",ModeSaisie.FOR_TEST,this);
+		SaisieContrat.saisieContrat(contratDTO,null,"Mode Test",ModeSaisie.FOR_TEST,this);
 		
 	}
 

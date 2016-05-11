@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -21,21 +21,10 @@
  package fr.amapj.view.views.meslivraisons;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
-import org.apache.commons.lang.time.DateUtils;
-
-import com.vaadin.navigator.View;
-import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
 
 import fr.amapj.service.services.excelgenerator.EGPlanningMensuel;
 import fr.amapj.service.services.meslivraisons.JourLivraisonsDTO;
@@ -45,143 +34,72 @@ import fr.amapj.service.services.meslivraisons.ProducteurLivraisonsDTO;
 import fr.amapj.service.services.meslivraisons.QteProdDTO;
 import fr.amapj.service.services.session.SessionManager;
 import fr.amapj.view.engine.excelgenerator.LinkCreator;
+import fr.amapj.view.engine.popup.PopupListener;
+import fr.amapj.view.engine.template.FrontOfficeView;
+import fr.amapj.view.engine.tools.BaseUiTools;
+import fr.amapj.view.views.common.semaineviewer.SemaineViewer;
 
 
 /**
- * Page permettant à l'utilisateur de gérer son compte :
- * -> changement de l'adresse e mail 
- * -> changement du mot de passe 
- * 
- *  
+ * Affichage des livraisons
  *
  */
-public class MesLivraisonsView extends Panel implements View
+@SuppressWarnings("serial")
+public class MesLivraisonsView extends FrontOfficeView implements PopupListener
 {
+	
+	// FORMAT : le type d'objet (PANEL, LABEL , BUTTON , ...) "-"  un descriptif 
 
-	SimpleDateFormat df = new SimpleDateFormat("EEEEE dd MMMMM yyyy");
 	
-	private Label titre;
+	static private String LABEL_DATEJOURLIV = "datejourliv";
+	static private String LABEL_QTEPRODUIT = "qteproduit";	
+	static private String PANEL_UNJOUR = "unjour";
+
 	
+		
 	private VerticalLayout planning;
 	
-	private Label livraison;
+	private VerticalLayout livraison;
 	
-	private Date date;
+	private SemaineViewer semaineViewer;
+	
+	private SimpleDateFormat df1 = new SimpleDateFormat("EEEEE dd MMMMM yyyy");
 
+	
+	@Override
+	public String getMainStyleName()
+	{
+		return "livraison";
+	}
 
 	/**
 	 * 
 	 */
 	@Override
-	public void enter(ViewChangeEvent event)
+	public void enter()
 	{
-		date = new Date();
-		setSizeFull();
-
-		
-		HorizontalLayout layout = new HorizontalLayout();
-		layout.setSizeFull();
-		
-		addButton(layout, "<<<< ",new Button.ClickListener()
-		{
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				reculer();
-			}
-		});
+		semaineViewer = new SemaineViewer(this);
+		addComponent(semaineViewer.getComponent());
 		
 		VerticalLayout central = new VerticalLayout();
-		central.setWidth("100%");
-		layout.addComponent(central);
-		layout.setExpandRatio(central, 8.0f);
+		addComponent(central);
 		
-		titre = addLabel(central, "");
 		planning = new VerticalLayout();
 		central.addComponent(planning);
-		livraison = addLabel2(central, "");
+		livraison = new VerticalLayout();
+		central.addComponent(livraison);
 		
-		
-		addButton(layout, ">>>> ",new Button.ClickListener()
-		{
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				avancer();
-			}
-		});
-		
-		
-		
-		
-		
-		refresh();
-		
-		layout.setMargin(true);
-		layout.setSpacing(true);
-		
-		setContent(layout);
-		addStyleName(ChameleonTheme.PANEL_BORDERLESS);
+		onPopupClose();
 	}
 
 	
 	
-	protected void avancer()
+
+
+	public void onPopupClose()
 	{
-		date = DateUtils.addDays(date, 7);
-		refresh();
-		
-	}
-
-
-
-	protected void reculer()
-	{
-		date = DateUtils.addDays(date, -7);
-		refresh();
-		
-	}
-
-
-
-	private Label addLabel(VerticalLayout layout, String str)
-	{
-		Label tf = new Label(str);
-		tf.addStyleName(ChameleonTheme.LABEL_H1);
-		layout.addComponent(tf);
-		return tf;
-		
-	}
-	
-	private Label addLabel2(VerticalLayout layout, String str)
-	{
-		Label tf = new Label(str,ContentMode.HTML);
-		tf.addStyleName(ChameleonTheme.LABEL_BIG);
-		layout.addComponent(tf);
-		return tf;
-		
-	}
-
-	
-	
-	private void addButton(HorizontalLayout layout, String str,ClickListener listener)
-	{
-		Button b = new Button(str);
-		b.addStyleName(ChameleonTheme.BUTTON_BIG);
-		b.addClickListener(listener);
-		b.setWidth("100%");
-		layout.addComponent(b);
-		layout.setExpandRatio(b, 1.0f);
-		
-	}
-
-
-	private void refresh()
-	{
-		MesLivraisonsDTO res = new MesLivraisonsService().getMesLivraisons(date,SessionManager.getUserRoles(),SessionManager.getUserId());
-		
-		titre.setValue("Semaine du "+df.format(res.dateDebut)+" au "+df.format(res.dateFin));
-		
+		MesLivraisonsDTO res = new MesLivraisonsService().getMesLivraisons(semaineViewer.getDate(),SessionManager.getUserRoles(),SessionManager.getUserId());
+		semaineViewer.updateTitreValue(res.dateDebut, res.dateFin);
 		
 		// Pour la semaine, ajout des planning mensuels de distribution
 		planning.removeAllComponents();
@@ -189,39 +107,48 @@ public class MesLivraisonsView extends Panel implements View
 		{
 			planning.addComponent(LinkCreator.createLink(planningMensuel));
 		}
+		if (res.planningMensuel.size()>0)
+		{
+			BaseUiTools.addEmptyLine(planning);
+		}
 		
 		
 		// Pour chaque jour, ajout des informations permanence et produits livrés
-		StringBuffer buf = new StringBuffer();
+		livraison.removeAllComponents();
 		for (JourLivraisonsDTO jour : res.jours)
 		{
-			buf.append("<br/><br/><h2>"+df.format(jour.date)+"</h2>");		
+			VerticalLayout vl = BaseUiTools.addPanel(livraison, PANEL_UNJOUR);
+			
+			String dateMessage = df1.format(jour.date);
+			BaseUiTools.addStdLabel(vl, dateMessage, LABEL_DATEJOURLIV);
 			
 			if (jour.distribution!=null)
 			{
-				buf.append("<br/><h2><i><b>"+
-							"!! Attention, vous devez réaliser la permanence ce "+df.format(jour.date)+"!!</br>"+
+				String msg = "<br/><h2><i><b>"+
+							"!! Attention, vous devez réaliser la permanence ce "+df1.format(jour.date)+"!!</br>"+
 							"Liste des personnes de permanence : "+jour.distribution.getUtilisateurs()+
-							"</i></b></h2>");
+							"</i></b></h2>";
+				BaseUiTools.addHtmlLabel(vl, msg, "");
 			}
 			
 			
 			for (ProducteurLivraisonsDTO producteurLiv : jour.producteurs)
 			{
-				buf.append("<br/><br/><h3> Contrat : "+producteurLiv.modeleContrat+ " - Producteur : "+producteurLiv.producteur+"</h3>");
+				BaseUiTools.addBandeau(vl, producteurLiv.modeleContrat, "nomcontrat");
 				
 				for (QteProdDTO cell : producteurLiv.produits)
 				{
-					buf.append("<br/>"+cell.qte+" "+cell.nomProduit+" , "+
-							cell.conditionnementProduit+"</h3>");
+					String content = cell.qte+" "+cell.nomProduit+" , "+cell.conditionnementProduit;
+					BaseUiTools.addStdLabel(vl, content, LABEL_QTEPRODUIT);
+				}
+				
+				if (BaseUiTools.isCompactMode()==false)
+				{
+					vl.addComponent(new Label("<br/>",ContentMode.HTML));
 				}
 				
 			}
-		}
-		
-		livraison.setValue(buf.toString());
-		
-		
+		}	
 	}
 	
 	

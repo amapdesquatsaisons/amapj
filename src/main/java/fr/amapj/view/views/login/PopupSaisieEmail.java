@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -26,6 +26,7 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 
 import fr.amapj.service.services.authentification.PasswordManager;
+import fr.amapj.view.engine.notification.NotificationHelper;
 import fr.amapj.view.engine.popup.formpopup.FormPopup;
 
 /**
@@ -75,7 +76,7 @@ public class PopupSaisieEmail extends FormPopup
 		}
 		else
 		{
-			Notification.show(msg, Type.WARNING_MESSAGE);
+			NotificationHelper.displayNotification(msg);
 		}
 	}
 }

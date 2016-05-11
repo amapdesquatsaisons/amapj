@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -27,6 +27,7 @@ import fr.amapj.service.services.gestioncontrat.GestionContratService;
 import fr.amapj.service.services.gestioncontrat.ModeleContratDTO;
 import fr.amapj.view.engine.popup.formpopup.FormPopup;
 import fr.amapj.view.engine.popup.formpopup.validator.IValidator;
+import fr.amapj.view.engine.popup.formpopup.validator.StringLengthValidator;
 import fr.amapj.view.engine.popup.formpopup.validator.UniqueInDatabaseValidator;
 
 /**
@@ -44,7 +45,7 @@ public class ModifEnteteContratEditorPart extends FormPopup
 	public ModifEnteteContratEditorPart(Long id)
 	{
 		popupTitle = "Modification d'un contrat";
-		popupWidth = "80%";
+		setWidth(80);
 				
 		// Chargement de l'objet  à modifier
 		modeleContrat = new GestionContratService().loadModeleContrat(id);
@@ -57,11 +58,14 @@ public class ModifEnteteContratEditorPart extends FormPopup
 	{
 		IValidator uniq = new UniqueInDatabaseValidator(ModeleContrat.class,"nom",modeleContrat.id);
 		
+		IValidator len_1_100 = new StringLengthValidator(1, 100);
+		IValidator len_1_255 = new StringLengthValidator(1, 255);
+		
 		// Champ 1
-		addTextField("Nom du contrat", "nom",uniq);
+		addTextField("Nom du contrat", "nom",uniq,len_1_100);
 		
 		// Champ 2
-		addTextField("Description du contrat", "description");
+		addTextField("Description du contrat", "description",len_1_255);
 			
 		// Champ 3
 		addDateField("Date de fin des inscriptions","dateFinInscription");

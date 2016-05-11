@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -47,7 +47,7 @@ public class TelechargerContrat
 	 */
 	static public void displayPopupTelechargerContrat(Long idModeleContrat, Long idContrat,PopupListener listener)
 	{
-		TelechargerPopup popup = new TelechargerPopup();
+		TelechargerPopup popup = new TelechargerPopup("Télecharger ...");
 		
 		if (idContrat!=null)
 		{

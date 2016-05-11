@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -61,8 +61,7 @@ public class ModifDatePaiementContratEditorPart extends WizardFormPopup
 	 */
 	public ModifDatePaiementContratEditorPart(Long id)
 	{
-		popupWidth = "80%";
-		popupHeight = "60%";
+		setWidth(80);
 		popupTitle = "Modification des dates de paiement d'un contrat (ajout / suppression)";
 		
 		// Chargement de l'objet  à modifier

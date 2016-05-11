@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -67,7 +67,7 @@ public class BarrerDateContratEditorPart extends PopupBooleanGrid
 		
 		//
 		popupTitle = "Barrer des dates pour le contrat "+contratDTO.nom;
-		popupWidth ="90%";
+		setWidth(90);
 		
 		//
 		param.messageSpecifique = null;

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -50,8 +50,7 @@ public class ModifDateContratEditorPart extends WizardFormPopup
 	 */
 	public ModifDateContratEditorPart(Long id)
 	{
-		popupWidth = "80%";
-		popupHeight = "60%";
+		setWidth(80);
 		popupTitle = "Modification des dates de livraison d'un contrat";
 		
 		// Chargement de l'objet  à modifier

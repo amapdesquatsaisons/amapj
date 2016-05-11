@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -20,6 +20,7 @@
  */
  package fr.amapj.view.engine.excelgenerator;
 
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.StreamResource;
 import com.vaadin.ui.Link;
 
@@ -43,6 +44,7 @@ public class LinkCreator
 		String fileName = fileInfoDTO.fileName;
 		String extension = fileInfoDTO.extension;
 		Link extractFile = new Link("Télécharger "+titre,new StreamResource(new CoreResource(fileInfoDTO.generator), fileName+"."+extension));
+		extractFile.setIcon(FontAwesome.DOWNLOAD);
 		return extractFile;
 	}
 	

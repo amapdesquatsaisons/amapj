@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -82,6 +82,7 @@ public class ErrorPopup extends CorePopup
 
 	protected void createContent(VerticalLayout contentLayout)
 	{
+		setColorStyle(ColorStyle.RED);
 
 		// Message loggé 
 		SessionParameters p = SessionManager.getSessionParameters();
@@ -97,10 +98,11 @@ public class ErrorPopup extends CorePopup
 		}
 		logger.info( debugMessage, throwable);
 		
-		if (throwable instanceof ConstraintViolationException)
+		
+		String constraintInfo = getConstraintInfo(throwable);
+		if (constraintInfo!=null)
 		{
-			ConstraintViolationException e = (ConstraintViolationException) throwable;
-			logger.info("Autre information:"+StackUtils.getConstraints(e));
+			logger.info("Constraint Information:"+constraintInfo);
 		}
 		
 
@@ -110,6 +112,11 @@ public class ErrorPopup extends CorePopup
 		{
 			msg = msg+"Information supplémentaire:<br/>" + message+"<br/>";
 		}
+		if (constraintInfo!=null)
+		{
+			msg = msg+"<br/>" + constraintInfo+"<br/>";
+		}
+		
 		msg = msg + "Veuillez cliquer sur OK pour continuer<br/>";
 		
 		
@@ -132,6 +139,20 @@ public class ErrorPopup extends CorePopup
 		contentLayout.addComponent(hlTexte);
 	}
 	
+	private String getConstraintInfo(Throwable t)
+	{
+		if (t instanceof ConstraintViolationException)
+		{
+			ConstraintViolationException e = (ConstraintViolationException) t;
+			return StackUtils.getConstraints(e);
+		}
+		else if (t.getCause()!=null)
+		{
+			return getConstraintInfo(t.getCause());
+		}
+		return null;
+	}
+
 	protected void createButtonBar()
 	{
 		addDefaultButton(okButtonTitle, new Button.ClickListener()

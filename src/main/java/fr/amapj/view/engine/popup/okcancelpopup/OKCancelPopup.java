@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -35,29 +35,39 @@ abstract public class OKCancelPopup extends CorePopup
 {
 	protected Button saveButton;
 	protected String saveButtonTitle = "Sauvegarder";
+	protected boolean hasSaveButton = true;
 	protected Button cancelButton;
 	protected String cancelButtonTitle = "Annuler";
+	protected boolean hasCancelButton = true;
+	
+	
 	
 	protected void createButtonBar()
 	{		
-		saveButton = addDefaultButton(saveButtonTitle, new Button.ClickListener()
+		if (hasCancelButton)
 		{
-			@Override
-			public void buttonClick(ClickEvent event)
+			cancelButton = addButton(cancelButtonTitle, new Button.ClickListener()
 			{
-				handleSauvegarder();
-			}
-		});
-				
+				@Override
+				public void buttonClick(ClickEvent event)
+				{
+					handleAnnuler();
+				}
+			});
+		}
 		
-		cancelButton = addButton(cancelButtonTitle, new Button.ClickListener()
+		if (hasSaveButton)
 		{
-			@Override
-			public void buttonClick(ClickEvent event)
+			saveButton = addDefaultButton(saveButtonTitle, new Button.ClickListener()
 			{
-				handleAnnuler();
-			}
-		});
+				@Override
+				public void buttonClick(ClickEvent event)
+				{
+					handleSauvegarder();
+				}
+			});
+		}
+				
 	}
 	
 

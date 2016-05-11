@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -42,9 +42,11 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.CustomField;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.PopupDateField;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.VerticalLayout;
 
 import fr.amapj.view.engine.collectioneditor.columns.ColumnInfo;
 import fr.amapj.view.engine.collectioneditor.columns.SearcherColumn;
@@ -122,7 +124,9 @@ public class CollectionEditor<BEANTYPE> extends CustomField implements Action.Ha
 	private void buildTable()
 	{
 		table = new Table();
-		table.addStyleName("big");
+		table.addStyleName("no-stripes");
+		table.addStyleName("no-vertical-lines");
+		table.addStyleName("no-horizontal-lines");
 		
 		
 		/*
@@ -195,7 +199,9 @@ public class CollectionEditor<BEANTYPE> extends CustomField implements Action.Ha
 		switch (fieldType)
 		{
 		case STRING:
-			return new TextField();
+			TextField str = new TextField();
+			str.addStyleName("text");
+			return str;
 			 
 		case SEARCHER:
 			SearcherColumn s = (SearcherColumn) col;
@@ -208,26 +214,40 @@ public class CollectionEditor<BEANTYPE> extends CustomField implements Action.Ha
 			{
 				box.setLinkedSearcher(s.linkedSearcher);
 			}
+			box.addStyleName("searcher");
 			return box;
 			
 		case CURRENCY:
-			return BaseUiTools.createCurrencyField("",false);
+			TextField currency  = BaseUiTools.createCurrencyField("",false);
+			currency.addStyleName("currency");
+			return currency;
 			
 		case QTE:
-			return BaseUiTools.createQteField("");
+			TextField qte = BaseUiTools.createQteField("");
+			qte.addStyleName("qte");
+			return qte;
 			
 		case INTEGER:
-			return BaseUiTools.createIntegerField("");
+			TextField integer = BaseUiTools.createIntegerField("");
+			integer.addStyleName("integer");
+			return integer;
 			
 		case DATE:
-			return BaseUiTools.createDateField("");
+			PopupDateField dateField = BaseUiTools.createDateField("");
+			dateField.addStyleName("date");
+			return dateField;
 
 			
 		case CHECK_BOX:
-			return BaseUiTools.createCheckBoxField("");
+			CheckBox checkBox = BaseUiTools.createCheckBoxField("");
+			checkBox.addStyleName("checkbox");
+			return checkBox;
+			
 			
 		case COMBO:
-			return EnumSearcher.createEnumSearcher("", (Enum) col.defaultValue);
+			ComboBox combo = EnumSearcher.createEnumSearcher("", (Enum) col.defaultValue);
+			combo.addStyleName("combo");
+			return combo;
 
 
 		}
@@ -463,7 +483,8 @@ public class CollectionEditor<BEANTYPE> extends CustomField implements Action.Ha
 	@Override
 	protected Component initContent()
 	{
-		CssLayout vl = new CssLayout();
+		VerticalLayout vl = new VerticalLayout();
+		vl.addStyleName("collection-editor");
 		buildTable();
 		vl.addComponent(getTable());
 		
@@ -478,42 +499,14 @@ public class CollectionEditor<BEANTYPE> extends CustomField implements Action.Ha
 	}
 
 
-	private void addButtons(CssLayout vl)
+	private void addButtons(VerticalLayout vl)
 	{
-		CssLayout buttons = new CssLayout();
-		buttons.addComponent(new Button(getMasterDetailAddItemCaption(), new ClickListener()
-		{
-			public void buttonClick(ClickEvent event)
-			{
-				addRow(null);
-			}
-		}));
+		HorizontalLayout buttons = new HorizontalLayout();
+		buttons.addComponent(new Button(getMasterDetailAddItemCaption(), e->addRow(null)));
+		buttons.addComponent(new Button(getMasterDetailRemoveItemCaption(), e->remove(getTable().getValue())));
+		buttons.addComponent(new Button(getMasterDetailUpItemCaption(), e->	up(getTable().getValue())));
+		buttons.addComponent(new Button(getMasterDetailDownItemCaption(), e->down(getTable().getValue())));
 			
-		buttons.addComponent(new Button(getMasterDetailRemoveItemCaption(), new ClickListener()
-		{
-			public void buttonClick(ClickEvent event)
-			{
-				remove(getTable().getValue());
-			}
-		}));
-		
-		
-		buttons.addComponent(new Button(getMasterDetailUpItemCaption(), new ClickListener()
-		{
-			public void buttonClick(ClickEvent event)
-			{
-				up(getTable().getValue());
-			}
-		}));
-		
-		buttons.addComponent(new Button(getMasterDetailDownItemCaption(), new ClickListener()
-		{
-			public void buttonClick(ClickEvent event)
-			{
-				down(getTable().getValue());
-			}
-		}));
-		
 		vl.addComponent(buttons);
 		
 	}

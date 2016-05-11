@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -37,8 +37,7 @@ public class ChoixActionContratSigne extends SwitchPopup
 	public ChoixActionContratSigne(Long mcId)
 	{
 		popupTitle = "Autres actions sur les contrats signés";
-		popupWidth = "50%";
-		
+		setWidth(50);
 		this.mcId = mcId;
 
 	}

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -36,7 +36,7 @@ public class ChoixActionUtilisateur extends SwitchPopup
 	public ChoixActionUtilisateur()
 	{
 		popupTitle = "Autres actions sur les utilisateurs";
-		popupWidth = "50%";
+		setWidth(50);
 
 	}
 

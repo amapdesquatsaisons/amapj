@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -27,6 +27,7 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.util.converter.Converter.ConversionException;
+import com.vaadin.server.Page;
 import com.vaadin.server.WebBrowser;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
@@ -34,7 +35,6 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.TextField;
@@ -45,7 +45,9 @@ import fr.amapj.view.engine.grid.ErreurSaisieException;
 import fr.amapj.view.engine.grid.GridHeaderLine;
 import fr.amapj.view.engine.grid.GridIJData;
 import fr.amapj.view.engine.grid.ShortCutManager;
+import fr.amapj.view.engine.notification.NotificationHelper;
 import fr.amapj.view.engine.popup.corepopup.CorePopup;
+import fr.amapj.view.engine.popup.corepopup.CorePopup.PopupType;
 import fr.amapj.view.engine.popup.formpopup.OnSaveException;
 import fr.amapj.view.engine.tools.BaseUiTools;
 import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
@@ -89,11 +91,14 @@ abstract public class PopupCurrencyVector extends CorePopup
 
 	protected void createContent(VerticalLayout mainLayout)
 	{
+		setType(PopupType.CENTERFIT);
 		loadParam();
 
 		if (param.messageSpecifique != null)
 		{
-			mainLayout.addComponent(new Label(param.messageSpecifique, ContentMode.HTML));
+			Label messageSpeLabel = new Label(param.messageSpecifique);
+			messageSpeLabel.addStyleName("popup-currency-vector-message");
+			mainLayout.addComponent(messageSpeLabel);
 		}
 		
 		if ((param.readOnly==false) && (param.computeLastLine==true))
@@ -105,7 +110,7 @@ abstract public class PopupCurrencyVector extends CorePopup
 		{
 			// Footer 1 avec le montant total des paiements
 			HorizontalLayout footer1 = new HorizontalLayout();
-			footer1.setWidth("410px");
+			footer1.setWidth("350px");
 			fillFooter(footer1,"Avoir initial",param.avoirInitial);
 			
 			// Footer 2 pour avoir un espace
@@ -127,13 +132,15 @@ abstract public class PopupCurrencyVector extends CorePopup
 
 		// Construction de la table de saisie
 		table = new Table();
-		table.addStyleName("big");
+		table.addStyleName("no-vertical-lines");
+		table.addStyleName("no-horizontal-lines");
+		table.addStyleName("no-stripes");
 
 		table.setColumnHeaderMode(ColumnHeaderMode.HIDDEN);
 
 		// Colonne de gauche contenant un libellé
 		table.addContainerProperty(new Integer(-1), Label.class, null);
-		table.setColumnWidth(new Integer(-1), param.largeurCol - 10);
+		table.setColumnWidth(new Integer(-1), param.largeurCol);
 
 		// colonne de droite correspondant à la saisie des quantites
 		Class clzz;
@@ -146,7 +153,7 @@ abstract public class PopupCurrencyVector extends CorePopup
 			clzz = TextField.class;
 		}
 		table.addContainerProperty(new Integer(0), clzz, null);
-		table.setColumnWidth(new Integer(0), param.largeurCol - 10);
+		table.setColumnWidth(new Integer(0), param.largeurCol);
 
 		// Convertion du vecteur en un tableau
 		boolean[][] excluded = new boolean[param.excluded.length][1];
@@ -158,7 +165,7 @@ abstract public class PopupCurrencyVector extends CorePopup
 		if (param.readOnly==false)
 		{
 			shortCutManager = new ShortCutManager(param.nbLig, 1, excluded);
-			shortCutManager.addShorcut(this);
+			shortCutManager.addShorcut(this.getWindow());
 		}
 
 		// Creation de toutes les cellules pour la saisie
@@ -195,8 +202,8 @@ abstract public class PopupCurrencyVector extends CorePopup
 		{
 			// Footer 1 avec le montant total des paiements
 			HorizontalLayout footer1 = new HorizontalLayout();
-			footer1.setWidth("410px");
-			montantTotalPaiement = fillFooter(footer1,"Montant total des paiements",getMontantTotalPaiement());
+			footer1.setWidth("350px");
+			montantTotalPaiement = fillFooter(footer1,"Montant total paiements",getMontantTotalPaiement());
 			
 			// Footer 2 pour avoir un espace
 			HorizontalLayout footer2 = new HorizontalLayout();
@@ -205,7 +212,7 @@ abstract public class PopupCurrencyVector extends CorePopup
 			
 			// Footer 3 avec le prix total du contrat
 			HorizontalLayout footer3 = new HorizontalLayout();
-			footer3.setWidth("410px");
+			footer3.setWidth("350px");
 			fillFooter(footer3,"Montant total dû",param.montantCible);
 
 
@@ -217,13 +224,10 @@ abstract public class PopupCurrencyVector extends CorePopup
 		{
 			// Footer 1 avec le prix total
 			HorizontalLayout footer1 = new HorizontalLayout();
-			footer1.setWidth("410px");
+			footer1.setWidth("350px");
 			fillFooter(footer1,"Montant total à régler",param.montantCible);
 			mainLayout.addComponent(footer1);
 		}
-
-		mainLayout.setMargin(true);
-
 	}
 
 	private int getMontantTotalPaiement()
@@ -267,6 +271,7 @@ abstract public class PopupCurrencyVector extends CorePopup
 					handleAnnuler();
 				}
 			});
+			ok.addStyleName("primary");
 		}
 		else
 		{
@@ -281,8 +286,18 @@ abstract public class PopupCurrencyVector extends CorePopup
 						handleCopier();
 					}
 				});
-				popupButtonBarLayout.setComponentAlignment(copierButton, Alignment.TOP_LEFT);
+				setButtonAlignement(copierButton, Alignment.TOP_LEFT);
 			}
+			
+			Button cancelButton = addButton("Annuler", new Button.ClickListener()
+			{
+
+				@Override
+				public void buttonClick(ClickEvent event)
+				{
+					handleAnnuler();
+				}
+			});
 
 			Button saveButton = addDefaultButton("Sauvegarder", new Button.ClickListener()
 			{
@@ -293,16 +308,9 @@ abstract public class PopupCurrencyVector extends CorePopup
 					handleSauvegarder();
 				}
 			});
+			saveButton.addStyleName("primary");
 
-			Button cancelButton = addButton("Annuler", new Button.ClickListener()
-			{
-
-				@Override
-				public void buttonClick(ClickEvent event)
-				{
-					handleAnnuler();
-				}
-			});
+			
 		}
 
 	}
@@ -315,7 +323,7 @@ abstract public class PopupCurrencyVector extends CorePopup
 		}
 		catch (ErreurSaisieException e)
 		{
-			Notification.show("Erreur de saisie sur la premiere ligne - Impossible de copier");
+			NotificationHelper.displayNotification("Erreur de saisie sur la premiere ligne - Impossible de copier");
 		}
 	}
 
@@ -365,17 +373,36 @@ abstract public class PopupCurrencyVector extends CorePopup
 
 	private int getPageLength()
 	{
-		WebBrowser webBrowser = UI.getCurrent().getPage().getWebBrowser();
+		Page page = UI.getCurrent().getPage();
 		int pageLength = 15;
+		
+		// On limite le nombre de ligne pour ne pas avoir une double scroolbar
+		
+		// Une ligne fait 32 en mode edition , sinon 26
+		int lineHeight = param.readOnly ? 26 : 32;   	
+		
+		// On cacule la place cosommée par les headers, boutons, ...
+		// 365 : nombre de pixel mesurée pour les haeders, les boutons, ... en mode normal, 270 en mode compact
+		int headerAndButtonHeight = BaseUiTools.isCompactMode() ? 270 : 365;
+		
+		
+		int maxLineAvailable = (page.getBrowserWindowHeight()-headerAndButtonHeight)/lineHeight;
+		
+		// Il y a au moins 4 lignes visibles
+		maxLineAvailable = Math.max(maxLineAvailable, 4);  						
+		pageLength = Math.min(pageLength,maxLineAvailable);
 
 		// Pour ie 8 et inférieur : on se limite a 6 lignes, sinon ca rame trop
+		WebBrowser webBrowser = UI.getCurrent().getPage().getWebBrowser();
 		if (webBrowser.isIE() && webBrowser.getBrowserMajorVersion() < 9)
 		{
-			pageLength = 6;
+			pageLength = Math.min(pageLength,6);
 		}
 
+		//
 		pageLength = Math.min(pageLength, param.nbLig);
 		return pageLength;
+		
 	}
 
 	/**
@@ -394,8 +421,7 @@ abstract public class PopupCurrencyVector extends CorePopup
 		List<Object> cells = new ArrayList<Object>();
 
 		Label dateLabel = new Label(param.leftPartLine.get(lig));
-		dateLabel.addStyleName("big");
-		dateLabel.addStyleName("align-center");
+		dateLabel.addStyleName("date-saisie");
 		dateLabel.setWidth(param.largeurCol + "px");
 
 		cells.add(dateLabel);
@@ -421,8 +447,7 @@ abstract public class PopupCurrencyVector extends CorePopup
 				txt = "" + new CurrencyTextFieldConverter().convertToString(qte);
 			}
 			Label tf = new Label(txt);
-			tf.addStyleName("align-center");
-			tf.addStyleName("big");
+			tf.addStyleName("cell-voir");
 			tf.setWidth((param.largeurCol - 10) + "px");
 			cells.add(tf);
 		}
@@ -433,8 +458,7 @@ abstract public class PopupCurrencyVector extends CorePopup
 				TextField tf = new TextField();
 				tf.setValue("XXXXXX");
 				tf.setEnabled(false);
-				tf.addStyleName("align-center");
-				tf.addStyleName("big");
+				tf.addStyleName("cell-voir");
 				tf.setWidth((param.largeurCol - 10) + "px");
 				cells.add(tf);
 			}
@@ -457,15 +481,12 @@ abstract public class PopupCurrencyVector extends CorePopup
 						}
 						catch (ErreurSaisieException e)
 						{
-							// TODO pas si simple
-							// tf.setStyleName("erreurqte");
-							Notification.show("Erreur de saisie");
+							NotificationHelper.displayNotificationMontant();
 						}
 					}
 				});
 
-				tf.addStyleName("align-center");
-				tf.addStyleName("big");
+				tf.addStyleName("cell-saisie");
 				tf.setWidth((param.largeurCol - 10) + "px");
 				shortCutManager.registerTextField(tf);
 				cells.add(tf);
@@ -534,7 +555,7 @@ abstract public class PopupCurrencyVector extends CorePopup
 		}
 		catch (ErreurSaisieException e)
 		{
-			Notification.show("Erreur de saisie ");
+			NotificationHelper.displayNotificationMontant();
 			return;
 		}
 

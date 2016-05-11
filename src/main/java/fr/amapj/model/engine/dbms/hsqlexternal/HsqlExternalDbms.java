@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -22,13 +22,16 @@
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import fr.amapj.model.engine.dbms.DBMS;
+import fr.amapj.model.engine.dbms.DBMSTools;
 import fr.amapj.model.engine.transaction.DbUtil;
 import fr.amapj.service.services.appinstance.AppInstanceDTO;
 import fr.amapj.service.services.appinstance.AppState;
@@ -120,9 +123,10 @@ public class HsqlExternalDbms implements DBMS
 		
 	}
 	
+		
 	
 	@Override
-	public void executeSqlCommand(String sqlCommand,AppInstanceDTO dto) throws SQLException
+	public int executeUpdateSqlCommand(String sqlCommand,AppInstanceDTO dto) throws SQLException
 	{
 		String url1 = conf.createUrl(dto.nomInstance);
 		String user1 = dto.dbUserName;
@@ -130,10 +134,36 @@ public class HsqlExternalDbms implements DBMS
 				
 		Connection conn = DriverManager.getConnection(url1, user1, password1);
 		Statement st = conn.createStatement();
-		st.execute(sqlCommand);	
+		int res = st.executeUpdate(sqlCommand);	
 		conn.commit();
 		conn.close();
+		
+		return res;
 		   			
 	}
+	
+	
+	
+	@Override
+	public List<List<String>> executeQuerySqlCommand(String sqlCommand,AppInstanceDTO dto) throws SQLException
+	{
+		String url1 = conf.createUrl(dto.nomInstance);
+		String user1 = dto.dbUserName;
+		String password1 = dto.dbPassword;
+				
+		Connection conn = DriverManager.getConnection(url1, user1, password1);
+		Statement st = conn.createStatement();
+		
+		ResultSet resultset = st.executeQuery(sqlCommand);	
+		
+		List<List<String>> result = DBMSTools.readResultSet(resultset);	
+		
+		conn.commit();
+		conn.close();
+		
+		return result;
+	}
+	
+	
 	
 }

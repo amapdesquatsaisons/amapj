@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -21,6 +21,7 @@
  package fr.amapj.view.views.parametres;
 
 import com.vaadin.data.util.BeanItem;
+import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.RichTextArea;
@@ -59,8 +60,7 @@ public class PopupSaisieParametres extends WizardFormPopup
 	 */
 	public PopupSaisieParametres(ParametresDTO dto)
 	{
-		popupWidth = "80%";
-		popupHeight = "60%";
+		setWidth(80);
 		popupTitle = "Modification des paramètres";
 
 		this.dto = dto;

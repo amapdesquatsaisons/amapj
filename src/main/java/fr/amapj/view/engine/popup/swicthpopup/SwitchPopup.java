@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -22,14 +22,11 @@
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import com.vaadin.data.Container;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.OptionGroup;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 import fr.amapj.view.engine.popup.corepopup.CorePopup;
@@ -67,6 +64,8 @@ abstract public class SwitchPopup extends CorePopup
 	
 	protected void createContent(VerticalLayout contentLayout)
 	{
+		contentLayout.addStyleName("popup-switch");
+		
 		loadFollowingPopups();
 		
 		group = new OptionGroup(line1);
@@ -89,24 +88,8 @@ abstract public class SwitchPopup extends CorePopup
 
 	protected void createButtonBar()
 	{
-		addDefaultButton("Continuer ...", new Button.ClickListener()
-		{
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				handleContinuer();
-			}
-		});
-				
-		
-		addButton("Annuler", new Button.ClickListener()
-		{
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				handleAnnuler();
-			}
-		});
+		addButton("Annuler", e->handleAnnuler());
+		addDefaultButton("Continuer ...", e->handleContinuer());
 	}
 	
 	
@@ -126,22 +109,14 @@ abstract public class SwitchPopup extends CorePopup
 		}
 		
 		
-		removeCloseListener(popupCloseListener);
-		addCloseListener(new CloseListener()
-		{
-			@Override
-			public void windowClose(CloseEvent e)
-			{
-				swithToNextPopup();
-			}
-		});
+		changeCloseListener(e->swithToNextPopup());
 		close();
 	}
 
 	protected void swithToNextPopup()
 	{
 		SwitchPopupInfo info = infos.get(index);
-		info.popup.addCloseListener(popupCloseListener);
+		info.popup.changeCloseListener(popupCloseListener);
 		CorePopup.open(info.popup);
 	}
 	

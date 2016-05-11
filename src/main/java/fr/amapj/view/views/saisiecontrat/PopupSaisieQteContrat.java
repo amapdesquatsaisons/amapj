@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -21,9 +21,8 @@
  package fr.amapj.view.views.saisiecontrat;
 
 import java.text.SimpleDateFormat;
-import org.apache.logging.log4j.LogManager;import org.apache.logging.log4j.Logger;
 
-import com.vaadin.ui.Notification;
+import org.apache.logging.log4j.LogManager;import org.apache.logging.log4j.Logger;
 
 import fr.amapj.service.services.mescontrats.ContratColDTO;
 import fr.amapj.service.services.mescontrats.ContratDTO;
@@ -31,6 +30,7 @@ import fr.amapj.service.services.mescontrats.ContratLigDTO;
 import fr.amapj.view.engine.grid.GridHeaderLine;
 import fr.amapj.view.engine.grid.GridSizeCalculator;
 import fr.amapj.view.engine.grid.integergrid.PopupIntegerGrid;
+import fr.amapj.view.engine.notification.NotificationHelper;
 import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
 import fr.amapj.view.views.saisiecontrat.SaisieContrat.ModeSaisie;
 import fr.amapj.view.views.saisiecontrat.SaisieContrat.SaisieContratData;
@@ -62,7 +62,7 @@ public class PopupSaisieQteContrat extends PopupIntegerGrid
 		this.contratDTO = data.contratDTO;
 		
 		//
-		popupTitle = "Saisie des quantités pour le contrat "+contratDTO.nom;
+		popupTitle = "Mon contrat "+contratDTO.nom;
 		
 		// 
 		param.readOnly = (data.modeSaisie==ModeSaisie.READ_ONLY);
@@ -126,20 +126,11 @@ public class PopupSaisieQteContrat extends PopupIntegerGrid
 	}
 	
 	
-	
-
-
-	@Override
-	protected void handleAnnuler()
-	{
-		data.cancel = true;
-		close();
-	}
-	
 	@Override
 	protected void handleContinuer()
 	{
 		data.montantCible = param.montantTotal;
+		data.shouldContinue = true;
 		close();
 	}
 
@@ -148,11 +139,12 @@ public class PopupSaisieQteContrat extends PopupIntegerGrid
 	{
 		if (contratDTO.isEmpty())
 		{
-			Notification.show("Vous devez saisir une quantité avant de continuer");
+			NotificationHelper.displayNotification("Vous devez saisir une quantité avant de continuer");
 			return false;
 		}
 		
 		data.montantCible = param.montantTotal;
+		data.shouldContinue = true;
 		
 		return true;
 	}

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -69,7 +69,11 @@ public class PopupAdhesion extends OKCancelPopup
 		else
 		{
 			saveButtonTitle = "OK";
+			hasCancelButton = false;
 		}	
+		
+		// 
+		setWidth(40, 450);
 	}
 	
 	@Override
@@ -87,8 +91,7 @@ public class PopupAdhesion extends OKCancelPopup
 			FormLayout f = new FormLayout();
 			textField = BaseUiTools.createCurrencyField("Montant de votre adhésion",false);
 			textField.setConvertedValue(new Integer(getPropositionMontant()));
-			textField.addStyleName("align-center");
-			textField.addStyleName("big");
+			textField.addStyleName("cell-saisie");
 			f.addComponent(textField);
 			contentLayout.addComponent(f);
 		}

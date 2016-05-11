@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -46,7 +46,7 @@ public class ModifProduitContratEditorPart extends FormPopup
 	public ModifProduitContratEditorPart(Long id)
 	{
 		popupTitle = "Modification des produits d'un contrat";
-		popupWidth = "80%";
+		setWidth(80);
 				
 		// Chargement de l'objet  à modifier
 		modeleContrat = new GestionContratService().loadModeleContrat(id);

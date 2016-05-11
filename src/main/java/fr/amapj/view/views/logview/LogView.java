@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -58,6 +58,7 @@ import fr.amapj.service.services.logview.LogFileResource;
 import fr.amapj.service.services.logview.LogViewService;
 import fr.amapj.view.engine.popup.PopupListener;
 import fr.amapj.view.engine.popup.corepopup.CorePopup;
+import fr.amapj.view.engine.template.BackOfficeView;
 import fr.amapj.view.engine.tools.DateTimeToStringConverter;
 
 
@@ -68,7 +69,7 @@ import fr.amapj.view.engine.tools.DateTimeToStringConverter;
  *  
  *
  */
-public class LogView extends VerticalLayout implements View, PopupListener
+public class LogView extends BackOfficeView implements View, PopupListener
 {
 
 	private Table beanTable;
@@ -78,13 +79,12 @@ public class LogView extends VerticalLayout implements View, PopupListener
 	 * 
 	 */
 	@Override
-	public void enter(ViewChangeEvent event)
+	public void enterIn(ViewChangeEvent event)
 	{		
 		listPartContainer = new BeanItemContainer<>(LogAccessDTO.class);
 								
 		// Bind it to a component
-		beanTable = new Table("", listPartContainer);
-		beanTable.setStyleName("big strong");
+		beanTable = createTable(listPartContainer);
 		
 		// Gestion de la liste des colonnes visibles
 		beanTable.setVisibleColumns("sudo" ,"nom" , "prenom" , "dbName" , "status" ,"typLog" , "ip" , "browser" , "dateIn" , "dateOut" , "nbError");
@@ -165,13 +165,24 @@ public class LogView extends VerticalLayout implements View, PopupListener
 			{
 				handleTelecharger();
 			}
+		});
+		
+		Button logLevelButton = new Button("Log ...");
+		logLevelButton.addClickListener(new Button.ClickListener()
+		{
+
+			@Override
+			public void buttonClick(ClickEvent event)
+			{
+				handleLogLevel();
+			}
 		});		
 	
 		
 		
 		Label title = new Label("Liste des logs");
 		title.setSizeUndefined();
-		title.addStyleName("h1");
+		title.addStyleName("stdlistpart-text-title");	
 		
 		
 		
@@ -187,6 +198,7 @@ public class LogView extends VerticalLayout implements View, PopupListener
 		
 		toolbar.addComponent(resfresh);
 		toolbar.addComponent(telechargerButton);
+		toolbar.addComponent(logLevelButton);
 		
 		toolbar.addComponent(nomField);
 		toolbar.addComponent(dbNameField);
@@ -200,15 +212,14 @@ public class LogView extends VerticalLayout implements View, PopupListener
 		toolbar.addComponent(erreurField);
 		
 		toolbar.setWidth("100%");
-
-		setMargin(true);
-		setSpacing(true);
+		toolbar.addStyleName("stdlistpart-hlayout-button");
+	
 		
 		addComponent(title);
 		addComponent(toolbar);
 		addComponent(beanTable);
 		setExpandRatio(beanTable, 1);
-		setSizeFull();
+	
 		
 		refresh();
 		
@@ -223,9 +234,14 @@ public class LogView extends VerticalLayout implements View, PopupListener
 	
 	private void handleTelecharger()
 	{
-		CorePopup.open(new TelechargerLogPopup(),this);
-		
+		CorePopup.open(new TelechargerLogPopup(),this);	
 	}
+	
+	private void handleLogLevel()
+	{
+		CorePopup.open(new ChoixLogLevel(),this);	
+	}
+	
 	
 	private DateField createDateFilterField(String inputPrompt, final String property)
 	{

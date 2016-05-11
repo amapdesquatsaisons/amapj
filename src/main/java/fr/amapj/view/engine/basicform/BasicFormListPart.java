@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -60,9 +60,10 @@ import fr.amapj.view.engine.popup.suppressionpopup.PopupSuppressionListener;
 import fr.amapj.view.engine.popup.suppressionpopup.SuppressionPopup;
 import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
 import fr.amapj.view.engine.searcher.Searcher;
+import fr.amapj.view.engine.template.BackOfficeView;
 import fr.amapj.view.engine.widgets.IntegerTextFieldConverter;
 
-abstract public class BasicFormListPart extends VerticalLayout implements ComponentContainer , View , PopupSuppressionListener
+abstract public class BasicFormListPart extends BackOfficeView implements ComponentContainer , View , PopupSuppressionListener
 {
 
 	private TextField searchField;
@@ -87,7 +88,7 @@ abstract public class BasicFormListPart extends VerticalLayout implements Compon
 	
 	
 	@Override
-	public void enter(ViewChangeEvent event)
+	public void enterIn(ViewChangeEvent event)
 	{
 		setSizeFull();
 		buildMainArea();
@@ -260,8 +261,8 @@ abstract public class BasicFormListPart extends VerticalLayout implements Compon
 		listPartContainer.sort(orderByInfo, new boolean[] { true, true });
 			
 		// Bind it to a component
-		beanTable = new Table("", listPartContainer);
-		beanTable.setStyleName("big strong");
+		beanTable = createTable(listPartContainer);
+		
 		
 		// Gestion de la liste des colonnes visibles
 		List<String> colNames = new ArrayList<String>();
@@ -323,7 +324,7 @@ abstract public class BasicFormListPart extends VerticalLayout implements Compon
 		
 		Label title = new Label(getListPartTitle());
 		title.setSizeUndefined();
-		title.addStyleName("h1");
+		title.addStyleName("stdlistpart-text-title");	
 		
 		
 		

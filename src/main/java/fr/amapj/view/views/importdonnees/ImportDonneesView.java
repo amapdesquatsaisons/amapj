@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -20,7 +20,6 @@
  */
  package fr.amapj.view.views.importdonnees;
 
-import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Component;
@@ -28,45 +27,45 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Upload;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
 
 import fr.amapj.service.services.excelgenerator.EGListeAdherent;
 import fr.amapj.service.services.excelgenerator.EGListeAdherent.Type;
 import fr.amapj.service.services.excelgenerator.EGListeProduitProducteur;
 import fr.amapj.view.engine.excelgenerator.LinkCreator;
+import fr.amapj.view.engine.template.BackOfficeLongView;
 
-public class ImportDonneesView extends Panel implements View
+public class ImportDonneesView extends BackOfficeLongView
 {
 
-	//private final static Logger logger = Logger.getLogger(ImportDonneesView.class.getName());
+	@Override
+	public String getMainStyleName()
+	{
+		return "import-donnees";
+	}
 
 	@Override
-	public void enter(ViewChangeEvent event)
+	public void enterIn(ViewChangeEvent event)
 	{
-
-		VerticalLayout layout = new VerticalLayout();
-		layout.setMargin(true);
-
-		addLabelH1(layout, "Outil d'import des données en masse");
-		addEmptyLine(layout);
-		addLabel(layout, "Cet outil vous permet d'importer en masse les utilisateurs, les produits et les producteurs");
-		//addLabel(layout, "Cet outil permet aussi de vider la base de données si nécessaire");
-		addEmptyLine(layout);
+		addLabelH1(this, "Outil d'import des données en masse");
+		
+		addLabel(this, "Cet outil vous permet d'importer en masse les utilisateurs, les produits et les producteurs");
+		addEmptyLine(this);
 		
 		Panel utilisateurPanel = new Panel("Importations des utilisateurs");
+		utilisateurPanel.addStyleName("action");
 		utilisateurPanel.setContent(getUtilisateurPanel());
 		
 		
 		Panel produitPanel = new Panel("Importations des produits et des producteurs");
+		produitPanel.addStyleName("action");
 		produitPanel.setContent(getProduitPanel());
 		
-		layout.addComponent(utilisateurPanel);
-		addEmptyLine(layout);
-		layout.addComponent(produitPanel);
+		addComponent(utilisateurPanel);
+		addEmptyLine(this);
+		addComponent(produitPanel);
 	
 
-		setContent(layout);
-		setSizeFull();
+	
 	}
 
 	private Component getUtilisateurPanel()
@@ -87,7 +86,6 @@ public class ImportDonneesView extends Panel implements View
 		UtilisateurImporter utilisateurImporter = new UtilisateurImporter();
 		Upload upload = new Upload(null, utilisateurImporter);
 		upload.addSucceededListener(utilisateurImporter);
-		upload.setStyleName("big");
 		upload.setImmediate(true);
 		upload.setButtonCaption("Charger les utilisateurs");
 
@@ -119,7 +117,6 @@ public class ImportDonneesView extends Panel implements View
 		ProduitImporter produitImporter = new ProduitImporter();
 		Upload upload = new Upload(null, produitImporter);
 		upload.addSucceededListener(produitImporter);
-		upload.setStyleName("big");
 		upload.setImmediate(true);
 		upload.setButtonCaption("Charger les produits et les producteurs");
 		
@@ -135,7 +132,7 @@ public class ImportDonneesView extends Panel implements View
 	private Label addLabelH1(VerticalLayout layout, String str)
 	{
 		Label tf = new Label(str);
-		tf.addStyleName(ChameleonTheme.LABEL_H1);
+		tf.addStyleName("titre");
 		layout.addComponent(tf);
 		return tf;
 
@@ -144,7 +141,6 @@ public class ImportDonneesView extends Panel implements View
 	private Label addLabel(VerticalLayout layout, String str)
 	{
 		Label tf = new Label(str);
-		tf.addStyleName(ChameleonTheme.LABEL_BIG);
 		layout.addComponent(tf);
 		return tf;
 
@@ -153,7 +149,6 @@ public class ImportDonneesView extends Panel implements View
 	private Label addEmptyLine(VerticalLayout layout)
 	{
 		Label tf = new Label("<br/>",ContentMode.HTML);
-		tf.addStyleName(ChameleonTheme.LABEL_BIG);
 		layout.addComponent(tf);
 		return tf;
 

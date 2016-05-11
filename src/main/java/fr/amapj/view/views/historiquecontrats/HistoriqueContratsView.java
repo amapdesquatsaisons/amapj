@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -49,6 +49,7 @@ import fr.amapj.service.services.historiquecontrats.HistoriqueContratsService;
 import fr.amapj.service.services.mescontrats.ContratDTO;
 import fr.amapj.service.services.mescontrats.MesContratsService;
 import fr.amapj.service.services.session.SessionManager;
+import fr.amapj.view.engine.template.BackOfficeView;
 import fr.amapj.view.engine.tools.DateTimeToStringConverter;
 import fr.amapj.view.engine.tools.DateToStringConverter;
 import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
@@ -62,7 +63,7 @@ import fr.amapj.view.views.saisiecontrat.SaisieContrat.ModeSaisie;
  *  
  *
  */
-public class HistoriqueContratsView extends VerticalLayout implements View
+public class HistoriqueContratsView extends BackOfficeView
 {
 
 	private Table beanTable;
@@ -80,7 +81,7 @@ public class HistoriqueContratsView extends VerticalLayout implements View
 	 * 
 	 */
 	@Override
-	public void enter(ViewChangeEvent event)
+	public void enterIn(ViewChangeEvent event)
 	{
 		listPartContainer = new BeanItemContainer<>(HistoriqueContratDTO.class);
 		List<HistoriqueContratDTO> contrats = new HistoriqueContratsService().getHistoriqueContrats(SessionManager.getUserId());
@@ -91,8 +92,7 @@ public class HistoriqueContratsView extends VerticalLayout implements View
 		listPartContainer.sort(new String[] { "nomProducteur" , "dateFin"}, new boolean[] { true, false});
 			
 		// Bind it to a component
-		beanTable = new Table("", listPartContainer);
-		beanTable.setStyleName("big strong");
+		beanTable = createTable(listPartContainer);
 		
 		// Gestion de la liste des colonnes visibles
 		beanTable.setVisibleColumns("nomProducteur" , "nomContrat" ,"dateDebut" , "dateFin" , "dateCreation" , "dateModification" , "montant");
@@ -153,7 +153,7 @@ public class HistoriqueContratsView extends VerticalLayout implements View
 		
 		Label title = new Label("Liste de vos anciens contrats");
 		title.setSizeUndefined();
-		title.addStyleName("h1");
+		title.addStyleName("stdlistpart-text-title");
 		
 		voirButton = new Button("Voir le détail");
 		voirButton.addClickListener(new Button.ClickListener()
@@ -191,16 +191,11 @@ public class HistoriqueContratsView extends VerticalLayout implements View
 		toolbar.setComponentAlignment(searchField, Alignment.TOP_RIGHT);
 		toolbar.setWidth("100%");
 		toolbar.setExpandRatio(searchField, 1);
-		
-
-		setMargin(true);
-		setSpacing(true);
-		
+	
 		addComponent(title);
 		addComponent(toolbar);
 		addComponent(beanTable);
 		setExpandRatio(beanTable, 1);
-		setSizeFull();
 		
 	}
 	

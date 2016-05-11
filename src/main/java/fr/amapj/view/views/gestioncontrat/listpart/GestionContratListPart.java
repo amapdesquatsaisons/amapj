@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -31,7 +31,6 @@ import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
-import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -40,27 +39,22 @@ import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.Table.Align;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
 
 import fr.amapj.model.engine.IdentifiableUtil;
 import fr.amapj.model.models.fichierbase.Producteur;
 import fr.amapj.service.services.access.AccessManagementService;
-import fr.amapj.service.services.excelgenerator.EGBilanCompletCheque;
-import fr.amapj.service.services.excelgenerator.EGCollecteCheque;
-import fr.amapj.service.services.excelgenerator.EGFeuilleLivraison;
-import fr.amapj.service.services.excelgenerator.EGSyntheseContrat;
 import fr.amapj.service.services.gestioncontrat.GestionContratService;
 import fr.amapj.service.services.gestioncontrat.ModeleContratSummaryDTO;
 import fr.amapj.service.services.mescontrats.ContratDTO;
 import fr.amapj.service.services.mescontrats.MesContratsService;
 import fr.amapj.service.services.session.SessionManager;
-import fr.amapj.view.engine.excelgenerator.TelechargerPopup;
-import fr.amapj.view.engine.popup.corepopup.CorePopup;
 import fr.amapj.view.engine.popup.formpopup.FormPopup;
 import fr.amapj.view.engine.popup.suppressionpopup.PopupSuppressionListener;
 import fr.amapj.view.engine.popup.suppressionpopup.SuppressionPopup;
 import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
+import fr.amapj.view.engine.template.BackOfficeView;
 import fr.amapj.view.engine.tools.DateToStringConverter;
 import fr.amapj.view.engine.tools.TableTools;
 import fr.amapj.view.views.common.contrattelecharger.TelechargerContrat;
@@ -74,7 +68,7 @@ import fr.amapj.view.views.saisiecontrat.SaisieContrat.ModeSaisie;
  * Gestion des modeles de contrats : création, diffusion, ...
  *
  */
-public class GestionContratListPart extends VerticalLayout implements ComponentContainer , View ,  PopupSuppressionListener
+public class GestionContratListPart extends BackOfficeView implements ComponentContainer ,  PopupSuppressionListener
 {
 
 	private TextField searchField;
@@ -102,14 +96,7 @@ public class GestionContratListPart extends VerticalLayout implements ComponentC
 	
 	
 	@Override
-	public void enter(ViewChangeEvent event)
-	{
-		setSizeFull();
-		buildMainArea();
-	}
-	
-
-	private void buildMainArea()
+	public void enterIn(ViewChangeEvent event)
 	{
 		allowedProducteurs = new AccessManagementService().getAccessLivraisonProducteur(SessionManager.getUserRoles(),SessionManager.getUserId());
 		
@@ -117,7 +104,7 @@ public class GestionContratListPart extends VerticalLayout implements ComponentC
 		mcInfos = new BeanItemContainer<ModeleContratSummaryDTO>(ModeleContratSummaryDTO.class);
 			
 		// Bind it to a component
-		cdesTable = new Table("", mcInfos);
+		cdesTable = createTable(mcInfos);
 		
 		// Titre des colonnes
 		cdesTable.setVisibleColumns(new String[] { "etat", "nom", "nomProducteur" ,"finInscription","dateDebut" , "dateFin" , "nbLivraison" ,"nbInscrits"});
@@ -127,14 +114,18 @@ public class GestionContratListPart extends VerticalLayout implements ComponentC
 		cdesTable.setColumnHeader("finInscription","Fin inscription");
 		cdesTable.setColumnHeader("dateDebut","Première livraison");
 		cdesTable.setColumnHeader("dateFin","Dernière livraison");
-		cdesTable.setColumnHeader("nbLivraison","Nb de livraisons");
-		cdesTable.setColumnHeader("nbInscrits","Nb de contrats signés");
+		cdesTable.setColumnHeader("nbLivraison","Livraisons");
+		cdesTable.setColumnHeader("nbInscrits","Contrats signés");
 		
 		
 		//
 		cdesTable.setConverter("finInscription", new DateToStringConverter());
 		cdesTable.setConverter("dateDebut", new DateToStringConverter());
 		cdesTable.setConverter("dateFin", new DateToStringConverter());
+		
+		cdesTable.setColumnAlignment("nbLivraison",Align.CENTER);
+		cdesTable.setColumnAlignment("nbInscrits",Align.CENTER);
+		
 
 		cdesTable.setSelectable(true);
 		cdesTable.setImmediate(true);
@@ -169,14 +160,14 @@ public class GestionContratListPart extends VerticalLayout implements ComponentC
 		});
 
 		HorizontalLayout toolbar = new HorizontalLayout();
-		
+		toolbar.addStyleName("stdlistpart-hlayout-button");
 		
 		Label title2 = new Label("Liste des contrats vierges");
 		title2.setSizeUndefined();
-		title2.addStyleName("h1");	
+		title2.addStyleName("stdlistpart-text-title");	
 		
 		newButton = new Button("Créer");
-		newButton.addClickListener(event -> handleAjouter() );
+		newButton.addClickListener(e -> handleAjouter() );
 			
 		
 		newButtonFrom = new Button("Créer à partir de ...");
@@ -287,9 +278,6 @@ public class GestionContratListPart extends VerticalLayout implements ComponentC
 		addComponent(toolbar);
 		addComponent(cdesTable);
 		setExpandRatio(cdesTable, 1);
-		setSizeFull();
-		setMargin(true);
-		setSpacing(true);
 		
 		refreshTable();
 
@@ -328,7 +316,7 @@ public class GestionContratListPart extends VerticalLayout implements ComponentC
 		}
 		ModeleContratSummaryDTO mcDto = (ModeleContratSummaryDTO) cdesTable.getValue();
 		ContratDTO contratDTO = new MesContratsService().loadContrat(mcDto.id,null);
-		SaisieContrat.saisieContrat(contratDTO,null,"<h1>Mode Test</h1>",ModeSaisie.FOR_TEST,this);
+		SaisieContrat.saisieContrat(contratDTO,null,"Mode Test",ModeSaisie.FOR_TEST,this);
 		
 	}
 

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -25,12 +25,16 @@ import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.ThreadContext;
 import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.appender.routing.RoutingAppender;
 import org.apache.logging.log4j.core.config.AppenderControl;
+import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.config.LoggerConfig;
 
 import com.vaadin.ui.UI;
 
@@ -157,6 +161,37 @@ public class AmapJLogManager
 			logger.error("Unable to close the logger",e);
 		}
 	}
+	
+	
+	/**
+	 * Permet de positionner le niveau de log de façon programatique 
+	 * @param level
+	 */
+	public static void setLevel(Level level)
+	{
+		LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+		Configuration config = ctx.getConfiguration();
+		LoggerConfig loggerConfig = config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME); 
+		loggerConfig.setLevel(level);
+		ctx.updateLoggers();  // This causes all Loggers to refetch information from their LoggerConfig
+	}
+	
+	
+	
+	/**
+	 * Permet de récuprer le niveau de log actuel  
+	 * @param level
+	 */
+	public static Level getLevel()
+	{
+		LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+		Configuration config = ctx.getConfiguration();
+		LoggerConfig loggerConfig = config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME); 
+		return loggerConfig.getLevel();
+		
+	}
+	
+	
 
 	
 	

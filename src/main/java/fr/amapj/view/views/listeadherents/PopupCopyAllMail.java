@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -20,6 +20,7 @@
  */
  package fr.amapj.view.views.listeadherents;
 
+import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -45,7 +46,7 @@ public class PopupCopyAllMail extends CorePopup
 	public PopupCopyAllMail(String mails)
 	{
 		popupTitle = "Comment envoyer un mail à tous les amapiens ? ";
-		popupWidth = "60%";
+		setWidth(60);
 				
 		this.mails = mails;
 		

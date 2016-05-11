@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -21,25 +21,15 @@
  package fr.amapj.view.views.producteur.livraison;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
-import org.apache.commons.lang.time.DateUtils;
-
-import com.vaadin.navigator.View;
-import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
-import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
-import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
 
 import fr.amapj.service.services.excelgenerator.EGFeuilleLivraison;
+import fr.amapj.service.services.gestioncontrat.GestionContratService;
 import fr.amapj.service.services.meslivraisons.JourLivraisonsDTO;
 import fr.amapj.service.services.meslivraisons.MesLivraisonsDTO;
 import fr.amapj.service.services.meslivraisons.MesLivraisonsService;
@@ -47,6 +37,9 @@ import fr.amapj.service.services.meslivraisons.ProducteurLivraisonsDTO;
 import fr.amapj.service.services.meslivraisons.QteProdDTO;
 import fr.amapj.view.engine.excelgenerator.LinkCreator;
 import fr.amapj.view.engine.popup.PopupListener;
+import fr.amapj.view.engine.template.FrontOfficeView;
+import fr.amapj.view.engine.tools.BaseUiTools;
+import fr.amapj.view.views.common.semaineviewer.SemaineViewer;
 import fr.amapj.view.views.producteur.ProducteurSelectorPart;
 
 
@@ -54,128 +47,52 @@ import fr.amapj.view.views.producteur.ProducteurSelectorPart;
  * Page permettant au producteur de visualiser la livraison de la semaine
  * 
  */
-public class ProducteurLivraisonsView extends Panel implements View , PopupListener
+public class ProducteurLivraisonsView extends FrontOfficeView implements PopupListener
 {
 
-	SimpleDateFormat df = new SimpleDateFormat("EEEEE dd MMMMM yyyy");
+	SimpleDateFormat df1 = new SimpleDateFormat("EEEEE dd MMMMM yyyy");
 	
-	private Date date;
 	
 	private ProducteurSelectorPart producteurSelector;
 	
 	private VerticalLayout central;
 	
+	
+	static private String LABEL_DATEJOURLIV = "datejourliv";
+	static private String LABEL_QTEPRODUIT = "qteproduit";	
+	static private String PANEL_UNJOUR = "unjour";
+
+	
+	private SemaineViewer semaineViewer;
+	
+	
+	public String getMainStyleName()
+	{
+		return "producteur-livraison";
+	}
 
 	/**
 	 * 
 	 */
 	@Override
-	public void enter(ViewChangeEvent event)
+	public void enter()
 	{
-		date = new Date();
 		producteurSelector = new ProducteurSelectorPart(this);
 		
-		VerticalLayout vLayout = new VerticalLayout();
-		vLayout.addComponent(producteurSelector.getChoixProducteurComponent());
-		vLayout.addComponent(getLivraisonDisplay());
-		
-		setSizeFull();
-		setContent(vLayout);
-		addStyleName(ChameleonTheme.PANEL_BORDERLESS);
-		
-		refresh();
-	}
+		addComponent(producteurSelector.getChoixProducteurComponent());
 
-
-
-	private Component getLivraisonDisplay()
-	{
-		
-		HorizontalLayout layout = new HorizontalLayout();
-		layout.setSizeFull();
-		
-		addButton(layout, "<<<<<",new Button.ClickListener()
-		{
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				reculer();
-			}
-		});
+		semaineViewer = new SemaineViewer(this);
+		addComponent(semaineViewer.getComponent());
 		
 		central = new VerticalLayout();
-		central.setWidth("100%");
-		layout.addComponent(central);
-		layout.setExpandRatio(central, 8.0f);	
+		addComponent(central);
+
 		
-		addButton(layout, ">>>>>",new Button.ClickListener()
-		{
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				avancer();
-			}
-		});
-		
-		layout.setMargin(true);
-		layout.setSpacing(true);
-		
-		return layout;
-	}
-	
-	
-	
-	protected void avancer()
-	{
-		date = DateUtils.addDays(date, 7);
-		refresh();
-		
+		onPopupClose();
 	}
 
-
-
-	protected void reculer()
-	{
-		date = DateUtils.addDays(date, -7);
-		refresh();
-		
-	}
-
-
-
-	private Label addLabel(VerticalLayout layout, String str)
-	{
-		Label tf = new Label(str);
-		tf.addStyleName(ChameleonTheme.LABEL_H1);
-		layout.addComponent(tf);
-		return tf;
-		
-	}
-	
-	private Label addLabel2(VerticalLayout layout, String str)
-	{
-		Label tf = new Label(str,ContentMode.HTML);
-		tf.addStyleName(ChameleonTheme.LABEL_BIG);
-		layout.addComponent(tf);
-		return tf;
-		
-	}
-
-	
-	
-	private void addButton(HorizontalLayout layout, String str,ClickListener listener)
-	{
-		Button b = new Button(str);
-		b.addStyleName(ChameleonTheme.BUTTON_BIG);
-		b.addClickListener(listener);
-		b.setWidth("100%");
-		layout.addComponent(b);
-		layout.setExpandRatio(b, 1.0f);
-		
-	}
-
-
-	private void refresh()
+	@Override
+	public void onPopupClose()
 	{
 		Long idProducteur = producteurSelector.getProducteurId();
 		
@@ -185,44 +102,79 @@ public class ProducteurLivraisonsView extends Panel implements View , PopupListe
 			return ;
 		}
 		
-		
-		MesLivraisonsDTO res = new MesLivraisonsService().getLivraisonProducteur(date, idProducteur);
+		//
+		MesLivraisonsDTO res = new MesLivraisonsService().getLivraisonProducteur(semaineViewer.getDate(), idProducteur);
 		central.removeAllComponents();
 
 		// Titre
-		addLabel(central, "Semaine du "+df.format(res.dateDebut)+" au "+df.format(res.dateFin));
-	
+		semaineViewer.updateTitreValue(res.dateDebut, res.dateFin);
 		
+		// Pour chaque jour, ajout des produits à livrer
 		for (JourLivraisonsDTO jour : res.jours)
 		{
-			addLabel2(central,"<br/><br/><h2>"+df.format(jour.date)+"</h2>");		
+			VerticalLayout vl = BaseUiTools.addPanel(central, PANEL_UNJOUR);
+			
+			String dateMessage = df1.format(jour.date);
+			BaseUiTools.addStdLabel(vl, dateMessage, LABEL_DATEJOURLIV);
+			
 			for (ProducteurLivraisonsDTO producteurLiv : jour.producteurs)
 			{
-				StringBuffer buf = new StringBuffer();
-				buf.append("<br/><br/><h3> Contrat : "+producteurLiv.modeleContrat+"</h3>");
+				BaseUiTools.addBandeau(vl, producteurLiv.modeleContrat, "nomcontrat");
 				
+				String msg = "<b>Quantités totales à livrer :</b><ul>";
 				for (QteProdDTO cell : producteurLiv.produits)
 				{
-					buf.append("<br/>"+cell.qte+" "+cell.nomProduit+" , "+cell.conditionnementProduit+"</h3>");
+					msg+= "<li>"+cell.qte+" "+cell.nomProduit+" , "+cell.conditionnementProduit+"</li>";
 				}
-				addLabel2(central,buf.toString());	
+				msg+="</ul>";
+				BaseUiTools.addHtmlLabel(vl, msg, LABEL_QTEPRODUIT);
 				
+				Button b = new Button("Voir le détail par amapien");
+				b.setIcon(FontAwesome.CHEVRON_DOWN);
+				vl.addComponent(b);
+				
+				Label detail = BaseUiTools.addHtmlLabel(vl, "", LABEL_QTEPRODUIT);
+				
+				b.addStyleName("icon-align-right");
+				b.addStyleName("large");	
+				b.addClickListener(e->buttonClick(detail,b,producteurLiv.idModeleContratDate));
+				b.setData(new Boolean(false));
+				
+				
+				//
 				Link extractFile = LinkCreator.createLink(new EGFeuilleLivraison(producteurLiv.idModeleContrat,producteurLiv.idModeleContratDate));
-				central.addComponent(extractFile);
+				vl.addComponent(extractFile);
 				
 			}
-		}
-		
-		
-		
-		
+		}		
 	}
 
 
-	@Override
-	public void onPopupClose()
+	public void buttonClick(Label detail,Button b,Long idModeleContratDate)
 	{
-		refresh();
+		boolean status = (Boolean) b.getData();
+		status = !status;
+		b.setData(status);
+		
+		if (status)
+		{
+			//
+			b.setCaption("Masquer le détail par amapien");
+			b.setIcon(FontAwesome.CHEVRON_UP);
+			//
+			String content = new GestionContratService().getDetailContrat(idModeleContratDate);
+			detail.setValue("<br/>"+content);
+		}
+		else
+		{
+			//
+			b.setCaption("Voir le détail par amapien");
+			b.setIcon(FontAwesome.CHEVRON_DOWN);
+			//
+			detail.setValue("");
+		}	
 	}
-
+	
+	
+	
 }

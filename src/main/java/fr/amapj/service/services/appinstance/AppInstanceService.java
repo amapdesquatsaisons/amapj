@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -34,6 +34,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import fr.amapj.common.AmapjRuntimeException;
+import fr.amapj.common.CollectionUtils;
+import fr.amapj.common.CollectionUtils.ToString;
 import fr.amapj.common.StringUtils;
 import fr.amapj.model.engine.db.DbManager;
 import fr.amapj.model.engine.dbms.DBMS;
@@ -46,12 +48,13 @@ import fr.amapj.model.engine.transaction.DbUtil;
 import fr.amapj.model.engine.transaction.DbWrite;
 import fr.amapj.model.engine.transaction.NewTransaction;
 import fr.amapj.model.engine.transaction.TransactionHelper;
+import fr.amapj.model.models.fichierbase.Utilisateur;
 import fr.amapj.model.models.saas.AppInstance;
 import fr.amapj.service.engine.appinitializer.AppInitializer;
 import fr.amapj.service.services.appinstance.SqlRequestDTO.DataBaseResponseDTO;
 import fr.amapj.service.services.appinstance.SqlRequestDTO.ResponseDTO;
+import fr.amapj.service.services.appinstance.SqlRequestDTO.SqlType;
 import fr.amapj.service.services.mailer.MailerCounter;
-import fr.amapj.service.services.mailer.MailerCounter.MailCount;
 import fr.amapj.service.services.parametres.ParametresDTO;
 import fr.amapj.service.services.parametres.ParametresService;
 import fr.amapj.service.services.session.SessionManager;
@@ -316,14 +319,7 @@ public class AppInstanceService
 	// PARTIE SUDO
 	public List<SudoUtilisateurDTO> getSudoUtilisateurDto(AppInstanceDTO dto)
 	{
-		return (List<SudoUtilisateurDTO>) SpecificDbUtils.executeInSpecificDb(dto.nomInstance, new SpecificDbImpl()
-		{
-			@Override
-			public Object perform()
-			{
-				return getSudoUtilisateurDto();
-			}
-		});
+		return SpecificDbUtils.executeInSpecificDb(dto.nomInstance, ()->getSudoUtilisateurDto());
 	}
 
 	public List<SudoUtilisateurDTO> getSudoUtilisateurDto()
@@ -348,8 +344,18 @@ public class AppInstanceService
 		return res;
 	}
 
+	/**
+	 * 
+	 * 
+	 * @param selected
+	 * @param appInstanceDTOs
+	 * @param ddlRequest si true, alors les requetes SQL sont des inserts, des updates ou des commandes DDL, sinon ce sont des requetes SQL de type SELECT  
+	 */
 	public void executeSqlRequest(SqlRequestDTO selected,List<AppInstanceDTO>  appInstanceDTOs)
 	{	
+		
+		boolean ddlRequest = (selected.sqlType == SqlType.UPDATE_OR_INSERT_OR_DDL);
+		
 		// Chaque requete est executée dans une transaction indépendante
 		// On s'arrête dès qu'une requete échoue 
 		
@@ -365,7 +371,7 @@ public class AppInstanceService
 			int index = 1;
 			for (String request : selected.verifiedRequests)
 			{
-				ResponseDTO res = executeOneSqlRequest(request,appInstanceDTO,index);
+				ResponseDTO res = executeOneSqlRequest(request,appInstanceDTO,index,ddlRequest);
 				dataBaseResponseDTO.responses.add(res);
 				if (res.success==false)
 				{
@@ -380,52 +386,35 @@ public class AppInstanceService
 	}
 
 
-	private ResponseDTO executeOneSqlRequest(String request, AppInstanceDTO dto,int index) 
+	private ResponseDTO executeOneSqlRequest(String request, AppInstanceDTO dto,int index, boolean ddlRequest) 
 	{
 		ResponseDTO res = new ResponseDTO();
 		res.index = index;
 		res.sqlRequest = request;
 		
-		String msg = executeOneSqlRequestException(request, dto);
-		
-		if (msg==null)
-		{	
-			res.sqlResponse = "OK";
-			res.success = true;
-		}
-		else
-		{
-			res.sqlResponse = "Erreur : "+msg;
-			res.success = false;	
-		}
-		
-		return res;
-	}
-	
-	
-	/**
-	 * Permet d'excuter une requete SQL sur l'instance indiquée
-	 * 
-	 * Retourne null si tout est OK, sinon retourne le message de l'exception SQL
-	 * 
-	 * @param request
-	 * @param dto
-	 * @return
-	 * @throws SQLException
-	 */
-	private String executeOneSqlRequestException(String request, AppInstanceDTO dto) 
-	{
 		DbManager dbManager = AppInitializer.dbManager;
 		DBMS dbms = dbManager.getDbms(dto.getDbms());
 		try
 		{
-			dbms.executeSqlCommand(request, dto);
-			return null;
+			if (ddlRequest)
+			{
+				res.nbModifiedLines = dbms.executeUpdateSqlCommand(request, dto);
+			}
+			else
+			{
+				res.sqlResultSet = dbms.executeQuerySqlCommand(request, dto);
+			}
+			
+			res.sqlResponse = "OK";
+			res.success = true;	
 		} 
 		catch (SQLException e)
 		{
-			return e.getMessage();
+			res.sqlResponse = "Erreur : "+ e.getMessage();
+			res.success = false;	
 		}
+		
+		return res;
 	}
 
 	/**
@@ -459,10 +448,11 @@ public class AppInstanceService
 		
 		String request = "BACKUP DATABASE TO '"+fileName+"' BLOCKING";
 		
-		String msg = executeOneSqlRequestException(request, appInstanceDTO);
-		if (msg!=null)
+		
+		ResponseDTO res =executeOneSqlRequest(request, appInstanceDTO,0,true);
+		if (res.success==false)
 		{
-			return "Erreur pour "+appInstanceDTO.nomInstance+": "+msg;
+			return "Erreur pour "+appInstanceDTO.nomInstance+": "+res.sqlResponse;
 		}
 		
 		
@@ -476,6 +466,30 @@ public class AppInstanceService
 	}
 
 	
-
+	/**
+	 * Permet de recuperer les mails de tous les tresoriers et adminitrateurs sur toutes les bases 
+	 * @return
+	 */
+	public String getAllMails()
+	{
+		StringBuffer str = new StringBuffer();
+		SpecificDbUtils.executeInAllDb(()->appendMails(str),false);
+		return str.toString();
+	}
+	
+	@DbRead
+	private Void appendMails(StringBuffer str)
+	{
+		EntityManager em = TransactionHelper.getEm();
+		
+		String dbName = DbUtil.getCurrentDb().getDbName();
+		
+		//Query q = em.createQuery("select distinct(u) from Utilisateur u  where u.id in (select a.utilisateur.id from RoleAdmin a) OR u.id in (select t.utilisateur.id from RoleTresorier t)  order by u.nom,u.prenom");
+		Query q = em.createQuery("select distinct(u) from Utilisateur u  where u.id in (select a.utilisateur.id from RoleAdmin a) order by u.nom,u.prenom");
+		List<Utilisateur> us = q.getResultList();
+		str.append(CollectionUtils.asStringFinalSep(us, ",",t->dbName+"<"+t.getEmail()+">"));
+		
+		return null;
+	}
 
 }

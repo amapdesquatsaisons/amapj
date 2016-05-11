@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -70,7 +70,7 @@ public class TableauDeBordView extends VerticalLayout implements View, PopupList
 	
 	private void handleStat()
 	{
-		TelechargerPopup popup = new TelechargerPopup();
+		TelechargerPopup popup = new TelechargerPopup("Tableau de bord");
 		popup.addGenerator(new EGStatAnnuelleProducteur());
 		CorePopup.open(popup,this);
 	}

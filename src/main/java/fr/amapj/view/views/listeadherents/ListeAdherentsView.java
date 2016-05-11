@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -30,32 +30,25 @@ import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
-import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.themes.ChameleonTheme;
 
-import fr.amapj.model.models.acces.RoleList;
 import fr.amapj.model.models.fichierbase.Utilisateur;
-import fr.amapj.model.models.param.paramecran.AbstractParamEcran;
-import fr.amapj.model.models.param.paramecran.PEListeAdherent;
 import fr.amapj.service.services.excelgenerator.EGListeAdherent;
 import fr.amapj.service.services.excelgenerator.EGListeAdherent.Type;
 import fr.amapj.service.services.listeadherents.ListeAdherentsService;
-import fr.amapj.service.services.parametres.ParamEcranDTO;
 import fr.amapj.service.services.parametres.ParametresService;
 import fr.amapj.service.services.parametres.paramecran.PEListeAdherentDTO;
-import fr.amapj.service.services.session.SessionManager;
 import fr.amapj.view.engine.excelgenerator.LinkCreator;
-import fr.amapj.view.engine.menu.MenuList;
 import fr.amapj.view.engine.popup.corepopup.CorePopup;
+import fr.amapj.view.engine.template.BackOfficeView;
 
 
 /**
@@ -64,7 +57,7 @@ import fr.amapj.view.engine.popup.corepopup.CorePopup;
  *  
  *
  */
-public class ListeAdherentsView extends VerticalLayout implements View
+public class ListeAdherentsView extends BackOfficeView
 {
 
 	private Table beanTable;
@@ -81,8 +74,8 @@ public class ListeAdherentsView extends VerticalLayout implements View
 	 * 
 	 */
 	@Override
-	public void enter(ViewChangeEvent event)
-	{
+	public void enterIn(ViewChangeEvent event)
+	{		
 		// TODO code à factoriser
 		PEListeAdherentDTO p = new ParametresService().getPEListeAdherentDTO();
 		
@@ -95,8 +88,8 @@ public class ListeAdherentsView extends VerticalLayout implements View
 		listPartContainer.sort(new String[] { "nom" , "prenom" }, new boolean[] { true, true });
 			
 		// Bind it to a component
-		beanTable = new Table("", listPartContainer);
-		beanTable.setStyleName("big strong");
+		beanTable = createTable(listPartContainer);
+		
 		
 		// Gestion de la liste des colonnes visibles
 		List<String> cols = new ArrayList<>();
@@ -148,7 +141,7 @@ public class ListeAdherentsView extends VerticalLayout implements View
 		
 		Label title = new Label("Liste des adhérents");
 		title.setSizeUndefined();
-		title.addStyleName("h1");
+		title.addStyleName("stdlistpart-text-title");	
 		
 		
 		sendMailButton = new Button("Envoyer un mail à tous ...");
@@ -191,16 +184,14 @@ public class ListeAdherentsView extends VerticalLayout implements View
 		toolbar.setComponentAlignment(searchField, Alignment.TOP_RIGHT);
 		toolbar.setSpacing(true);
 
-		setMargin(true);
-		setSpacing(true);
+		
 		
 		addComponent(title);
 		addComponent(toolbar);
 		
 		addComponent(beanTable);
 		setExpandRatio(beanTable, 1);
-		setSizeFull();
-		
+				
 	}
 	
 	private void handleSendMail()

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -34,7 +34,6 @@ public class TableBuilder
 	public Label createLabel(String msg,int taille)
 	{
 		Label l = new Label(msg);
-		l.addStyleName("big");
 		l.addStyleName("align-center");
 		l.setWidth(taille+"px");
 		return l;
@@ -43,7 +42,6 @@ public class TableBuilder
 	public CheckBox createCheckBox(boolean value,int taille)
 	{
 		CheckBox cb = new CheckBox();
-		cb.addStyleName("big");
 		cb.addStyleName("align-center");
 		cb.setValue(value);
 		cb.setWidth(taille+"px");
@@ -55,7 +53,6 @@ public class TableBuilder
 	{
 		TextField tf = new TextField();
 		tf.setValue(value);
-		tf.addStyleName("big");
 		tf.setWidth(taille+"px");
 		tf.setNullRepresentation("");
 		tf.setImmediate(true);
@@ -85,7 +82,7 @@ public class TableBuilder
 	public void addHeaderBox(String msg,int taille)
 	{
 		Label hLabel = new Label(msg);
-		hLabel.setWidth(taille+"px");
+		hLabel.setWidth((taille+13)+"px");
 		hLabel.setHeight(height+"px");
 		hLabel.addStyleName(styleName);
 		header1.addComponent(hLabel);

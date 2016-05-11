@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -30,41 +30,44 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.Panel;
 import com.vaadin.ui.RichTextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
 
 import fr.amapj.service.services.mailer.MailerMessage;
 import fr.amapj.service.services.mailer.MailerService;
 import fr.amapj.service.services.parametres.ParametresDTO;
 import fr.amapj.service.services.parametres.ParametresService;
+import fr.amapj.view.engine.template.BackOfficeLongView;
 
 
 /**
  * Page permettant l'envoi d'un mail 
- * 
- *  
- *
  */
-public class SendMailView extends Panel implements View
+public class SendMailView extends BackOfficeLongView implements View
 {
 
 	TextField titre;
 	TextField destinataires;
-	RichTextArea zoneTexte;	
+	RichTextArea zoneTexte;
+	
+	
+	@Override
+	public String getMainStyleName()
+	{
+		return "sendmail";
+	}
 
 	/**
 	 * 
 	 */
 	@Override
-	public void enter(ViewChangeEvent event)
+	public void enterIn(ViewChangeEvent event)
 	{
 
 		ParametresDTO param = new ParametresService().getParametres();
 		
-		VerticalLayout layout = new VerticalLayout();
+		VerticalLayout layout = this;
 		
 		addLabel(layout, "Cet outil permet d'envoyer un mail à une personne, ou à tous les utilisateurs actifs.");
 		addLabel(layout, "Cet outil permet de tester le bon fonctionnement de l'envoi des mails");
@@ -97,14 +100,7 @@ public class SendMailView extends Panel implements View
 				handleEnvoyerMail();
 			}
 		});
-		
-		
-		layout.setMargin(true);
-		layout.setSpacing(true);
-		setSizeFull();
-		setContent(layout);
-		
-			
+				
 	}
 
 	private TextField addTextField(VerticalLayout layout, String lib)
@@ -141,7 +137,7 @@ public class SendMailView extends Panel implements View
 	private void addButton(Layout layout, String str,ClickListener listener)
 	{
 		Button b = new Button(str);
-		b.addStyleName(ChameleonTheme.BUTTON_BIG);
+		b.addStyleName("primary");
 		b.addClickListener(listener);
 		layout.addComponent(b);
 		
@@ -151,7 +147,6 @@ public class SendMailView extends Panel implements View
 	private Label addLabel(VerticalLayout layout, String str)
 	{
 		Label tf = new Label(str);
-		tf.addStyleName(ChameleonTheme.LABEL_BIG);
 		layout.addComponent(tf);
 		return tf;
 
@@ -160,7 +155,6 @@ public class SendMailView extends Panel implements View
 	private Label addEmptyLine(VerticalLayout layout)
 	{
 		Label tf = new Label("<br/>",ContentMode.HTML);
-		tf.addStyleName(ChameleonTheme.LABEL_BIG);
 		layout.addComponent(tf);
 		return tf;
 

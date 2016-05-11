@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -50,8 +50,7 @@ public class PopupChercherChequeARendre extends WizardFormPopup
 	 */
 	public PopupChercherChequeARendre(Long mcId)
 	{
-		popupWidth = "80%";
-		popupHeight = "60%";
+		setWidth(80);
 		popupTitle = "Rechercher les chèques à rendre aux amapiens";
 		
 		this.mcId = mcId;

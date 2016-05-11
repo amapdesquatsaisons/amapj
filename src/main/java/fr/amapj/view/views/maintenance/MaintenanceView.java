@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -40,69 +40,67 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.Upload;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 
 import fr.amapj.service.engine.deamons.DeamonsContext;
 import fr.amapj.service.services.backupdb.BackupDatabaseService;
-import fr.amapj.service.services.excelgenerator.EGListeAdherent;
-import fr.amapj.service.services.excelgenerator.EGListeAdherent.Type;
 import fr.amapj.service.services.mailer.MailerCounter;
 import fr.amapj.service.services.maintenance.MaintenanceService;
 import fr.amapj.service.services.session.SessionManager;
-import fr.amapj.view.engine.excelgenerator.LinkCreator;
 import fr.amapj.view.engine.popup.corepopup.CorePopup;
-import fr.amapj.view.views.importdonnees.UtilisateurImporter;
+import fr.amapj.view.engine.template.BackOfficeLongView;
 
-public class MaintenanceView extends Panel implements View
+public class MaintenanceView extends BackOfficeLongView implements View
 {
 
 	private final static Logger logger = LogManager.getLogger();
+	
+	@Override
+	public String getMainStyleName()
+	{
+		return "maintenance";
+	}
 
 	@Override
-	public void enter(ViewChangeEvent event)
+	public void enterIn(ViewChangeEvent event)
 	{
 		boolean adminFull = SessionManager.getSessionParameters().isAdminFull();
 		
 		SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 		
-		VerticalLayout layout = new VerticalLayout();
-		layout.setMargin(true);
 
-		addLabelH1(layout, "Maintenance du système");
-		addEmptyLine(layout);
+		addLabel(this, "Maintenance du système","titre");
+	
 		
-		addLabel(layout, "Date et heure courante "+df.format(new Date()));
-		addEmptyLine(layout);
-		addLabel(layout, "Version de l'application : "+getVersion());
-		addEmptyLine(layout);
-		addLabel(layout, "Nombre d'emails envoyés aujourd'hui : "+MailerCounter.getNbMails());
-		addEmptyLine(layout);
+		addLabel(this, "Date et heure courante "+df.format(new Date()));
+		addLabel(this, "Version de l'application : "+getVersion());
+		addLabel(this, "Nombre d'emails envoyés aujourd'hui : "+MailerCounter.getNbMails());
 		
 		
 		Panel backupPanel = new Panel("Sauvegarde de la base et envoi par e mail");
+		backupPanel.addStyleName("action");
 		backupPanel.setContent(getBackupPanel());
 		
 		Panel suppressionPanel = new Panel("Suppression complète d'un contrat vierge et des contrats associés");
+		suppressionPanel.addStyleName("action");
 		suppressionPanel.setContent(getSuppressionPanel());
 		
 		Panel diversPanel = new Panel("Outils divers");
+		diversPanel.addStyleName("action");
 		diversPanel.setContent(getDiversPanel());
 		
-		layout.addComponent(backupPanel);
-		addEmptyLine(layout);
-		layout.addComponent(suppressionPanel);
-		addEmptyLine(layout);
+		addComponent(backupPanel);
+		addEmptyLine(this);
+		addComponent(suppressionPanel);
+		addEmptyLine(this);
 		
 		//
 		if (adminFull)
 		{
-			layout.addComponent(diversPanel);
+			addComponent(diversPanel);
 		}
 		
-		setContent(layout);
-		setSizeFull();
 	}
 	
 	
@@ -277,21 +275,21 @@ public class MaintenanceView extends Panel implements View
 		}
 	}
 
-	private Label addLabelH1(VerticalLayout layout, String str)
+	
+	private Label addLabel(VerticalLayout layout, String str,String stylename)
 	{
 		Label tf = new Label(str);
-		tf.addStyleName(ChameleonTheme.LABEL_H1);
+		if (stylename!=null)
+		{
+			tf.addStyleName(stylename);
+		}
 		layout.addComponent(tf);
 		return tf;
-		
 	}
 	
 	private Label addLabel(VerticalLayout layout, String str)
 	{
-		Label tf = new Label(str);
-		tf.addStyleName(ChameleonTheme.LABEL_BIG);
-		layout.addComponent(tf);
-		return tf;
+		return addLabel(layout, str, null);
 	}
 	
 	

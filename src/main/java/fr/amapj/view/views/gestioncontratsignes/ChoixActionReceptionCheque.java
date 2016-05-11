@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -37,7 +37,7 @@ public class ChoixActionReceptionCheque extends SwitchPopup
 	public ChoixActionReceptionCheque(Long mcId)
 	{
 		popupTitle = "Autres actions sur les paiements";
-		popupWidth = "50%";
+		setWidth(50);
 		
 		this.mcId = mcId;
 

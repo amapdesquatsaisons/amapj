@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -34,6 +34,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 
 import fr.amapj.view.engine.popup.corepopup.CorePopup;
+import fr.amapj.view.engine.popup.corepopup.CorePopup.ColorStyle;
 import fr.amapj.view.engine.popup.errorpopup.ErrorPopup;
 import fr.amapj.view.engine.popup.messagepopup.MessagePopup;
 
@@ -81,6 +82,8 @@ public class SuppressionPopup extends CorePopup
 	protected void createContent(VerticalLayout contentLayout)
 	{
 
+		setWidth(40,450);
+		
 		// Construction de la zone de texte
 		HorizontalLayout hlTexte = new HorizontalLayout();
 		hlTexte.setMargin(true);
@@ -200,7 +203,7 @@ public class SuppressionPopup extends CorePopup
 			String title = "Erreur à la suppression";
 			String t1="Impossible de supprimer cet élément. Raison :";
 			String t2 = e.getMessage();
-			MessagePopup popup = new MessagePopup(title,ContentMode.HTML,t1,t2);
+			MessagePopup popup = new MessagePopup(title,ContentMode.HTML,ColorStyle.RED,t1,t2);
 			CorePopup.open(popup);
 		}
 		catch(Exception e)

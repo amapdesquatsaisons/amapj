@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -44,6 +44,7 @@ import com.vaadin.ui.themes.ChameleonTheme;
 import fr.amapj.service.services.suiviacces.ConnectedUserDTO;
 import fr.amapj.service.services.suiviacces.SuiviAccesService;
 import fr.amapj.view.engine.popup.formpopup.FormPopup;
+import fr.amapj.view.engine.template.BackOfficeView;
 import fr.amapj.view.engine.tools.DateTimeToStringConverter;
 
 
@@ -54,7 +55,7 @@ import fr.amapj.view.engine.tools.DateTimeToStringConverter;
  *  
  *
  */
-public class SuiviAccesView extends VerticalLayout implements View
+public class SuiviAccesView extends BackOfficeView
 {
 
 	private Table beanTable;
@@ -69,7 +70,7 @@ public class SuiviAccesView extends VerticalLayout implements View
 	 * 
 	 */
 	@Override
-	public void enter(ViewChangeEvent event)
+	public void enterIn(ViewChangeEvent event)
 	{
 		listPartContainer = new BeanItemContainer<>(ConnectedUserDTO.class);
 							
@@ -77,8 +78,7 @@ public class SuiviAccesView extends VerticalLayout implements View
 		listPartContainer.sort(new String[] { "nom" , "prenom"  }, new boolean[] { true, true });
 			
 		// Bind it to a component
-		beanTable = new Table("", listPartContainer);
-		beanTable.setStyleName("big strong");
+		beanTable = createTable(listPartContainer);
 		
 		// Gestion de la liste des colonnes visibles
 		beanTable.setVisibleColumns("nom" , "prenom" , "email" , "date" , "agent" ,"dbName");
@@ -142,7 +142,7 @@ public class SuiviAccesView extends VerticalLayout implements View
 		
 		Label title = new Label("Liste des personnes connectées");
 		title.setSizeUndefined();
-		title.addStyleName("h1");
+		title.addStyleName("stdlistpart-text-title");	
 		
 		
 		
@@ -168,14 +168,12 @@ public class SuiviAccesView extends VerticalLayout implements View
 		toolbar.setExpandRatio(searchField, 1);
 		toolbar.setComponentAlignment(searchField, Alignment.TOP_RIGHT);
 
-		setMargin(true);
-		setSpacing(true);
 		
 		addComponent(title);
 		addComponent(toolbar);
 		addComponent(beanTable);
 		setExpandRatio(beanTable, 1);
-		setSizeFull();
+		
 		
 		refresh();
 		

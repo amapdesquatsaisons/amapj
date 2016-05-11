@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -20,11 +20,10 @@
  */
  package fr.amapj.view.engine.excelgenerator;
 
-
-
 import java.util.ArrayList;
 import java.util.List;
 
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.StreamResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
@@ -36,7 +35,6 @@ import com.vaadin.ui.VerticalLayout;
 import fr.amapj.service.engine.generator.CoreGenerator;
 import fr.amapj.service.engine.generator.CoreGeneratorService;
 import fr.amapj.service.engine.generator.FileInfoDTO;
-import fr.amapj.service.engine.generator.excel.AbstractExcelGenerator;
 import fr.amapj.view.engine.popup.corepopup.CorePopup;
 
 /**
@@ -51,10 +49,14 @@ public class TelechargerPopup extends CorePopup
 	
 	// Mémorise l'index des generators qui sont suivis par un espace
 	private List<Integer> separators = new ArrayList<>();
+
 	
-	public TelechargerPopup()
+	public TelechargerPopup(String popupTitle)
 	{	
+		this.popupTitle = popupTitle;
 	}
+	
+	
 	
 	public void addGenerator(CoreGenerator generator)
 	{
@@ -70,7 +72,11 @@ public class TelechargerPopup extends CorePopup
 
 	protected void createContent(VerticalLayout contentLayout)
 	{
-		contentLayout.addComponent(new Label("Veuillez cliquer sur le lien du fichier que vous souhaitez télécharger<br/>",ContentMode.HTML));
+		
+		contentLayout.addStyleName("popup-telecharger");
+		
+		Label l = new Label("Veuillez cliquer sur le lien du fichier que vous souhaitez télécharger");
+		contentLayout.addComponent(l);
 		
 		
 		List<FileInfoDTO> fileInfoDTOs = new CoreGeneratorService().getFileInfo(generators);
@@ -93,6 +99,7 @@ public class TelechargerPopup extends CorePopup
 		String fileName = fileInfoDTO.fileName;
 		String extension = fileInfoDTO.extension;
 		Link extractFile = new Link(titre,new StreamResource(new CoreResource(fileInfoDTO.generator), fileName+"."+extension));
+		extractFile.setIcon(FontAwesome.DOWNLOAD);
 		contentLayout.addComponent(extractFile);
 	}
 

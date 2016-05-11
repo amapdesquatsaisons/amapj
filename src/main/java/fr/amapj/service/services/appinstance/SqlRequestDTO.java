@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -29,6 +29,8 @@ import java.util.List;
  */
 public class SqlRequestDTO 
 {
+	public SqlType sqlType = SqlType.REQUETE_SQL_STANDARD;
+	
 	public String requests;
 	
 	public List<String> verifiedRequests = new ArrayList<String>();
@@ -36,17 +38,6 @@ public class SqlRequestDTO
 	public List<DataBaseResponseDTO> responses = new ArrayList<SqlRequestDTO.DataBaseResponseDTO>();
 	
 	public boolean success;
-
-	public String getRequests()
-	{
-		return requests;
-	}
-
-	public void setRequests(String requests)
-	{
-		this.requests = requests;
-	}
-
 	
 	static public class DataBaseResponseDTO
 	{
@@ -65,7 +56,50 @@ public class SqlRequestDTO
 		
 		public boolean success;
 		
+		// Sera renseigné dans tous les cas
 		public String sqlResponse;
+		
+		// Sera renseigné uniquement dans le cas d'un select 
+		public List<List<String>> sqlResultSet;
+		
+		// Sera renseigné uniquement dans le cas d'un update ou ddl 
+		public int nbModifiedLines;
+				
+		
 	}
+	
+	
+	static public enum SqlType
+	{
+		// 
+		REQUETE_SQL_STANDARD ,
+		
+		// 
+		UPDATE_OR_INSERT_OR_DDL ;
+
+	}
+
+
+	public SqlType getSqlType()
+	{
+		return sqlType;
+	}
+
+	public void setSqlType(SqlType sqlType)
+	{
+		this.sqlType = sqlType;
+	}
+	
+	public String getRequests()
+	{
+		return requests;
+	}
+
+	public void setRequests(String requests)
+	{
+		this.requests = requests;
+	}
+
+	
 	
 }

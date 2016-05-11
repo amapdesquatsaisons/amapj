@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -80,7 +80,7 @@ public class GenerateSqlSchema
 	{
 		// TODO remettre au propre la gestion des logs
 		// On pourrait mettre une valeur par défaut dans le fichier log4j2.xml de developpement 
-		AmapJLogManager.setLogDir("../logs/");
+		AmapJLogManager.setLogDir("../../logs/");
 		
 		GenerateSqlSchema generateSqlSchema = new GenerateSqlSchema();
 		System.out.println("Debut de la generation du schema sql");

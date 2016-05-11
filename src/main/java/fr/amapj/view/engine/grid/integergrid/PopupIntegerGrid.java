@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -27,26 +27,23 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.util.converter.Converter.ConversionException;
+import com.vaadin.server.Page;
 import com.vaadin.server.WebBrowser;
-import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
-import com.vaadin.ui.themes.ChameleonTheme;
 
 import fr.amapj.view.engine.grid.ErreurSaisieException;
 import fr.amapj.view.engine.grid.GridHeaderLine;
 import fr.amapj.view.engine.grid.GridIJData;
 import fr.amapj.view.engine.grid.ShortCutManager;
+import fr.amapj.view.engine.notification.NotificationHelper;
 import fr.amapj.view.engine.popup.corepopup.CorePopup;
 import fr.amapj.view.engine.tools.BaseUiTools;
 import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
@@ -85,12 +82,15 @@ abstract public class PopupIntegerGrid extends CorePopup
 
 	protected void createContent(VerticalLayout mainLayout)
 	{
+		setType(PopupType.CENTERFIT);
 		loadParam();
 		param.initialize();
 
 		if (param.messageSpecifique != null)
 		{
-			mainLayout.addComponent(new Label(param.messageSpecifique, ContentMode.HTML));
+			Label messageSpeLabel = new Label(param.messageSpecifique);
+			messageSpeLabel.addStyleName("popup-integer-grid-message");
+			mainLayout.addComponent(messageSpeLabel);
 		}
 
 		// Construction des headers
@@ -101,14 +101,17 @@ abstract public class PopupIntegerGrid extends CorePopup
 
 		// Construction de la table de saisie
 		table = new Table();
-		table.addStyleName("big");
+		table.addStyleName("no-vertical-lines");
+		table.addStyleName("no-horizontal-lines");
+		table.addStyleName("no-stripes");
+		
 
 		table.setColumnHeaderMode(ColumnHeaderMode.HIDDEN);
 
 		
 		// Colonne de gauche contenant un libellé
 		table.addContainerProperty(new Integer(-1), Label.class, null);
-		table.setColumnWidth(new Integer(-1), param.largeurCol - 10);
+		table.setColumnWidth(new Integer(-1), param.largeurCol);
 		
 
 		// Les autres colonnes correspondant à la saisie des quantites
@@ -124,14 +127,14 @@ abstract public class PopupIntegerGrid extends CorePopup
 				clzz = TextField.class;
 			}
 			table.addContainerProperty(new Integer(i), clzz, null);
-			table.setColumnWidth(new Integer(i), param.largeurCol - 10);
+			table.setColumnWidth(new Integer(i), param.largeurCol);
 		}
 
 		//
 		if (param.readOnly==false)
 		{
 			shortCutManager = new ShortCutManager(param.nbLig, param.nbCol, param.excluded);
-			shortCutManager.addShorcut(this);
+			shortCutManager.addShorcut(this.getWindow());
 		}
 
 		// Creation de toutes les cellules pour la saisie
@@ -178,23 +181,6 @@ abstract public class PopupIntegerGrid extends CorePopup
 		mainLayout.addComponent(table);
 		mainLayout.addComponent(footer0);
 		mainLayout.addComponent(footer1);
-
-		mainLayout.setMargin(true);
-		
-		// Largeur totale du popup
-		// On considére qu'il y a 40 pixels de marges
-		int totalWidth = (param.largeurCol - 10)*(1+param.nbCol)+40;
-		if (totalWidth>UI.getCurrent().getPage().getBrowserWindowWidth())
-		{
-			popupWidth="90%";
-		}
-		else
-		{
-			popupWidth="";
-		}
-		
-
-		
 		
 	}
 		
@@ -202,48 +188,22 @@ abstract public class PopupIntegerGrid extends CorePopup
 	{
 		if (param.readOnly)
 		{
-			Button ok = addDefaultButton("Continuer ...", new Button.ClickListener()
-			{
-				@Override
-				public void buttonClick(ClickEvent event)
-				{
-					handleContinuer();
-				}
-			});
+			Button ok = addDefaultButton("Continuer ...", e->handleContinuer());
 		}
 		else
 		{
 			if (param.nbLig > 1)
 			{
-				Button copierButton = addButton("Copier la 1ère ligne partout", new Button.ClickListener()
-				{
-					@Override
-					public void buttonClick(ClickEvent event)
-					{
-						handleCopier();
-					}
-				});
-				popupButtonBarLayout.setComponentAlignment(copierButton, Alignment.TOP_LEFT);
+				Button copierButton = addButton("Copier la 1ère ligne partout", e->	handleCopier());
+				setButtonAlignement(copierButton, Alignment.TOP_LEFT);
 			}
 
-			Button saveButton = addDefaultButton("Continuer ...", new Button.ClickListener()
-			{
-				@Override
-				public void buttonClick(ClickEvent event)
-				{
-					handleSauvegarder();
-				}
-			});
-		
-
-			Button cancelButton = addButton("Annuler", new Button.ClickListener()
-			{
-				@Override
-				public void buttonClick(ClickEvent event)
-				{
-					handleAnnuler();
-				}
-			});
+			
+			Button cancelButton = addButton("Annuler", e->handleAnnuler());
+			
+			Button saveButton = addDefaultButton("Continuer ...", e->handleSauvegarder());
+			saveButton.addStyleName("primary");
+			
 		}
 	}
 
@@ -255,7 +215,7 @@ abstract public class PopupIntegerGrid extends CorePopup
 		}
 		catch (ErreurSaisieException e)
 		{
-			Notification.show("Erreur de saisie sur la premiere ligne - Impossible de copier");
+			NotificationHelper.displayNotification("Erreur de saisie sur la premiere ligne - Impossible de copier");
 		}
 	}
 
@@ -310,16 +270,35 @@ abstract public class PopupIntegerGrid extends CorePopup
 
 	private int getPageLength()
 	{
-		WebBrowser webBrowser = UI.getCurrent().getPage().getWebBrowser();
+		Page page = UI.getCurrent().getPage();
 		int pageLength = 15;
+		
+		// On limite le nombre de ligne pour ne pas avoir une double scroolbar
+		
+		// Une ligne fait 32 en mode edition , sinon 26
+		int lineHeight = param.readOnly ? 26 : 32;   	
+		
+		// On cacule la place consommée par les headers, boutons, ...
+		// 365 : nombre de pixel mesurée pour les haeders, les boutons, ... en mode normal, 270 en mode compact
+		int headerAndButtonHeight = BaseUiTools.isCompactMode() ? 270 : 365;
+		
+		
+		int maxLineAvailable = (page.getBrowserWindowHeight()-headerAndButtonHeight)/lineHeight;
+		
+		// Il y a au moins 4 lignes visibles
+		maxLineAvailable = Math.max(maxLineAvailable, 4);  						
+		pageLength = Math.min(pageLength,maxLineAvailable);
 
 		// Pour ie 8 et inférieur : on se limite a 6 lignes, sinon ca rame trop
+		WebBrowser webBrowser = UI.getCurrent().getPage().getWebBrowser();
 		if (webBrowser.isIE() && webBrowser.getBrowserMajorVersion() < 9)
 		{
-			pageLength = 6;
+			pageLength = Math.min(pageLength,6);
 		}
 
+		//
 		pageLength = Math.min(pageLength, param.nbLig);
+		
 		return pageLength;
 	}
 
@@ -342,9 +321,8 @@ abstract public class PopupIntegerGrid extends CorePopup
 		List<Object> cells = new ArrayList<Object>();
 
 		Label dateLabel = new Label(param.leftPartLine.get(lig));
-		dateLabel.addStyleName("big");
-		dateLabel.addStyleName("align-center");
-		dateLabel.setWidth(param.largeurCol + "px");
+		dateLabel.addStyleName("date-saisie");
+		
 
 		cells.add(dateLabel);
 		for (int j = 0; j < param.nbCol; j++)
@@ -371,8 +349,7 @@ abstract public class PopupIntegerGrid extends CorePopup
 					txt = "" + qte;
 				}
 				Label tf = new Label(txt);
-				tf.addStyleName("align-center");
-				tf.addStyleName("big");
+				tf.addStyleName("cell-voir");
 				tf.setWidth((param.largeurCol - 10) + "px");
 				cells.add(tf);
 			}
@@ -385,8 +362,7 @@ abstract public class PopupIntegerGrid extends CorePopup
 					TextField tf = new TextField();
 					tf.setValue("XXXXXX");
 					tf.setEnabled(false);
-					tf.addStyleName("align-center");
-					tf.addStyleName("big");
+					tf.addStyleName("cell-voir");
 					tf.setWidth((param.largeurCol - 10) + "px");
 					cells.add(tf);
 				}
@@ -417,15 +393,12 @@ abstract public class PopupIntegerGrid extends CorePopup
 							}
 							catch (ErreurSaisieException e)
 							{
-								// TODO pas si simple
-								// tf.setStyleName("erreurqte");
-								Notification.show("Erreur de saisie");
+								NotificationHelper.displayNotificationQte();
 							}
 						}
 					});
 	
-					tf.addStyleName("align-center");
-					tf.addStyleName("big");
+					tf.addStyleName("cell-saisie");
 					tf.setWidth((param.largeurCol - 10) + "px");
 					shortCutManager.registerTextField(tf);
 					cells.add(tf);
@@ -437,6 +410,7 @@ abstract public class PopupIntegerGrid extends CorePopup
 
 	}
 
+	
 	/**
 	 * Indique si cette cellule est exclue de la saisie
 	 * @param lig
@@ -495,7 +469,7 @@ abstract public class PopupIntegerGrid extends CorePopup
 		}
 		catch (ErreurSaisieException e)
 		{
-			Notification.show("Erreur de saisie");
+			NotificationHelper.displayNotificationQte();
 			return;
 		}
 

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -21,10 +21,7 @@
  package fr.amapj.view.views.saisiecontrat;
 
 
-
 import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 
@@ -39,7 +36,6 @@ import fr.amapj.view.views.saisiecontrat.SaisieContrat.SaisieContratData;
  * Popup d'informations sur le paiement
  *  
  */
-@SuppressWarnings("serial")
 public class PopupInfoPaiement extends CorePopup
 {
 	private InfoPaiementDTO paiementDTO;
@@ -54,7 +50,7 @@ public class PopupInfoPaiement extends CorePopup
 		this.paiementDTO = data.contratDTO.paiement;
 		
 		popupTitle = "Information sur les paiements pour le contrat "+data.contratDTO.nom;
-		popupWidth ="50%";
+		setWidth(50);
 	}
 
 	protected void createContent(VerticalLayout contentLayout)
@@ -78,36 +74,12 @@ public class PopupInfoPaiement extends CorePopup
 	{
 		if (data.modeSaisie == ModeSaisie.READ_ONLY)
 		{
-			Button ok = addDefaultButton("OK", new Button.ClickListener()
-			{
-
-				@Override
-				public void buttonClick(ClickEvent event)
-				{
-					handleAnnuler();
-				}
-			});
+			addDefaultButton("OK", e->handleAnnuler());
 		}
 		else
 		{
-			Button saveButton = addDefaultButton("Sauvegarder", new Button.ClickListener()
-			{
-				@Override
-				public void buttonClick(ClickEvent event)
-				{
-					handleSauvegarder();
-				}
-			});
-
-			Button cancelButton = addButton("Annuler", new Button.ClickListener()
-			{
-
-				@Override
-				public void buttonClick(ClickEvent event)
-				{
-					handleAnnuler();
-				}
-			});
+			addButton("Annuler", e->handleAnnuler());
+			addDefaultButton("Sauvegarder", e->	handleSauvegarder());
 		}
 
 	}

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -23,10 +23,12 @@
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -44,6 +46,7 @@ import fr.amapj.common.DateUtils;
 import fr.amapj.common.StackUtils;
 import fr.amapj.model.engine.db.DbManager;
 import fr.amapj.model.engine.dbms.DBMS;
+import fr.amapj.model.engine.dbms.DBMSTools;
 import fr.amapj.model.engine.ddl.MakeSqlSchemaForEmptyDb;
 import fr.amapj.model.engine.tools.SpecificDbImpl;
 import fr.amapj.model.engine.tools.SpecificDbUtils;
@@ -231,17 +234,41 @@ public class HsqlInternalDbms implements DBMS
 	
 	
 	@Override
-	public void executeSqlCommand(String sqlCommand,AppInstanceDTO dto) throws SQLException
+	public int executeUpdateSqlCommand(String sqlCommand,AppInstanceDTO dto) throws SQLException
 	{
 		String url1 = conf.createUrl(dto.nomInstance);
 				
 		Connection conn = DriverManager.getConnection(url1, user, password);
 		Statement st = conn.createStatement();
-		st.execute(sqlCommand);	
+		int res = st.executeUpdate(sqlCommand);	
 		conn.commit();
 		conn.close();
+		
+		return res;
 		   			
 	}
+	
+	
+	
+	
+	@Override
+	public List<List<String>> executeQuerySqlCommand(String sqlCommand,AppInstanceDTO dto) throws SQLException
+	{
+		String url1 = conf.createUrl(dto.nomInstance);
+				
+		Connection conn = DriverManager.getConnection(url1, user, password);
+		Statement st = conn.createStatement();
+		
+		ResultSet resultset = st.executeQuery(sqlCommand);	
+		
+		List<List<String>> result = DBMSTools.readResultSet(resultset);	
+		
+		conn.commit();
+		conn.close();
+		
+		return result;
+	}
+	
 	
 	
 	
@@ -273,28 +300,9 @@ public class HsqlInternalDbms implements DBMS
 		registerDb(appInstanceDTO, AppState.ON);
 		
 		// On remplit la base de données, en faisant un appel de service dans cette base
-		Throwable t = (Throwable) SpecificDbUtils.executeInSpecificDb(dbName, new SpecificDbImpl()
-		{
-			@Override
-			public Object perform()
-			{
-				try
-				{
-					new DemoService().generateDemoData(appInstanceDTO);
-					return null;
-				}
-				catch(Throwable t)
-				{
-					return t;
-				}
-			}
-		});
+		SpecificDbUtils.executeInSpecificDb(dbName, ()->new DemoService().generateDemoData(appInstanceDTO));
+					
 		
-		// 
-		if (t!=null)
-		{
-			throw new AmapjRuntimeException("Une erreur est survenue",t);
-		}
 	}
 	
 	

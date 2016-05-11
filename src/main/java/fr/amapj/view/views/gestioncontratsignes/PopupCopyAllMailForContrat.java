@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -22,6 +22,7 @@
 
 import java.util.List;
 
+import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -49,7 +50,7 @@ public class PopupCopyAllMailForContrat extends CorePopup
 	public PopupCopyAllMailForContrat(Long idModeleContrat)
 	{
 		popupTitle = "Comment envoyer un mail à tous les amapiens de ce contrat ? ";
-		popupWidth = "60%";
+		setWidth(60);
 				
 		this.idModeleContrat = idModeleContrat;
 		

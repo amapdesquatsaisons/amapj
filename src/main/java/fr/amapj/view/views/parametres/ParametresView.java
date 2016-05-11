@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -20,24 +20,19 @@
  */
  package fr.amapj.view.views.parametres;
 
-import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
-import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
 
-import fr.amapj.model.models.param.EtatModule;
 import fr.amapj.service.services.parametres.ParametresDTO;
 import fr.amapj.service.services.parametres.ParametresService;
 import fr.amapj.view.engine.popup.PopupListener;
 import fr.amapj.view.engine.popup.corepopup.CorePopup;
 import fr.amapj.view.engine.popup.formpopup.FormPopup;
+import fr.amapj.view.engine.template.BackOfficeLongView;
 import fr.amapj.view.views.parametres.paramecran.PEListeAdherentEditorPart;
 import fr.amapj.view.views.parametres.paramecran.PEReceptionChequeEditorPart;
 import fr.amapj.view.views.parametres.paramecran.PESaisiePaiementEditorPart;
@@ -48,7 +43,7 @@ import fr.amapj.view.views.parametres.paramecran.PESaisiePaiementEditorPart;
  *  
  *
  */
-public class ParametresView extends VerticalLayout implements View, PopupListener
+public class ParametresView extends BackOfficeLongView implements PopupListener
 {
 
 	ParametresDTO dto;
@@ -56,106 +51,57 @@ public class ParametresView extends VerticalLayout implements View, PopupListene
 	TextField nomAmap;
 	TextField villeAmap;
 	
-	TextField sendingMailUsername;
-	TextField url;
-	TextField backupReceiver;
 	
-	TextField modulePlanningDistribution;
-	TextField moduleGestionCotisation;
-	TextField moduleEditionSpecifique;
-
-	
+	@Override
+	public String getMainStyleName()
+	{
+		return "parametres";
+	}
 
 	/**
 	 * 
 	 */
 	@Override
-	public void enter(ViewChangeEvent event)
-	{
+	public void enterIn(ViewChangeEvent event)
+	{		
+		// Bloc identifiants
+		FormLayout form1 = new FormLayout();
+        form1.setMargin(false);
+        form1.addStyleName("light");
+        addComponent(form1);
+        
+        
+        Label section = new Label("Paramètres de l'AMAP");
+        section.addStyleName("h2");
+        section.addStyleName("colored");
+        form1.addComponent(section);
+		
+		nomAmap = addTextField("Nom de l'AMAP ",form1);
+		villeAmap = addTextField("Ville de l'AMAP ",form1);
+		
 
-		GridLayout layout = new GridLayout(3, 12);
-		layout.setWidth("80%");
-		layout.setColumnExpandRatio(0, 0);
 		
+		addButton("Changer les paramètres",e->handleChangerParam());
+			
 		
-		// Une ligne vide
-		addEmptyLine(layout);
-		
-		// 
-		nomAmap = addLine(layout,"Nom de l'AMAP:");
-		villeAmap = addLine(layout,"Ville de l'AMAP:");
-		addEmptyLine(layout);
-		
-		sendingMailUsername = addLine(layout,"Adresse mail qui enverra les messages");
-		url = addLine(layout,"URL de l'application utilisée dans les mails");
-		backupReceiver = addLine(layout,"Adresse mail du destinataire des sauvegardes quotidiennes");
-		addEmptyLine(layout);
-		
-		modulePlanningDistribution = addLine(layout, "Activation du module Planning de distribution");
-		moduleGestionCotisation = addLine(layout, "Activation du module Gestion des cotisations");
-		moduleEditionSpecifique = addLine(layout, "Activation du module Etiquettes et autres éditions spécifiques");
-		
-		
-		addLabel(layout, "...");
-		addLabel(layout," ");
-		addLabel(layout," ");	
-		
-		
-		addButton(layout, "Changer les paramètres",new Button.ClickListener()
-		{
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				handleChangerParam();
-			}
-		});
-		
-		addLabel(layout," ");
-		addLabel(layout," ");	
-		addEmptyLine(layout);
 		
 		final PopupListener listener = this;
 		
-		addButton(layout, "Ecran \"Liste des adhérents\"",e -> 	CorePopup.open(new PEListeAdherentEditorPart(),listener));
+
+		addButton("Ecran \"Liste des adhérents\"",e -> 	CorePopup.open(new PEListeAdherentEditorPart(),listener));
 			
-		addButton(layout, "Ecran \"Réception des chèques\"",e -> CorePopup.open(new PEReceptionChequeEditorPart(),listener));
-		
-		addButton(layout, "Ecran \"Saisie des paiements par l'amapien\"",e -> CorePopup.open(new PESaisiePaiementEditorPart(),listener));
+		addButton("Ecran \"Réception des chèques\"",e -> CorePopup.open(new PEReceptionChequeEditorPart(),listener));
+
+		addButton("Ecran \"Saisie des paiements par l'amapien\"",e -> CorePopup.open(new PESaisiePaiementEditorPart(),listener));
 	
 		
 		refresh();
 		
-		layout.setMargin(true);
-		layout.setSpacing(true);
-		layout.setSizeFull();
-		addComponent(layout);
-		
-		
 	}
 
 
 
-	private void addEmptyLine(GridLayout layout)
-	{
-		for(int i=0;i<3;i++)
-		{
-			Label tf = new Label("<br/>",ContentMode.HTML);
-			layout.addComponent(tf);
-		}
-	}
-
-
-
-	private TextField addLine(GridLayout layout, String label)
-	{
-		addLabel(layout,label);
-		TextField tf = addTextField(layout);
-		addLabel(layout," ");
-		return tf;
-	}
-
-
-
+	
 	
 	private void handleChangerParam()
 	{
@@ -165,34 +111,11 @@ public class ParametresView extends VerticalLayout implements View, PopupListene
 	
 
 	
-	
-	private Label addLabel(GridLayout layout, String str)
-	{
-		Label tf = new Label(str);
-		tf.addStyleName(ChameleonTheme.LABEL_BIG);
-		layout.addComponent(tf);
-		return tf;
-		
-	}
-
-	private TextField addTextField(GridLayout layout)
-	{
-		TextField tf = new TextField();
-		tf.setWidth("100%");
-		tf.setNullRepresentation("");
-		tf.addStyleName(ChameleonTheme.TEXTFIELD_BIG);
-		tf.setEnabled(false);
-		layout.addComponent(tf);
-		return tf;
-		
-	}
-	
-	private void addButton(GridLayout layout, String str,ClickListener listener)
+	private void addButton(String str,ClickListener listener)
 	{
 		Button b = new Button(str);
-		b.addStyleName(ChameleonTheme.BUTTON_BIG);
 		b.addClickListener(listener);
-		layout.addComponent(b);
+		addComponent(b);
 		
 	}
 
@@ -206,17 +129,34 @@ public class ParametresView extends VerticalLayout implements View, PopupListene
 	{
 		dto = new ParametresService().getParametres();
 		
-		nomAmap.setValue(dto.nomAmap);
-		villeAmap.setValue(dto.villeAmap);
-		
-		sendingMailUsername.setValue(dto.sendingMailUsername);
-		url.setValue(dto.url);
-		backupReceiver.setValue(dto.backupReceiver);
-		
-		modulePlanningDistribution.setValue(dto.etatPlanningDistribution.toString());
-		moduleGestionCotisation.setValue(dto.etatGestionCotisation.toString());
-		moduleEditionSpecifique.setValue(dto.etatEditionSpecifique.toString());
-					
+		setValue(nomAmap,dto.nomAmap);
+		setValue(villeAmap,dto.villeAmap);		
 	}
+	
+	
+	
+	// TOOLS
+
+
+	private void setValue(TextField tf, String val)
+	{
+		tf.setReadOnly(false);
+		tf.setValue(val);
+		tf.setReadOnly(true);
+	}
+	
+	
+	private TextField addTextField(String lib,FormLayout form)
+	{
+		TextField name = new TextField(lib);
+		// name.addStyleName(TEXTFIELD_COMPTEINPUT);
+		name.setWidth("100%");
+		name.setNullRepresentation("");
+		name.setReadOnly(true);
+		form.addComponent(name);
+
+		return name;
+	}
+
 
 }

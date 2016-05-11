@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -36,12 +36,14 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Upload.Receiver;
 import com.vaadin.ui.Upload.SucceededEvent;
 import com.vaadin.ui.Upload.SucceededListener;
 
 import fr.amapj.common.LongUtils;
 import fr.amapj.model.engine.tools.TestTools;
+import fr.amapj.view.engine.popup.corepopup.CorePopup.ColorStyle;
 import fr.amapj.view.engine.popup.formpopup.OnSaveException;
 import fr.amapj.view.engine.popup.messagepopup.MessagePopup;
 import fr.amapj.view.engine.tools.TableItem;
@@ -87,18 +89,18 @@ abstract public class AbstractImporter<T extends TableItem> implements Receiver 
 			processFile();
 			if (errorMessage.size()==0)
 			{
-				MessagePopup popup = new MessagePopup("Chargement effectué", "Le chargement a été effectué");
+				MessagePopup popup = new MessagePopup("Chargement effectué", ColorStyle.GREEN,"Le chargement a été effectué");
 				MessagePopup.open(popup);
 			}
 			else
 			{
-				MessagePopup popup = new MessagePopup("Erreur lors du chargement", errorMessage);
+				MessagePopup popup = new MessagePopup("Erreur lors du chargement",errorMessage);
 				MessagePopup.open(popup);
 			}
 		}
 		catch (IOException e)
 		{
-			MessagePopup popup = new MessagePopup("Erreur lors du chargement", e.getMessage());
+			MessagePopup popup = new MessagePopup("Erreur lors du chargement", ColorStyle.RED , e.getMessage());
 			MessagePopup.open(popup);
 		}
 	}

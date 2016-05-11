@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -27,16 +27,15 @@ import com.vaadin.data.Item;
 import com.vaadin.server.WebBrowser;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnHeaderMode;
-import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ChameleonTheme;
 
 import fr.amapj.view.engine.grid.ErreurSaisieException;
 import fr.amapj.view.engine.grid.GridHeaderLine;
@@ -103,19 +102,21 @@ abstract public class PopupBooleanGrid extends CorePopup
 		}
 		
 		// Construction de la table de saisie 
-		table = new Table();
-		table.addStyleName("big");
+		table =  new Table();
+		table.addStyleName("no-vertical-lines");
+		table.addStyleName("no-horizontal-lines");
+		table.addStyleName("no-stripes");
 		
 		table.setColumnHeaderMode(ColumnHeaderMode.HIDDEN);
 		
 		// Colonne de gauche contenant un libellé
 		table.addContainerProperty(new Integer(-1), Label.class, null);
-		table.setColumnWidth(new Integer(-1), param.largeurCol-10);
+		table.setColumnWidth(new Integer(-1), param.largeurCol);
 		
 		if (param.leftPartLine2!=null)
 		{
 			table.addContainerProperty(new Integer(-2), Label.class, null);
-			table.setColumnWidth(new Integer(-2), param.largeurCol-10);
+			table.setColumnWidth(new Integer(-2), param.largeurCol);
 		}
 		
 		
@@ -124,7 +125,7 @@ abstract public class PopupBooleanGrid extends CorePopup
 		for (int i = 0; i < param.nbCol; i++)
 		{
 			table.addContainerProperty(new Integer(i), CheckBox.class, null);
-			table.setColumnWidth(new Integer(i), param.largeurCol-10);
+			table.setColumnWidth(new Integer(i), param.largeurCol);
 		}
 		
 		
@@ -150,36 +151,12 @@ abstract public class PopupBooleanGrid extends CorePopup
 	{		
 		if (errorInInitialCondition)
 		{
-			addButton("OK", new Button.ClickListener()
-			{
-				@Override
-				public void buttonClick(ClickEvent event)
-				{
-					close();
-				}
-			});
+			addButton("OK", e->	close());
 			return ;
 		}
 		
-		
-		saveButton = addDefaultButton(saveButtonTitle, new Button.ClickListener()
-		{
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				handleSauvegarder();
-			}
-		});
-				
-		
-		cancelButton = addButton(cancelButtonTitle, new Button.ClickListener()
-		{
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				handleAnnuler();
-			}
-		});
+		cancelButton = addButton(cancelButtonTitle, e->	handleAnnuler());
+		saveButton = addDefaultButton(saveButtonTitle, e-> handleSauvegarder());
 	}
 	
 

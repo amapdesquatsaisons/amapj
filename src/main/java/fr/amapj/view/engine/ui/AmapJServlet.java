@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -20,6 +20,8 @@
  */
  package fr.amapj.view.engine.ui;
 
+import javax.servlet.ServletException;
+
 import com.vaadin.server.DeploymentConfiguration;
 import com.vaadin.server.ServiceException;
 import com.vaadin.server.VaadinServlet;
@@ -38,6 +40,13 @@ public class AmapJServlet extends VaadinServlet
 		VaadinServletService servletService = new AmapJServletService(this, deploymentConfiguration);
 		servletService.init();
 		return servletService;
+	}
+	
+	@Override
+	protected void servletInitialized() throws ServletException 
+	{
+		super.servletInitialized();
+		getService().addSessionInitListener(new ValoThemeSessionInitListener());
 	}
 
 }

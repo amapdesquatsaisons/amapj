@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -20,91 +20,66 @@
  */
  package fr.amapj.view.views.appinstance;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
-import com.vaadin.data.Property;
-import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.data.util.filter.Like;
-import com.vaadin.event.FieldEvents.TextChangeEvent;
-import com.vaadin.event.FieldEvents.TextChangeListener;
-import com.vaadin.event.ItemClickEvent;
-import com.vaadin.event.ItemClickEvent.ItemClickListener;
-import com.vaadin.navigator.View;
-import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.ComponentContainer;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.Table;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
 
-import fr.amapj.common.AmapjRuntimeException;
-import fr.amapj.service.engine.appinitializer.AppInitializer;
 import fr.amapj.service.services.appinstance.AppInstanceDTO;
 import fr.amapj.service.services.appinstance.AppInstanceService;
+import fr.amapj.view.engine.listpart.ButtonType;
+import fr.amapj.view.engine.listpart.StandardListPart;
 import fr.amapj.view.engine.popup.suppressionpopup.PopupSuppressionListener;
 import fr.amapj.view.engine.popup.suppressionpopup.SuppressionPopup;
 import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
 import fr.amapj.view.engine.tools.DateTimeToStringConverter;
-import fr.amapj.view.engine.tools.DateToStringConverter;
-import fr.amapj.view.engine.tools.TableItem;
-import fr.amapj.view.engine.tools.TableTools;
-import fr.amapj.view.engine.ui.AppConfiguration;
 
 
 /**
  * Gestion des instances
  *
  */
-public class AppInstanceBasicForm extends VerticalLayout implements ComponentContainer , View ,  PopupSuppressionListener
+public class AppInstanceBasicForm extends StandardListPart<AppInstanceDTO> implements  PopupSuppressionListener
 {
-
-	private TextField searchField;
-
-	private Button newButton;
-	private Button deleteButton;
-	private Button startButton;
-	private Button connectButton;
-	private Button sqlButton;
-	private Button saveButton;
-
-
-	private String textFilter;
-
-	private BeanItemContainer<AppInstanceDTO> mcInfos;
-
-	private Table cdesTable;
 
 	public AppInstanceBasicForm()
 	{
+		super(AppInstanceDTO.class,true);
 	}
 	
 	
 	@Override
-	public void enter(ViewChangeEvent event)
+	protected String getTitle() 
 	{
-		setSizeFull();
-		buildMainArea();
+		return "Liste des instances";
+	}
+
+
+	@Override
+	protected void drawButton() 
+	{
+		addButton("Créer une nouvelle instance", ButtonType.ALWAYS, ()->handleAjouter());
+		addButton("Changer l'état", ButtonType.EDIT_MODE, ()->handleStart());
+		addButton("Se connecter", ButtonType.EDIT_MODE, ()->handleConnect());
+		addButton("Requete SQL", ButtonType.EDIT_MODE, ()->handleSql());
+		addButton("Sauvegarder", ButtonType.EDIT_MODE, ()->handleSave());
+		addButton("Supprimer", ButtonType.EDIT_MODE, ()->handleSupprimer());
+		addButton("Autre ...", ButtonType.ALWAYS, ()->handleAutre());
+
+		addSearchField("Rechercher par nom");
+		
 	}
 	
-
-	private void buildMainArea()
+	@Override
+	protected void addExtraComponent() 
 	{
-		// Lecture dans la base de données
-		mcInfos = new BeanItemContainer<AppInstanceDTO>(AppInstanceDTO.class);
-			
-		// Bind it to a component
-		cdesTable = new Table("", mcInfos);
-		cdesTable.setStyleName("big strong");
-		
-		
+		// Do nothing 
+	}
+
+
+
+	@Override
+	protected void drawTable() 
+	{
 		// Titre des colonnes
 		cdesTable.setVisibleColumns(new String[] { "nomInstance", "dbms","dateCreation" ,"state" ,"nbUtilisateurs" , "nbMails" });
 		
@@ -116,159 +91,26 @@ public class AppInstanceBasicForm extends VerticalLayout implements ComponentCon
 		cdesTable.setColumnHeader("nbMails","Mails envoyés");
 		
 		cdesTable.setConverter("dateCreation", new DateTimeToStringConverter());
+	}
 
-		cdesTable.setSelectable(true);
-		cdesTable.setMultiSelect(true);
-		cdesTable.setImmediate(true);
 
-		// Activation au desactivation des boutons delete et edit
-		cdesTable.addValueChangeListener(new Property.ValueChangeListener()
-		{
-			@Override
-			public void valueChange(ValueChangeEvent event)
-			{
-				Set s = (Set) event.getProperty().getValue();
-				setModificationsEnabled( s.size()>0);
-			}
 
-			private void setModificationsEnabled(boolean b)
-			{
-				enableButtonBar(b);
-			}
-		});
+	@Override
+	protected List<AppInstanceDTO> getLines() 
+	{
+		return new AppInstanceService().getAllInstances(true);
+	}
 
-		cdesTable.setSizeFull();
 
-		cdesTable.addItemClickListener(new ItemClickListener()
-		{
-			@Override
-			public void itemClick(ItemClickEvent event)
-			{
-				if (event.isDoubleClick())
-				{
-					cdesTable.select(event.getItemId());
-				}
-			}
-		});
-
-		HorizontalLayout toolbar = new HorizontalLayout();
-		
-		
-		Label title2 = new Label("Liste des instances");
-		title2.setSizeUndefined();
-		title2.addStyleName("h1");	
-		
-		newButton = new Button("Créer une nouvelle instance");
-		newButton.addClickListener(new Button.ClickListener()
-		{
-
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				handleAjouter();
-			}
-		});
-		
-		startButton = new Button("Changer l'état");
-		startButton.addClickListener(new Button.ClickListener()
-		{
-
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				handleStart();
-
-			}
-		});	
-		
-		connectButton = new Button("Se connecter ...");
-		connectButton.addClickListener(new Button.ClickListener()
-		{
-
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				handleConnect();
-
-			}
-		});	
-		
-		sqlButton = new Button("Requete SQL ...");
-		sqlButton.addClickListener(new Button.ClickListener()
-		{
-
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				handleSql();
-
-			}
-		});	
-		
-		saveButton = new Button("Sauvegarder ...");
-		saveButton.addClickListener(new Button.ClickListener()
-		{
-
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				handleSave();
-
-			}
-		});	
-		
-
-		deleteButton = new Button("Supprimer");
-		deleteButton.addClickListener(new Button.ClickListener()
-		{
-
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				handleSupprimer();
-
-			}
-		});
-		
-
-		searchField = new TextField();
-		searchField.setInputPrompt("Rechercher par nom");
-		searchField.addTextChangeListener(new TextChangeListener()
-		{
-
-			@Override
-			public void textChange(TextChangeEvent event)
-			{
-				textFilter = event.getText();
-				updateFilters();
-			}
-		});
-
-		
-		toolbar.addComponent(newButton);
-		toolbar.addComponent(startButton);
-		toolbar.addComponent(connectButton);
-		toolbar.addComponent(sqlButton);
-		toolbar.addComponent(saveButton);
-		toolbar.addComponent(deleteButton);
-		
-		toolbar.addComponent(searchField);
-		toolbar.setWidth("100%");
-		toolbar.setExpandRatio(searchField, 1);
-		toolbar.setComponentAlignment(searchField, Alignment.TOP_RIGHT);
-
-		
+	@Override
+	protected String[] getSortInfos() 
+	{
+		return new String[] { "nomInstance" };
+	}
 	
-		addComponent(title2);
-		addComponent(toolbar);
-		addComponent(cdesTable);
-		setExpandRatio(cdesTable, 1);
-		setSizeFull();
-		setMargin(true);
-		setSpacing(true);
-		
-		refreshTable();
-
+	protected String[] getSearchInfos()
+	{
+		return new String[] { "nomInstance" };
 	}
 	
 	
@@ -278,15 +120,20 @@ public class AppInstanceBasicForm extends VerticalLayout implements ComponentCon
 		AppInstanceEditorPart.open(new AppInstanceEditorPart(), this);
 	}
 	
+	private void handleAutre()
+	{
+		ChoixAppInstance.open(new ChoixAppInstance(), this);
+	}
+	
 	private void handleStart()
 	{
-		List<AppInstanceDTO> dtos = getSelected();
+		List<AppInstanceDTO> dtos = getSelectedLines();
 		PopupEtatAppInstance.open(new PopupEtatAppInstance(dtos), this);
 	}
 	
 	private void handleConnect()
 	{
-		List<AppInstanceDTO> dtos = getSelected();
+		List<AppInstanceDTO> dtos = getSelectedLines();
 		if (dtos.size()==1)
 		{
 			AppInstanceDTO dto = dtos.get(0);
@@ -301,32 +148,21 @@ public class AppInstanceBasicForm extends VerticalLayout implements ComponentCon
 	
 	private void handleSql()
 	{
-		List<AppInstanceDTO> dtos = getSelected();
+		List<AppInstanceDTO> dtos = getSelectedLines();
 		PopupSqlAppInstance.open(new PopupSqlAppInstance(dtos), this);
 	}
 	
 	private void handleSave()
 	{
-		List<AppInstanceDTO> dtos = getSelected();
+		List<AppInstanceDTO> dtos = getSelectedLines();
 		PopupSaveAppInstance.open(new PopupSaveAppInstance(dtos), this);
 	}
 
-	/**
-	 * Retourne la liste des lignes selectionnées
-	 * @return
-	 */
-	private List<AppInstanceDTO> getSelected()
-	{
-		List<AppInstanceDTO> res = new ArrayList<AppInstanceDTO>();
-		Set s = (Set) cdesTable.getValue();
-		res.addAll(s);
-		return res;
-	}
 
 
 	protected void handleSupprimer()
 	{
-		List<AppInstanceDTO> dtos = getSelected();
+		List<AppInstanceDTO> dtos = getSelectedLines();
 		if (dtos.size()!=1)
 		{
 			Notification.show("Vous devez selectionner une et une seule instance");
@@ -346,54 +182,5 @@ public class AppInstanceBasicForm extends VerticalLayout implements ComponentCon
 		new AppInstanceService().delete(idItemToSuppress);
 	}
 
-
-
-
-	private void updateFilters()
-	{
-		mcInfos.removeAllContainerFilters();
-		if (textFilter != null && !textFilter.equals(""))
-		{
-			mcInfos.addContainerFilter(new Like("nom", textFilter + "%", false));
-		}
-	}
-	
-	/**
-	 * Permet de rafraichir la table
-	 */
-	public void refreshTable()
-	{
-		String[] sortColumns = new String[] { "nomInstance"  };
-		boolean[] sortAscending = new boolean[] { true } ;
-		
-		List<AppInstanceDTO> res = new AppInstanceService().getAllInstances(true);
-		boolean enabled = TableTools.updateTableMultiselect(cdesTable, res, sortColumns, sortAscending);
-		
-		enableButtonBar(enabled);		
-	}
-	
-	
-	
-
-	
-	
-	@Override
-	public void onPopupClose()
-	{
-		refreshTable();
-		
-	}
-	
-	
-	private void enableButtonBar(boolean enable)
-	{
-		deleteButton.setEnabled(enable);
-		startButton.setEnabled(enable);
-		connectButton.setEnabled(enable);
-		sqlButton.setEnabled(enable);
-		saveButton.setEnabled(enable);
-	}
-	
-	
 	
 }

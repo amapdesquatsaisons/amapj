@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -46,7 +46,7 @@ public class UtilisateurListPart extends StandardListPart<UtilisateurDTO> implem
 
 	public UtilisateurListPart()
 	{
-		super(UtilisateurDTO.class);
+		super(UtilisateurDTO.class,false);
 	}
 	
 	
@@ -111,7 +111,7 @@ public class UtilisateurListPart extends StandardListPart<UtilisateurDTO> implem
 	
 	private void handleChangerPassword()
 	{
-		UtilisateurDTO dto = (UtilisateurDTO) cdesTable.getValue();
+		UtilisateurDTO dto = getSelectedLine();
 		FormPopup.open(new PopupSaisiePassword(dto.id),this);		
 	}
 	
@@ -119,7 +119,7 @@ public class UtilisateurListPart extends StandardListPart<UtilisateurDTO> implem
 
 	private void handleChangeState()
 	{
-		UtilisateurDTO dto = (UtilisateurDTO) cdesTable.getValue();
+		UtilisateurDTO dto = getSelectedLine();
 		FormPopup.open(new PopupSaisieEtatUtilisateur(dto),this);
 	}
 	
@@ -137,13 +137,13 @@ public class UtilisateurListPart extends StandardListPart<UtilisateurDTO> implem
 
 	protected void handleEditer()
 	{
-		UtilisateurDTO dto = (UtilisateurDTO) cdesTable.getValue();
+		UtilisateurDTO dto = getSelectedLine();
 		ModificationUtilisateurEditorPart.open(new ModificationUtilisateurEditorPart(dto), this);
 	}
 
 	protected void handleSupprimer()
 	{
-		UtilisateurDTO dto = (UtilisateurDTO) cdesTable.getValue();
+		UtilisateurDTO dto = getSelectedLine();
 		String text = "Etes vous sûr de vouloir supprimer l'utilisateur "+dto.nom+" "+dto.prenom+" ?";
 		SuppressionPopup confirmPopup = new SuppressionPopup(text,dto.id);
 		SuppressionPopup.open(confirmPopup, this);		

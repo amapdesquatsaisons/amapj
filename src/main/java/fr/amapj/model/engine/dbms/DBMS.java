@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -20,7 +20,11 @@
  */
  package fr.amapj.model.engine.dbms;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.List;
 
 import fr.amapj.service.services.appinstance.AppInstanceDTO;
 import fr.amapj.service.services.appinstance.AppState;
@@ -72,10 +76,16 @@ public interface DBMS
 	public void createOneBase(AppInstanceDTO appInstanceDTO);
 	
 	/**
-	 * Permet l'execution d'une requete SQL d'update ou de modification du schéma sur la base indiquée
+	 * Permet l'execution d'une requete SQL d'update ou d'insert ou de modification du schéma sur la base indiquée
+	 * Retourne le nombre de lignes modifiées
 	 */
-	public void executeSqlCommand(String sqlCommand,AppInstanceDTO dto) throws SQLException;
-
+	public int executeUpdateSqlCommand(String sqlCommand,AppInstanceDTO dto) throws SQLException;
+	
+	/**
+	 * Permet l'execution d'une requete SQL de requete (SELECT ...)
+	 * Retourne le resultat de la requete
+	 */
+	public List<List<String>> executeQuerySqlCommand(String sqlCommand,AppInstanceDTO dto) throws SQLException;
 
 
 }

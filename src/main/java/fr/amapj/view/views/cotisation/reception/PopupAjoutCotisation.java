@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -57,8 +57,7 @@ public class PopupAjoutCotisation extends WizardFormPopup
 		this.dto = new PeriodeCotisationUtilisateurDTO();
 		dto.idPeriodeCotisation = idPeriodeCotisation;
 		
-		popupWidth = "40%";
-		popupHeight = "40%";
+		setWidth(40);
 		popupTitle = "Ajout d'une nouvelle cotisation";
 		
 		item = new BeanItem<PeriodeCotisationUtilisateurDTO>(dto);

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -96,6 +96,7 @@ abstract public class WizardFormPopup extends CorePopup
 	{
 		//
 		this.contentLayout = contentLayout;
+		contentLayout.addStyleName("wizard-popup");
 		EnumSet enums = EnumSet.allOf(getEnumClass());
 		enumArray = enums.toArray();
 		
@@ -110,7 +111,8 @@ abstract public class WizardFormPopup extends CorePopup
 		
 		
 		// Mise en place du titre
-		hTitre = new Label("",ContentMode.HTML);
+		hTitre = new Label("");
+		hTitre.addStyleName("wizard-popup-etape");
 		contentLayout.addComponent(hTitre);
 		
 		//
@@ -428,8 +430,7 @@ abstract public class WizardFormPopup extends CorePopup
 	
 	protected void setStepTitle(String message)
 	{
-		hTitre.setValue("<h2>Etape "+(pageNumber+1)+" : "+message+"</h2>");
-		hTitre.setStyleName(ChameleonTheme.LABEL_BIG);
+		hTitre.setValue("Etape "+(pageNumber+1)+" : "+message);
 	}
 	
 	/**

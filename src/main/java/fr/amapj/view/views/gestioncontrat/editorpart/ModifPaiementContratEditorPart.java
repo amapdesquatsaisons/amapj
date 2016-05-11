@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -21,6 +21,7 @@
  package fr.amapj.view.views.gestioncontrat.editorpart;
 
 import com.vaadin.data.util.BeanItem;
+import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.ui.PopupDateField;
 import com.vaadin.ui.TextField;
 
@@ -53,8 +54,7 @@ public class ModifPaiementContratEditorPart extends WizardFormPopup
 	 */
 	public ModifPaiementContratEditorPart(Long id)
 	{
-		popupWidth = "80%";
-		popupHeight = "60%";
+		setWidth(80);
 		popupTitle = "Modification des conditions de paiement d'un contrat";
 		
 		// Chargement de l'objet  à modifier

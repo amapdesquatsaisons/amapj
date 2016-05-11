@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -28,20 +28,18 @@ import org.apache.logging.log4j.Logger;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.server.DefaultErrorHandler;
+import com.vaadin.server.Responsive;
 import com.vaadin.server.VaadinRequest;
-import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.UI;
+import com.vaadin.ui.themes.ValoTheme;
 
-import fr.amapj.common.DebugUtil;
 import fr.amapj.model.engine.transaction.DataBaseInfo;
 import fr.amapj.model.engine.transaction.DbUtil;
 import fr.amapj.service.services.appinstance.AppState;
 import fr.amapj.service.services.authentification.PasswordManager;
 import fr.amapj.service.services.session.SessionManager;
-import fr.amapj.service.services.session.SessionParameters;
 import fr.amapj.service.services.session.SessionManager.BroadcastListener;
 import fr.amapj.view.engine.menu.MenuPart;
 import fr.amapj.view.engine.popup.errorpopup.ErrorPopup;
@@ -62,7 +60,7 @@ public class AmapUI extends UI implements BroadcastListener
 	// Layout top level de l'application
 	// Contient soit l'écran de login, soit un écran composé d'un menu et d'une
 	// zone de travail
-	CssLayout root = new CssLayout();
+	//CssLayout root = new CssLayout();
 
 	// Gestion de la page application (écran composé d'un menu et d'une zone de
 	// travail)
@@ -72,6 +70,10 @@ public class AmapUI extends UI implements BroadcastListener
 	private LoginPart loginPart = new LoginPart();
 
 	private final static Logger logger = LogManager.getLogger();
+
+	//
+	private ValoMenuLayout root = new ValoMenuLayout();	
+	
 
 	@Override
 	protected void init(VaadinRequest request)
@@ -113,17 +115,6 @@ public class AmapUI extends UI implements BroadcastListener
 			invokeTestClass(testClass, request);
 			return;
 		}
-
-		// Mode normal
-		setContent(root);
-		root.setSizeFull();
-
-		// Unfortunate to use an actual widget here, but since CSS generated
-		// elements can't be transitioned yet, we must
-		Label bg = new Label();
-		bg.setSizeUndefined();
-		root.addComponent(bg);
-
 		
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
@@ -135,7 +126,15 @@ public class AmapUI extends UI implements BroadcastListener
 			saisieNewPassword(resetPasswordSalt);
 		}
 
-		buildLoginView(false, username,password,sudo);
+		// Affichage graphique 
+		Responsive.makeResponsive(this);
+		setContent(root);
+		root.setSizeFull();
+		addStyleName(ValoTheme.UI_WITH_MENU);
+
+		
+		// Construction de la page de login
+		buildLoginView(username,password,sudo);
 
 	}
 	
@@ -214,15 +213,15 @@ public class AmapUI extends UI implements BroadcastListener
 		});
 	}
 
-	public void buildLoginView(boolean exit, String username,String password,String sudo)
+	public void buildLoginView(String username,String password,String sudo)
 	{
 
-		loginPart.buildLoginView(exit, root, this, username,password,sudo);
+		loginPart.buildLoginView(root, this, username,password,sudo);
 	}
 
 	public void buildMainView()
 	{
-		menuPart.buildMainView(this, loginPart.loginLayout, root);
+		menuPart.buildMainView(this, root);
 	}
 
 	/*
@@ -268,5 +267,12 @@ public class AmapUI extends UI implements BroadcastListener
 			return ;
 		}
 	}
+
+	public ValoMenuLayout getRoot()
+	{
+		return root;
+	}
+	
+	
 
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -82,12 +82,12 @@ public class ContratSelectorPart
 		HorizontalLayout toolbar1 = new HorizontalLayout();
 
 		Label pLabel = new Label("Producteur");
-		pLabel.addStyleName(ChameleonTheme.LABEL_BIG);
+		pLabel.addStyleName("stdlistpart-text-comboxbox");
 		pLabel.setSizeUndefined();
 
 		producteurBox = new Searcher(SearcherList.PRODUCTEUR,null,allowedProducteurs);
 		producteurBox.setImmediate(true);
-		producteurBox.setSizeUndefined();
+		
 
 		
 		producteurBox.addValueChangeListener(new Property.ValueChangeListener()
@@ -101,7 +101,7 @@ public class ContratSelectorPart
 		
 
 		Label cLabel = new Label("Contrat");
-		cLabel.addStyleName(ChameleonTheme.LABEL_BIG);
+		cLabel.addStyleName("stdlistpart-text-comboxbox");
 		cLabel.setSizeUndefined();
 
 		contratContainer = new BeanItemContainer(ModeleContrat.class);
@@ -109,7 +109,9 @@ public class ContratSelectorPart
 		contratBox.setItemCaptionMode(ItemCaptionMode.PROPERTY);
 		contratBox.setItemCaptionPropertyId("nom");
 		contratBox.setConverter(new SearcherConverterIdentifiable(contratContainer));
+		
 		contratBox.setImmediate(true);
+		contratBox.setWidth("300px");
 		
 
 		contratBox.addValueChangeListener(new Property.ValueChangeListener()

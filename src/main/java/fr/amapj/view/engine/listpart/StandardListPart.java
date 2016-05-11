@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -23,6 +23,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Property;
@@ -34,7 +35,6 @@ import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
-import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -44,9 +44,10 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
 
+import fr.amapj.common.AmapjRuntimeException;
 import fr.amapj.view.engine.popup.PopupListener;
+import fr.amapj.view.engine.template.BackOfficeView;
 import fr.amapj.view.engine.tools.TableItem;
 import fr.amapj.view.engine.tools.TableTools;
 
@@ -56,7 +57,7 @@ import fr.amapj.view.engine.tools.TableTools;
  *
  */
 @SuppressWarnings("serial")
-abstract public class StandardListPart<T extends TableItem> extends VerticalLayout implements ComponentContainer , View ,  PopupListener
+abstract public class StandardListPart<T extends TableItem> extends BackOfficeView implements ComponentContainer ,  PopupListener
 {
 
 	private TextField searchField;
@@ -70,10 +71,14 @@ abstract public class StandardListPart<T extends TableItem> extends VerticalLayo
 	protected Table cdesTable;
 	
 	private Class<T> beanClazz;
+	
+	// Par defaut, une seule ligne est selectionnable à la fois 
+	private boolean multiSelect;
 
-	public StandardListPart(Class<T> beanClazz)
+	public StandardListPart(Class<T> beanClazz,boolean multiSelect)
 	{
 		this.beanClazz = beanClazz;
+		this.multiSelect = multiSelect;
 	}
 	
 	abstract protected String getTitle();
@@ -92,9 +97,8 @@ abstract public class StandardListPart<T extends TableItem> extends VerticalLayo
 	
 	
 	@Override
-	public void enter(ViewChangeEvent event)
+	public void enterIn(ViewChangeEvent event)
 	{
-		setSizeFull();
 		buildMainArea();
 	}
 	
@@ -144,22 +148,30 @@ abstract public class StandardListPart<T extends TableItem> extends VerticalLayo
 		mcInfos = new BeanItemContainer<T>(beanClazz);
 			
 		// Bind it to a component
-		cdesTable = new Table("", mcInfos);
-		cdesTable.setStyleName("big strong");
+		cdesTable = createTable(mcInfos);
 		
 		drawTable();
 		
 
 		cdesTable.setSelectable(true);
+		cdesTable.setMultiSelect(multiSelect);
 		cdesTable.setImmediate(true);
 
-		// Activation au desactivation des boutons delete et edit
+		// Activation ou desactivation des boutons delete et edit
 		cdesTable.addValueChangeListener(new Property.ValueChangeListener()
 		{
 			@Override
 			public void valueChange(ValueChangeEvent event)
 			{
-				buttonBarEditMode(event.getProperty().getValue() != null);	
+				if (multiSelect)
+				{
+					Set s = (Set) event.getProperty().getValue();
+					buttonBarEditMode( s.size()>0);
+				}
+				else
+				{
+					buttonBarEditMode(event.getProperty().getValue() != null);
+				}
 			}
 		});
 
@@ -178,10 +190,11 @@ abstract public class StandardListPart<T extends TableItem> extends VerticalLayo
 		});
 
 		HorizontalLayout toolbar = new HorizontalLayout();
+		toolbar.addStyleName("stdlistpart-hlayout-button");
 		
-		Label title2 = new Label("Liste des utilisateurs");
+		Label title2 = new Label(getTitle());
 		title2.setSizeUndefined();
-		title2.addStyleName("h1");	
+		title2.addStyleName("stdlistpart-text-title");	
 		
 		drawButton();
 		
@@ -205,9 +218,6 @@ abstract public class StandardListPart<T extends TableItem> extends VerticalLayo
 		addExtraComponent();
 		addComponent(cdesTable);
 		setExpandRatio(cdesTable, 1);
-		setSizeFull();
-		setMargin(true);
-		setSpacing(true);
 		
 		refreshTable();
 
@@ -246,7 +256,16 @@ abstract public class StandardListPart<T extends TableItem> extends VerticalLayo
 		Arrays.fill(sortAscending,true);
 		
 		List<T> res = getLines();
-		boolean enabled = TableTools.updateTable(cdesTable, res, sortColumns, sortAscending);
+		boolean enabled;
+		
+		if (multiSelect==true)
+		{
+			enabled = TableTools.updateTableMultiselect(cdesTable, res, sortColumns, sortAscending);
+		}
+		else
+		{
+			enabled = TableTools.updateTable(cdesTable, res, sortColumns, sortAscending);
+		}
 		
 		buttonBarEditMode(enabled);		
 	}
@@ -288,6 +307,41 @@ abstract public class StandardListPart<T extends TableItem> extends VerticalLayo
 			}
 		}		
 	}
+	
+	
+	/**
+	 * Retourne la liste des lignes selectionnées
+	 * @return
+	 */
+	protected List<T> getSelectedLines()
+	{
+		if (multiSelect==false)
+		{
+			throw new AmapjRuntimeException("Vous ne pouvez pas utiliser cette methode en mono selection ");
+		}
+		
+		List<T> res = new ArrayList<T>();
+		Set s = (Set) cdesTable.getValue();
+		res.addAll(s);
+		return res;
+	}
+	
+	
+	/**
+	 * Retourne la ligne selectionnée
+	 * @return
+	 */
+	protected T getSelectedLine()
+	{
+		if (multiSelect==true)
+		{
+			throw new AmapjRuntimeException("Vous ne pouvez pas utiliser cette methode en multi selection ");
+		}
+		
+		T dto = (T) cdesTable.getValue();
+		return dto;
+	}
+	
 	
 	
 	

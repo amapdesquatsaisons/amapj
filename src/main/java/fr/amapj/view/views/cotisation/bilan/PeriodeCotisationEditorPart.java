@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -52,8 +52,7 @@ public class PeriodeCotisationEditorPart extends WizardFormPopup
 	{
 		this.create = create;
 		
-		popupWidth = "80%";
-		popupHeight = "60%";
+		setWidth(80);
 	
 		
 		if (create)

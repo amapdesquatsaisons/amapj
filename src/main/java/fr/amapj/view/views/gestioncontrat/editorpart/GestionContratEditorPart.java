@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -80,8 +80,7 @@ public class GestionContratEditorPart extends WizardFormPopup
 	{
 		this.allowedProducteurs = allowedProducteurs;
 		
-		popupWidth = "80%";
-		popupHeight = "60%";
+		setWidth(80);
 		popupTitle = "Création d'un contrat";
 
 		// Chargement de l'objet à créer
@@ -139,6 +138,7 @@ public class GestionContratEditorPart extends WizardFormPopup
 		
 		// Liste des validators
 		IValidator len_1_100 = new StringLengthValidator(1, 100);
+		IValidator len_1_255 = new StringLengthValidator(1, 255);
 		IValidator uniq = new UniqueInDatabaseValidator(ModeleContrat.class,"nom",null);
 		IValidator notNull = new NotNullValidator();
 		IValidator prodValidator = new ProducteurAvecProduitValidator();
@@ -150,7 +150,7 @@ public class GestionContratEditorPart extends WizardFormPopup
 
 
 		// Champ 2
-		addTextField("Description du contrat", "description",len_1_100);
+		addTextField("Description du contrat", "description",len_1_255);
 
 		// Champ 3
 		

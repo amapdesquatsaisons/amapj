@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.vaadin.data.util.BeanItem;
+import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.TextArea;
 
@@ -65,8 +66,7 @@ public class ProducteurEditorPart extends WizardFormPopup
 	{
 		this.create = create;
 		
-		popupWidth = "80%";
-		popupHeight = "60%";
+		setWidth(80);
 		
 		if (create)
 		{

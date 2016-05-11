@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -21,6 +21,7 @@
  package fr.amapj.view.views.utilisateur;
 
 import com.vaadin.data.util.BeanItem;
+import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.TextArea;
 
@@ -57,10 +58,10 @@ public class PopupEnvoiPasswordMasse extends WizardFormPopup
 	 */
 	public PopupEnvoiPasswordMasse()
 	{
-		popupWidth = "80%";
-		popupHeight = "60%";
+		setWidth(80);
 		popupTitle = "Envoi des mots de passe en masse";
 		saveButtonTitle = "Quitter";
+
 
 		// Chargement de l'objet à créer
 		envoiMail = new UtilisateurService().getEnvoiMailDTO();

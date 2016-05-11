@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -58,6 +58,7 @@ import fr.amapj.view.engine.popup.okcancelpopup.OKCancelPopup;
 import fr.amapj.view.engine.popup.suppressionpopup.PopupSuppressionListener;
 import fr.amapj.view.engine.popup.suppressionpopup.SuppressionPopup;
 import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
+import fr.amapj.view.engine.template.BackOfficeView;
 import fr.amapj.view.engine.tools.DateTimeToStringConverter;
 import fr.amapj.view.engine.tools.TableTools;
 import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
@@ -74,7 +75,7 @@ import fr.amapj.view.views.saisiecontrat.SaisieContrat.ModeSaisie;
  * 
  *
  */
-public class GestionContratSignesListPart extends VerticalLayout implements ComponentContainer , View ,  PopupSuppressionListener , IContratSelectorPart
+public class GestionContratSignesListPart extends BackOfficeView implements ComponentContainer ,   PopupSuppressionListener , IContratSelectorPart
 {
 	
 	private TextField searchField;
@@ -110,7 +111,7 @@ public class GestionContratSignesListPart extends VerticalLayout implements Comp
 	
 	
 	@Override
-	public void enter(ViewChangeEvent event)
+	public void enterIn(ViewChangeEvent event)
 	{
 		// Détermination du status de la page
 		status = Status.CHEQUE;
@@ -130,7 +131,7 @@ public class GestionContratSignesListPart extends VerticalLayout implements Comp
 		mcInfos = new BeanItemContainer<ContratSigneDTO>(ContratSigneDTO.class);
 			
 		// Bind it to a component
-		cdesTable = new Table("", mcInfos);
+		cdesTable = createTable(mcInfos);
 		
 		// Titre des colonnes
 		if (status==Status.STANDARD)
@@ -211,14 +212,16 @@ public class GestionContratSignesListPart extends VerticalLayout implements Comp
 		
 		Label title2 = new Label(str);
 		title2.setSizeUndefined();
-		title2.addStyleName("h1");
+		title2.addStyleName("stdlistpart-text-title");
 			
 		// Partie choix du contrat
 		contratSelectorPart = new ContratSelectorPart(this);
 		HorizontalLayout toolbar1 = contratSelectorPart.getChoixContratComponent();
+		toolbar1.addStyleName("stdlistpart-hlayout-contratselector");
 		
 		// Partie bouton
 		HorizontalLayout toolbar2 = new HorizontalLayout();
+		toolbar2.addStyleName("stdlistpart-hlayout-button");
 		
 		
 		newButton = new Button("Ajouter un contrat signé");
@@ -232,7 +235,7 @@ public class GestionContratSignesListPart extends VerticalLayout implements Comp
 			}
 		});
 		
-		voirButton = new Button("Visualiser un contrat signé");
+		voirButton = new Button("Visualiser");
 		voirButton.addClickListener(new Button.ClickListener()
 		{
 
@@ -245,7 +248,7 @@ public class GestionContratSignesListPart extends VerticalLayout implements Comp
 		
 		
 		
-		editButton = new Button("Modifier les quantités d'un contrat signé");
+		editButton = new Button("Modifier les quantités");
 		editButton.addClickListener(new Button.ClickListener()
 		{
 
@@ -303,7 +306,7 @@ public class GestionContratSignesListPart extends VerticalLayout implements Comp
 		
 	
 
-		deleteButton = new Button("Supprimer un contrat signé");
+		deleteButton = new Button("Supprimer");
 		deleteButton.addClickListener(new Button.ClickListener()
 		{
 
@@ -419,7 +422,7 @@ public class GestionContratSignesListPart extends VerticalLayout implements Comp
 	{
 		ContratSigneDTO c = (ContratSigneDTO) cdesTable.getValue();
 		
-		String message = "<h2> Modification des chèques de "+c.prenomUtilisateur+" "+c.nomUtilisateur+"</h2>";
+		String message = "Modification des chèques de "+c.prenomUtilisateur+" "+c.nomUtilisateur;
 	
 		ContratDTO contratDTO = new MesContratsService().loadContrat(c.idModeleContrat,c.idContrat);
 		SaisieContrat.saisieContrat(contratDTO,c.idUtilisateur,message,ModeSaisie.CHEQUE_SEUL,this);
@@ -438,7 +441,7 @@ public class GestionContratSignesListPart extends VerticalLayout implements Comp
 	{
 		ContratSigneDTO c = (ContratSigneDTO) cdesTable.getValue();
 		
-		String message = "<h2> Visualisation du contrat de "+c.prenomUtilisateur+" "+c.nomUtilisateur+"</h2>";
+		String message = "Visualisation du contrat de "+c.prenomUtilisateur+" "+c.nomUtilisateur;
 	
 		ContratDTO contratDTO = new MesContratsService().loadContrat(c.idModeleContrat,c.idContrat);
 		SaisieContrat.saisieContrat(contratDTO,c.idUtilisateur,message,ModeSaisie.READ_ONLY,this);
@@ -450,7 +453,7 @@ public class GestionContratSignesListPart extends VerticalLayout implements Comp
 	{
 		ContratSigneDTO c = (ContratSigneDTO) cdesTable.getValue();
 		
-		String message = "<h1> !!!!! Contrat de "+c.prenomUtilisateur+" "+c.nomUtilisateur+" !!!</h1>";
+		String message = "Contrat de "+c.prenomUtilisateur+" "+c.nomUtilisateur;
 		
 		ContratDTO contratDTO = new MesContratsService().loadContrat(c.idModeleContrat,c.idContrat);
 		SaisieContrat.saisieContrat(contratDTO,c.idUtilisateur,message,ModeSaisie.QTE_SEUL,this);
@@ -486,7 +489,7 @@ public class GestionContratSignesListPart extends VerticalLayout implements Comp
 				if (userId!=null)
 				{
 					Utilisateur u = (Utilisateur) new DbService().getOneElement(Utilisateur.class, userId);
-					String message = "<h1> !!!!! Contrat de "+u.getPrenom()+" "+u.getNom()+" !!!</h1>";
+					String message = "Contrat de "+u.getPrenom()+" "+u.getNom();
 					
 					ContratDTO contratDTO = new MesContratsService().loadContrat(idModeleContrat,null);
 					SaisieContrat.saisieContrat(contratDTO,userId,message,ModeSaisie.STANDARD,listenerFinal);

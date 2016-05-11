@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -21,6 +21,7 @@
  package fr.amapj.view.views.saisiepermanence;
 
 import com.vaadin.data.util.ObjectProperty;
+import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.RichTextArea;
 import com.vaadin.ui.TextArea;
@@ -50,8 +51,7 @@ public class PopupRappelPermanence extends WizardFormPopup
 	 */
 	public PopupRappelPermanence()
 	{
-		popupWidth = "80%";
-		popupHeight = "60%";
+		setWidth(80);
 		popupTitle = "Envoi d'un mail de rappel des permanences";
 
 		// 

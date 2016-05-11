@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2015 AmapJ Team
+ *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -22,7 +22,6 @@
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -34,11 +33,8 @@ import javax.persistence.criteria.Root;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.poi.ss.usermodel.DateUtil;
 
-import fr.amapj.common.BigDecimalUtils;
 import fr.amapj.common.DateUtils;
-import fr.amapj.common.LongUtils;
 import fr.amapj.common.SQLUtils;
 import fr.amapj.model.engine.transaction.DbRead;
 import fr.amapj.model.engine.transaction.DbWrite;
@@ -50,6 +46,7 @@ import fr.amapj.model.models.contrat.modele.ModeleContratDate;
 import fr.amapj.model.models.contrat.modele.ModeleContratDatePaiement;
 import fr.amapj.model.models.contrat.modele.ModeleContratExclude;
 import fr.amapj.model.models.contrat.modele.ModeleContratProduit;
+import fr.amapj.model.models.contrat.reel.ContratCell;
 import fr.amapj.model.models.fichierbase.Producteur;
 import fr.amapj.model.models.fichierbase.Produit;
 import fr.amapj.model.models.fichierbase.Utilisateur;
@@ -1057,6 +1054,52 @@ public class GestionContratService
 		return SQLUtils.toInt(q.getSingleResult());
 	}
 	
+	
+	/**
+	 * Permet d'obtenir le detail d'un contrat pour l'afficher dans la livraison d'un producteur
+	 * 
+	 * @return
+	 */
+	@DbRead
+	public String getDetailContrat(Long modeleContratDateId)
+	{
+		String msg = "";
+		Long user = 0L;
+		EntityManager em = TransactionHelper.getEm();
+				
+		ModeleContratDate mcDate = em.find(ModeleContratDate.class, modeleContratDateId);
+		
+		Query q = em.createQuery("select c from ContratCell c WHERE " +
+				"c.modeleContratDate=:mcDate "+
+				"order by c.contrat.utilisateur.nom , c.contrat.utilisateur.prenom , c.modeleContratProduit.indx");
+		q.setParameter("mcDate", mcDate);
+		
+		List<ContratCell> cells = q.getResultList();
+		for (ContratCell cell : cells)
+		{
+			int qte =  cell.getQte();
+			Utilisateur u = cell.getContrat().getUtilisateur();
+			Produit produit = cell.getModeleContratProduit().getProduit();
+			
+			if (u.getId().equals(user)==false)
+			{
+				user = u.getId();
+				if (msg.length()!=0)
+				{
+					msg +="</ul>";
+				}
+				msg += "<b>"+u.getNom()+" "+u.getPrenom()+"</b><ul>";
+			}
+			msg += "<li>"+qte+" "+produit.getNom()+" , "+produit.getConditionnement()+"</li>";
+		}
+		
+		if (msg.length()!=0)
+		{
+			msg +="</ul>";
+		}
+		
+		return msg;
+	}
 	
 	
 	
