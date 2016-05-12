@@ -45,6 +45,14 @@ public class TransactionHelper
 	public static EntityManager getEm()
 	{
 		TransactionInfo transactionInfo = mainInstance.threadLocal.get();
+
+		if (transactionInfo==null)
+		{
+			transactionInfo = new TransactionInfo();
+			transactionInfo.em = DbUtil.createEntityManager();
+			mainInstance.threadLocal.set(transactionInfo);
+		}		
+		
 		return transactionInfo.em;
 	}
 	
