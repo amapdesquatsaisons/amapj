@@ -1,4 +1,7 @@
-docker.image('maven:3.3.3-jdk-8').inside {
-  git 'https://github.com/amapdesquatsaisons/amapj.git'
-  sh 'mvn -B clean install'
-}
+ node {
+  stage 'Build and Test'
+  env.PATH = "${tool 'Maven 3'}/bin:${env.PATH}"
+  checkout scm
+  sh 'mvn clean package'
+ }
+ 
