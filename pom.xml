@@ -258,4 +258,11 @@
 			</build>
 		</profile>
 	</profiles>
+	<repositories>
+		<repository>
+		  <id>arcann.net</id>
+		  <name>arcann.net</name>
+		  <url>http://pic.arcann.net/nexus/content/groups/public/</url>
+		</repository>
+	</repositories>
 </project>
